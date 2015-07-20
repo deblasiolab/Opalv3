@@ -1,0 +1,24 @@
+/Aligner.java/1.9/Tue Sep 29 01:11:14 2009//
+/Alignment.java/1.8/Tue Sep 29 01:11:14 2009//
+/CompressedAlignmentGraph.java/1.1/Tue Oct 28 06:20:22 2008//
+/ConsistencyAligner.java/1.8/Tue Sep 29 01:11:14 2009//
+/ConsistencyHeuristicAligner.java/1.8/Tue Sep 29 01:11:14 2009//
+/ConsistencyModifiers_AllPairs.java/1.1/Tue Oct 28 06:20:22 2008//
+/ConsistencyModifiers_Pair.java/1.1/Tue Oct 28 06:20:21 2008//
+/ExactCountAligner.java/1.3/Thu Dec 11 23:18:30 2008//
+/ExactCountAligner_Time.java/1.7/Tue Sep 29 01:11:14 2009//
+/PairAligner.java/1.6/Tue Sep 29 01:11:14 2009//
+/PairAligner_SplitGamma.java/1.6/Tue Sep 29 01:11:14 2009//
+/PairSuboptimalityMatrices.java/1.7/Thu Dec 11 23:18:30 2008//
+/PairSuboptimalityMatricesModified.java/1.6/Thu Dec 11 23:18:29 2008//
+/PairwiseAlignmentContainer_asymBlendOneParam.java/1.3/Thu Dec 11 23:18:30 2008//
+/PairwiseAlignmentContainer_asymBlendTwoParam.java/1.3/Thu Dec 11 23:18:29 2008//
+/PairwiseAlignmentContainer_pureSuboptBlend.java/1.3/Thu Dec 11 23:18:29 2008//
+/PairwiseAlignmentContainer_pureSuboptSigmaOnlyBlend.java/1.3/Thu Dec 11 23:18:29 2008//
+/PairwiseAlignmentContainer_simpleBlend.java/1.3/Thu Dec 11 23:18:30 2008//
+/PairwiseAlignmentContainer_symmetricBlend.java/1.3/Thu Dec 11 23:18:30 2008//
+/PairwiseAlignmentsContainer.java/1.7/Thu Dec 11 23:18:30 2008//
+/ProfileAligner.java/1.6/Tue Sep 29 01:11:14 2009//
+/SequenceIdPair.java/1.1/Tue Oct 28 06:20:22 2008//
+/StructureAlignment.java/1.5/Thu Dec 11 23:18:30 2008//
+D/shapes////

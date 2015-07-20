@@ -1,0 +1,120 @@
+http://opal.cs.arizona.edu/
+See website for terms of use, etc.
+
+Please cite: 
+Wheeler, T.J. and Kececioglu, J.D.
+Proceedings of the 15th ISCB Conference on Intelligent 
+Systems for Molecular Biology, Bioinformatics 23, i559-i568, 2007.
+
+Quick-start
+-----------
+
+To form an alignment of multiple input sequences, run:
+   java -jar Opal.jar --in infile.fasta --out outfile
+or
+   java -jar Opal.jar infile.fasta > outfile
+
+
+To align two fixed alignments, run:
+   java -jar Opal.x.jar --in alignment1.fasta --in2 alignment2.fasta
+
+
+If you receive an "out of memory" error message, increase the memory 
+allocated to the Java VM like this:
+   java -Xmx1G -jar Opal.jar --in infile.fasta --out outfile
+(this example give 1GB of RAM to Opal)
+
+
+***********************************************
+** Note: input files must be in fasta format **
+***********************************************
+
+
+
+Common arguments (optional)
+---------------------------
+
+--in filename 
+    Specify file (fasta format) containing the unaligned sequences
+    that Opal is to align.
+--in2 filename 
+    With this option, an alignment of two alignments is performed. 
+    The two files specified in \"--in\" and \"--in2\" must 
+    both contain alignments, and be in fasta format.
+--out filename 
+    Specify the name of the file that Opal should write the 
+    alignment to. Default is to print to STDOUT
+--out_format [fasta|clustalw] 
+    Default = fasta		
+--align_method [exact|profile|mixed] 
+    Default = mixed
+	Alignment method used in building initial alignment 
+	(before polishing)
+    	* Exact method shows slightly better recovery of benchmarks.
+		* Profile is much faster for large inputs.
+		* Mixed method performs exact (slower) alignment on small 
+		subproblems, and profile (faster) alignment on larger 
+		subproblems.
+--polish_align_method  [exact|profile|mixed]
+    Default = value of align_method
+    Alignment method used when performing post-polishing step
+    See --align_method
+--polish [exhaust_twocut|random_twocut|random_tree_twocut|random_threecut]
+    Default = random_tree_twocut
+    See ISMB paper for details
+--polish_reps n 
+    Default depends on alignment method and number of input sequences
+--gamma n 
+    Gap open penalty. 
+    Defaults: Amino acid = 60; Nucleotide = 280.
+--lambda n 
+    Gap extension penalty. 
+    Defaults: Amino acid = 38; Nucleotide = 66.
+--gamma_term n 
+    Open penalty for terminal gaps. 
+    Defaults: Amino acid = 15; Nucleotide = 280. 
+--lambda_term n 
+    Extension penalty for terminal gaps. 
+    Defaults: Amino acid = 36; Nucleotide = 66.
+--treein
+    Name of file containing the merge tree (in Newick format)  
+--treeout
+    Name of file to which Opal should write the merge tree 
+    it calculates (in Newick format)
+--just_tree
+    Just build the merge tree, then quit (no alignment)
+--quiet 
+    Restrict status updates printed to STDERR
+--distance_type  [kmer_normcost|normcost|pctid]
+    Default = kmer_normcost
+    pctid calculates a distance for each pair of sequences by 
+        aligning the pair, then calculating the percent of all
+        non-gap columns that are identical under a compressed 
+        alphabet; the merge tree is built based on these costs.
+    normcost calculates a distance for each pair of sequences 
+        based on normalized alignment cost (see Opal paper for
+        details); the merge tree is built based on these costs. 
+    kmer_normcost causes an initial merge tree to be built based 
+        on pairwise kmer counts (see MAFFT papers for basic 
+        approach). With this tree, an initial mulitple alignment 
+        is formed, and new pairwise distances (based on 
+        normalized cost) are calculated from the pairwise 
+        alignments induced by that multiple alignment. A new 
+        merge tree is formed based on those distances. This may be 
+        repeated (see --tree_iterations)
+--tree_iterations
+    Default = 2 (if distance_type == kmer_normcost).
+    Number of times to repeat construction of merge tree based
+    on alignment in previous step. Value of 1 will just 
+    build an alignment based on the initial merge tree
+--input_order 
+    Output sequences of alignment in the same order as in the 
+    input file.  This is default behavior.
+--tree_order
+    Output sequences of alignment in an order that depends on 
+    the merge tree.  Default is --input_order
+--protein
+    Opal attempts to guess the type of sequences that are to be
+    aligned.  If no characters are found in the input that are 
+    amino-acid-only (not a nucleotide ambiguity code), then Opal
+    guesses DNA. This argument forces treatment as protein sequence.

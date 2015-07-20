@@ -1,0 +1,58 @@
+PAM - Calculate a log-odds matrix for specified integral PAM distance.
+
+On most UNIX-like systems, the command "make" will build the "pam"
+executable that calculates the matrices.   The program will compile
+on non-UNIX systems as well, though you will need to use some
+mechanism other than "make" to run the C compiler.  The entire source
+code for this executable is in the pam.c file.  This code is standard
+ANSI C (ISO C90) and uses C standard math library.
+
+The basic command syntax is 
+
+   pam [ -n <PAM distance> ] [ -s <scale> ] [ -j ] [ -C ]
+
+where <PAM distance> is a positive integer, and <scale> is a positive
+floating point number.  <PAM distance> defaults to 70 and <scale>
+defaults to ln(2)/3 = 0.23105.
+
+The PAM matrix is a "log-odds" matrix, and is calculated as the
+natural logarithm of target over background amino acid pair
+frequencies, divided by a number representing the scale.  The default
+value for <scale> gives matrix entries on a 1/3 bit scale. It is also
+common to use a 1/2 bit scale, by setting <scale> to ln(2)/2 = .3466.
+For significance calculations, <scale> will be approximately equal to
+the parameter "lambda" (Karlin & Altschul, PNAS 87:2264-2268).  The
+slight difference is due to round-off errors, and to the use of PAM
+matrices with proteins that have amino acid frequencies different than
+those used by Dayhoff et al.
+
+The -j and -C options specify that the joint probabilities for the PAM
+matrices, rather than the matrices themselves, should be printed.
+Choose at most one of the options -j and -C.  When either option is
+used, <scale> is irrelevant.  
+
+If -j is specified, the joint probabilities are printed on 20 lines,
+with 20 columns per line.
+
+If -C is specified, then both the joint and background probabilities
+are printed as array literals in the programming language C.  These
+literals are intended for direct inclusion in C source code.  In many
+applications, it is important that probabilities sum to 1.0, and so
+the probabilities are printed to machine precision.  The high
+precision is intended to prevent mathematical errors due to
+unnormalized probabilities, not to indicate extremely high precision
+in the data.
+
+Authors:
+
+E. Michael Gertz
+Stephen F. Altschul
+
+Please direct questions to E. Michael Gertz <gertz@ncbi.nlm.nih.gov>.
+
+Relevant literature:
+
+Dayhoff, M. O., Schwartz, R. M. & Orcutt, B. C. (1978).
+A model of evolutionary change in proteins. In Atlas of Protein Sequence
+and Structure, Vol. 5, Suppl. 3, Ed. M. O. Dayhoff, pp. 345-352.
+Natl. Biomed. Res. Found., Washington.
