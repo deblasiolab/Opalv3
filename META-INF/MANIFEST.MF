@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Implementation-Version: 3.0.b0
+Main-Class: opal.Opal
+
