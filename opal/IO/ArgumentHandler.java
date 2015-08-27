@@ -72,7 +72,7 @@ public class ArgumentHandler {
 		*/
 		
 		
-		LongOpt[] longopts = new LongOpt[69];
+		LongOpt[] longopts = new LongOpt[68];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -102,23 +102,23 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("out", LongOpt.REQUIRED_ARGUMENT, null, 'o'); // fasta, clustalw
 		longopts[longopts_index++] = new LongOpt("out_format", LongOpt.REQUIRED_ARGUMENT, null, 'o'); // fasta, clustalw 
 		longopts[longopts_index++] = new LongOpt("output_width", LongOpt.REQUIRED_ARGUMENT, null, 'w'); // default depends on output type: 55 for clustal, 80 for fasta
-		longopts[longopts_index++] = new LongOpt("upper_case", LongOpt.NO_ARGUMENT, null, 'u'); // default retain input case 
-		longopts[longopts_index++] = new LongOpt("tree_order", LongOpt.NO_ARGUMENT, null, 'o');
-		longopts[longopts_index++] = new LongOpt("input_order", LongOpt.NO_ARGUMENT, null, 'o');
-		longopts[longopts_index++] = new LongOpt("show_cost", LongOpt.NO_ARGUMENT, null, 's');
-		longopts[longopts_index++] = new LongOpt("out_best", LongOpt.REQUIRED_ARGUMENT, null, 'o'); // fasta, clustalw
-		longopts[longopts_index++] = new LongOpt("out_config", LongOpt.REQUIRED_ARGUMENT, null, 'o'); // fasta, clustalw
-		longopts[longopts_index++] = new LongOpt("out_feature", LongOpt.REQUIRED_ARGUMENT, null, 'o'); // fasta, clustalw
+		longopts[longopts_index++] = new LongOpt("upper_case", LongOpt.NO_ARGUMENT, null, 'u'); // default retain input case
+		longopts[longopts_index++] = new LongOpt("tree_order", LongOpt.NO_ARGUMENT, null, 'o'); //<<<<<<<<<
+		longopts[longopts_index++] = new LongOpt("input_order", LongOpt.NO_ARGUMENT, null, 'o'); //<<<<<<<<<
+		longopts[longopts_index++] = new LongOpt("show_cost", LongOpt.NO_ARGUMENT, null, 's'); //<<<<<<<<<
+		longopts[longopts_index++] = new LongOpt("out_best", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_config", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_feature", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		
 		longopts[longopts_index++] = new LongOpt("linear_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'z'); // default = 20
 		longopts[longopts_index++] = new LongOpt("mixed_alignment_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'm');
 		
-		longopts[longopts_index++] = new LongOpt("just_polish", LongOpt.NO_ARGUMENT, null, 'p');
+		longopts[longopts_index++] = new LongOpt("just_polish", LongOpt.NO_ARGUMENT, null, 'p'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("seed", LongOpt.REQUIRED_ARGUMENT, null, 's'); // random seed for polishing  
 		longopts[longopts_index++] = new LongOpt("polish_reps", LongOpt.REQUIRED_ARGUMENT, null, 'r'); // # repetitions of polishing
-		longopts[longopts_index++] = new LongOpt("polish", LongOpt.REQUIRED_ARGUMENT, null, 'p');
+		longopts[longopts_index++] = new LongOpt("polish", LongOpt.REQUIRED_ARGUMENT, null, 'p'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("convert", LongOpt.NO_ARGUMENT, null, 1);
-		longopts[longopts_index++] = new LongOpt("polish_align_method", LongOpt.REQUIRED_ARGUMENT, null, 'p');
+		longopts[longopts_index++] = new LongOpt("polish_align_method", LongOpt.REQUIRED_ARGUMENT, null, 'p'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("polish_reps_exhaustive", LongOpt.REQUIRED_ARGUMENT, null, 'r'); // # repetitions of exhaustive polishing (only worth doing if first polish is with heuristic) 
 		
 		longopts[longopts_index++] = new LongOpt("subopt", LongOpt.REQUIRED_ARGUMENT, null, 's');
@@ -129,38 +129,36 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("just_tree", LongOpt.REQUIRED_ARGUMENT, null, 't');
 		
 		longopts[longopts_index++] = new LongOpt("consistency_badscore_mult", LongOpt.REQUIRED_ARGUMENT, null, 'y');
-		longopts[longopts_index++] = new LongOpt("consistency_use_avg", LongOpt.NO_ARGUMENT, null, 'y');
-		longopts[longopts_index++] = new LongOpt("consistency_use_neighbor_weights", LongOpt.NO_ARGUMENT, null, 'y');
+		longopts[longopts_index++] = new LongOpt("consistency_use_avg", LongOpt.NO_ARGUMENT, null, 'y'); //<<<<<<<<<
+		longopts[longopts_index++] = new LongOpt("consistency_use_neighbor_weights", LongOpt.NO_ARGUMENT, null, 'y'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("consistency_neighbors", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		longopts[longopts_index++] = new LongOpt("consistency_maxsubtree", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		longopts[longopts_index++] = new LongOpt("consistency_flatten_abc_subopt", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		longopts[longopts_index++] = new LongOpt("consistency_weight", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		longopts[longopts_index++] = new LongOpt("consistency_other_seqs_weight", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		longopts[longopts_index++] = new LongOpt("consistency_blend_type", LongOpt.REQUIRED_ARGUMENT, null, 'y');
-		longopts[longopts_index++] = new LongOpt("use_consistency", LongOpt.NO_ARGUMENT, null, 'y');
+		longopts[longopts_index++] = new LongOpt("use_consistency", LongOpt.NO_ARGUMENT, null, 'y'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("consistency_neighbor_dist_thresh", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		longopts[longopts_index++] = new LongOpt("consistency_align_method", LongOpt.REQUIRED_ARGUMENT, null, 'y');
 		
-		longopts[longopts_index++] = new LongOpt("just_pair_dists", LongOpt.NO_ARGUMENT, null, 'p');
-		longopts[longopts_index++] = new LongOpt("pess_do_reverse", LongOpt.NO_ARGUMENT, null, 'r');
-		longopts[longopts_index++] = new LongOpt("tree_iterations", LongOpt.REQUIRED_ARGUMENT, null, 'i');
+		longopts[longopts_index++] = new LongOpt("just_pair_dists", LongOpt.NO_ARGUMENT, null, 'p'); 
+		longopts[longopts_index++] = new LongOpt("pess_do_reverse", LongOpt.NO_ARGUMENT, null, 'r'); //<<<<<<<<<
+		longopts[longopts_index++] = new LongOpt("tree_iterations", LongOpt.REQUIRED_ARGUMENT, null, 'i'); 
 		longopts[longopts_index++] = new LongOpt("structure_file", LongOpt.REQUIRED_ARGUMENT, null, 's');
 		longopts[longopts_index++] = new LongOpt("structure_file2", LongOpt.REQUIRED_ARGUMENT, null, 's');
 		longopts[longopts_index++] = new LongOpt("structure_model", LongOpt.REQUIRED_ARGUMENT, null, 's');
 		
-		longopts[longopts_index++] = new LongOpt("dna", LongOpt.NO_ARGUMENT, null, 'd');
+		longopts[longopts_index++] = new LongOpt("dna", LongOpt.NO_ARGUMENT, null, 'd'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("protein", LongOpt.NO_ARGUMENT, null, 'p');
 		longopts[longopts_index++] = new LongOpt("dnaAG", LongOpt.REQUIRED_ARGUMENT, null, 'd');
 		longopts[longopts_index++] = new LongOpt("dnaCT", LongOpt.REQUIRED_ARGUMENT, null, 'd');
 		longopts[longopts_index++] = new LongOpt("dnaCU", LongOpt.REQUIRED_ARGUMENT, null, 'd');
 
-		
-		
-		
-		Getopt g = new Getopt("opal", argv, "a:b:c:d:e:f:g:hi:jl:m:o:p:r:s:t:w:y:z:huq:j", longopts);		
+		Getopt g = new Getopt("opal", argv, "a:b:c:d:e:f:g:hi:j:l:m:n:o:pqr:s:t:uw:y:z:1", longopts);		
 		 
 		String optName;
 		while ((c = g.getopt()) != -1) {
+			//System.out.println((char)c + " " + longopts_index);
             arg = g.getOptarg();
             
 			switch (c)  {
