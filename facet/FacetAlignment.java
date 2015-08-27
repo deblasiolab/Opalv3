@@ -13,7 +13,122 @@ public class FacetAlignment {
 	public String[] structure;
 	public float[][][] structure_prob;
 	public float bigN;
+	public char[] consensus;
+	public char[] structure_consensus;
 	
+	public enum AlignmentType {
+		Protein,
+		DNA,
+		RNA
+	}
+	
+	public AlignmentType type;
+	
+	private void setConsensus(){
+		consensus = new char[width];
+		//System.err.println("Consensus length:" + width);
+		for(int i=0;i<width;i++){
+			consensus[i] = sequence[0].charAt(i);
+			int count = 0;
+			for(int j=0;j<numberOfSequences;j++){
+				int temp_count = 0;
+				for(int k=0;k<numberOfSequences;k++){
+					if(sequence[j].charAt(i) == sequence[k].charAt(i)) temp_count++;
+				}
+				if(temp_count>count){
+					count = temp_count;
+					consensus[i] = sequence[j].charAt(i);
+				}
+			}
+			//System.err.print(consensus[i]);
+		}
+		//System.err.println();
+		if(type == AlignmentType.Protein){
+			structure_consensus = new char[width];
+			for(int i=0;i<width;i++){
+				double sum_c = 0;
+				double sum_h = 0;
+				double sum_e = 0;
+				for(int j=0;j<numberOfSequences;j++){
+					if(structure_prob[j][i][0]>=0){
+						sum_c += structure_prob[j][i][0];
+						sum_h += structure_prob[j][i][1];
+						sum_e += structure_prob[j][i][2];
+					}
+				}
+				if(sum_c>sum_h && sum_c>sum_e) structure_consensus[i] = 'C';
+				else if(sum_h>sum_e) structure_consensus[i] = 'H';
+				else structure_consensus[i] = 'E';
+			}
+		}
+	}
+	
+	public FacetAlignment(char[][] al, float[][][] opal_sp){
+		if(opal_sp != null){
+			type = AlignmentType.Protein;
+		}
+        processAlArray(al);
+        processOpalSP(opal_sp);
+        setConsensus();
+	}
+	
+	private void processOpalSP(float[][][] opal_sp){
+	        structure_prob = new float[numberOfSequences][width][3];
+	        structure = new String[numberOfSequences];
+	        for(int i=0;i<numberOfSequences;i++){
+	                structure[i] = "";
+	                int k=0;
+	                for(int j=0;j<width;j++){
+	                        if(sequence[i].charAt(j) == '-'){
+	                                structure[i] += "-";
+	                                structure_prob[i][j][0]=-1;
+	                                structure_prob[i][j][1]=-1;
+	                                structure_prob[i][j][2]=-1;
+	                        }
+	                        else{
+	                                if(opal_sp[i][k][0]>=opal_sp[i][k][1] && opal_sp[i][k][0]>=opal_sp[i][k][2]) structure[i] += "C";
+	                                else if(opal_sp[i][k][1]>opal_sp[i][k][2]) structure[i] += "H";
+	                                else structure[i] += "E";
+	
+	                                structure_prob[i][j][0] = opal_sp[i][k][0];
+	                                structure_prob[i][j][1] = opal_sp[i][k][1];
+	                                structure_prob[i][j][2] = opal_sp[i][k][2];
+	                                k++;
+	                        }
+	                }
+	                //System.err.println(structure[i]);
+	        }
+	}
+	private void processAlArray(char[][] al){
+	    numberOfSequences = al.length;
+	    sequence = new String[al.length];
+	    name = new String[al.length];
+	    int max1 = 0;
+	    int max2 = 0;
+	    for(int i=0;i<al.length;i++){
+	            sequence[i] = "";
+	            name[i] = "";
+	            int countNonGap = 0;
+	            for(int j=0;j<al[i].length;j++){
+	                    if(al[i][j]!='-'){
+	                            countNonGap++;
+	                            sequence[i] = sequence[i].concat(String.valueOf(al[i][j]));
+	                    }else{
+	                            sequence[i] = sequence[i].concat("-");
+	                    }
+	            }
+	            //System.err.println(sequence[i]);
+	            if(countNonGap>max1){
+	                    max2 = max1;
+	                    max1 = countNonGap;
+	            }else if(countNonGap>max2){
+	                    max2 = countNonGap;
+	            }
+	    }
+	    width = sequence[0].length();
+	    setBigN(max1, max2);
+	
+	}
 	public FacetAlignment(String[] se, String[] st, String[] na, String[][][] sp){
 		sequence = se.clone();
 		name = na.clone();
@@ -22,6 +137,9 @@ public class FacetAlignment {
 		width=sequence[0].length();
 		numberOfSequences = se.length;
 		structure_prob = new float[numberOfSequences][width][3];
+		
+		type=AlignmentType.Protein;
+		
 		for(int i=0;i<numberOfSequences;i++){
 			int k=0;
 			if(st[i].length()>max1){
@@ -45,89 +163,61 @@ public class FacetAlignment {
 		}
 
 		setBigN(max1,max2);
+		setConsensus();
 		
 	}
 	
-	public FacetAlignment(char[][] al, String structureFile, String structureProbFile) throws FileNotFoundException{
-		processAlArray(al);
-		readStructureFromFile(structureFile);
-		readStructureProbFromFile(structureProbFile);
-	}
-	
-	public FacetAlignment(char[][] al, float[][][] opal_sp){
-		processAlArray(al);
-		processOpalSP(opal_sp);
-	}
-	
-	private void processOpalSP(float[][][] opal_sp){
-		structure_prob = new float[numberOfSequences][width][3];
-		structure = new String[numberOfSequences];
-		for(int i=0;i<numberOfSequences;i++){
-			structure[i] = "";
-			int k=0;
-			for(int j=0;j<width;j++){
-				if(sequence[i].charAt(j) == '-'){
-					structure[i] += "-";
-					structure_prob[i][j][0]=-1;
-					structure_prob[i][j][1]=-1;
-					structure_prob[i][j][2]=-1;
-				}
-				else{
-					if(opal_sp[i][k][0]>=opal_sp[i][k][1] && opal_sp[i][k][0]>=opal_sp[i][k][2]) structure[i] += "C";
-					else if(opal_sp[i][k][0]>opal_sp[i][k][0]) structure[i] += "H";
-					else structure[i] += "E";
-					
-					structure_prob[i][j][0] = opal_sp[i][k][0];
-					structure_prob[i][j][1] = opal_sp[i][k][1];
-					structure_prob[i][j][2] = opal_sp[i][k][2];
-					k++;
-				}
-			}
-		}
-	}
-	
-	private void processAlArray(char[][] al){
+	public FacetAlignment(int[][] al, char[] chars, String structureFile, String structureProbFile) throws Exception{
 		numberOfSequences = al.length;
 		sequence = new String[al.length];
 		name = new String[al.length];
-		int max1 = 0;
-		int max2 = 0;
+		
+		
 		for(int i=0;i<al.length;i++){
 			sequence[i] = "";
 			name[i] = "";
-			int countNonGap = 0;
 			for(int j=0;j<al[i].length;j++){
-				if(al[i][j]!='-'){
-					countNonGap++;
-					sequence[i] = sequence[i].concat(String.valueOf(al[i][j]));
+				if(al[i][j]>=0 && al[i][j]<chars.length){
+					sequence[i] = sequence[i].concat(String.valueOf(chars[al[i][j]]));
 				}else{
 					sequence[i] = sequence[i].concat("-");
 				}
 			}
 			//System.err.println(sequence[i]);
-			if(countNonGap>max1){
-				max2 = max1;
-				max1 = countNonGap;
-			}else if(countNonGap>max2){
-				max2 = countNonGap;
-			}
 		}
 		width = sequence[0].length();
-		setBigN(max1, max2);
+		
+		if(structureFile == null && structureProbFile == null) type=AlignmentType.DNA;
+		else if(structureFile != null && structureProbFile != null) type=AlignmentType.Protein;
+		else throw new IllegalArgumentException("Either both structure and probability need to be given for protein or neither should be given for DNA");
+		
+		if(type == AlignmentType.Protein){
+			readStructureFromFile(structureFile);
+			readStructureProbFromFile(structureProbFile);
+		}
+		setConsensus();
 		
 	}
 	
-	public FacetAlignment(String seqFile, String structureFile, String structureProbFile) throws FileNotFoundException{
+	public FacetAlignment(String seqFile, String structureFile, String structureProbFile) throws Exception{
+		
+		if(structureFile == null && structureProbFile == null) type=AlignmentType.DNA;
+		else if(structureFile != null && structureProbFile != null) type=AlignmentType.Protein;
+		else throw new IllegalArgumentException("Either both structure and probability need to be given for protein or neither should be given for DNA");
+		
 		numberOfSequences = numberOfSequencesInFile(seqFile);
 		readSequencesFromFile(seqFile);
-		width = sequence[0].length();
-		readStructureFromFile(structureFile);
-		readStructureProbFromFile(structureProbFile);
+		if(type == AlignmentType.Protein){
+			readStructureFromFile(structureFile);
+			readStructureProbFromFile(structureProbFile);
+		}
+		setConsensus();
 	}
 	
 	public static int numberOfSequencesInFile(String filename) throws FileNotFoundException{
 		int numberOfNames = 0;
 		Scanner sc = new Scanner(new File(filename));
+		sc.useLocale(Locale.US);
 		while(sc.hasNext()){
 			String line = sc.next();
 			if(line.charAt(0) == '>'){
@@ -147,11 +237,12 @@ public class FacetAlignment {
 	}
 	
 	private void setBigN(int max1, int max2){
-		bigN = (float) ((((numberOfSequences+1.0)*((float)numberOfSequences))/2.0)*max1+max2);
+		bigN = (float) ((((numberOfSequences-1.0)*((float)numberOfSequences))/2.0)*(max1+max2));
 	}
 	
-	public void readSequencesFromFile(String filename) throws FileNotFoundException{
+	public void readSequencesFromFile(String filename) throws Exception{
 		Scanner sc = new Scanner(new File(filename));
+		sc.useLocale(Locale.US);
 		int i = -1;
 		sequence = new String[numberOfSequences];
 		name = new String[numberOfSequences];
@@ -170,21 +261,29 @@ public class FacetAlignment {
 			}else{
 				sequence[i] = sequence[i].concat(line);
 			}
+			if(!(sequence[i].matches("^[ACTGUactgu-]$")) && type == AlignmentType.DNA){
+				throw new IllegalArgumentException("The input type was DNA but the sequences contain non-DNA characters."); 
+			}
 		}
-		sc.close();
+		
 		int ct = numberNotGap(sequence[i]);
 		if(ct>max1){max2 = max1; max1 = ct;}
 		else if(ct>max2){max2 = ct;}
+		
+		width = sequence[0].length();
+		sc.close();
 		setBigN(max1,max2);
 	}
 	
 	public void readStructureFromFile(String filename) throws FileNotFoundException{
 		Scanner sc = new Scanner(new File(filename));
+		sc.useLocale(Locale.US);
 		int i = 0;
 		structure = new String[numberOfSequences];
 		while(sc.hasNext()){
 			structure[i] = sc.next();
 			for(int j=0;j<width;j++){
+				//System.err.println(sequence[i] + "\n" + structure[i]);
 				//System.err.println("The structure length of " + i + " is " + structure[i].length());
 				if(sequence[i].charAt(j) == '-'){
 					structure[i] = (new StringBuffer(structure[i])).insert(j, "-").toString();
@@ -197,6 +296,7 @@ public class FacetAlignment {
 	
 	public void readStructureProbFromFile(String filename) throws FileNotFoundException{
 		Scanner sc = new Scanner(new File(filename));
+		sc.useLocale(Locale.US);
 		int i = 0, j=0, k=0;
 		structure_prob = new float[numberOfSequences][width][3];
 		while(sc.hasNextFloat()){

@@ -4,12 +4,14 @@ public class Consistancy {
 	private static int consistant_pairs;
 	private static int pairs;
 	private static float consistant_pair_float;
+	
 	public static String sequence(Configuration c){
-		String rtn = "sequenceConsistancy";
-		if(c.equivelanceClassSize!=20) rtn += "-E" + c.equivelanceClassSize;
-		if(c.phylogenyGradient) rtn += "-phylogenyGradient";
-		return rtn;
+		return "Sequence Consistancy" + ((c.equivelanceClassSize == 20)?"":(" E" + c.equivelanceClassSize));
 	}
+	public static String gap(Configuration c){
+		return "Gap Consistancy";
+	}
+	
 	public static float sequence(FacetAlignment a, Configuration c){
 		pairs = 0; consistant_pairs = 0;
 		boolean key[] = new boolean[a.width];
@@ -90,11 +92,6 @@ public class Consistancy {
 		}
 	}
 	
-	public static String gap(Configuration c){
-		String rtn = "gapConsistancy";
-		if(c.phylogenyGradient) rtn += "-phylogenyGradient";
-		return rtn;
-	}
 	public static float gap(FacetAlignment a, Configuration c){
 		pairs = 0; consistant_pairs = 0;
 		boolean key[] = new boolean[a.width];

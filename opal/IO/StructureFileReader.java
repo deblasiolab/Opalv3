@@ -17,7 +17,7 @@ public class StructureFileReader {
 	public static float[][] structureNeighborLevels;
 	public static float[][][] structure;
 
-	public static int window = 7;
+	public static int window = 0;
 	
 	private static String getContentFromFname(String filename) throws GenericOpalException{
 		InputStream is = null;

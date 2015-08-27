@@ -1,12 +1,10 @@
 package facet;
 
 public class GapCoil {
-	public static String Percentage(Configuration c){
-		String rtn = "gapInCoilPercentage";
-		if(c.structureType == Configuration.Structure.Probability) rtn += "-structureProbability";
-		return rtn;
+	public static String percentage(Configuration c){
+		return "Gap Coil Percentage" + ((c.structureType==Configuration.Structure.Probability)?" Prob":"");
 	}
-	public static float Percentage(FacetAlignment a, Configuration c){
+	public static float percentage(FacetAlignment a, Configuration c){
 		float count_float = 0;
 		int count = 0;
 		int total = 0;
@@ -29,3 +27,4 @@ public class GapCoil {
 		}
 	}
 }
+ 

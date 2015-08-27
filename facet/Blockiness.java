@@ -4,11 +4,8 @@ public class Blockiness {
 	private static int min(int i, int j){
 		return (i>j)?j:i;
 	}
-
 	public static String evaluate(Configuration c){
-		String rtn = "structureBlockiness";
-		if(c.gapsInBlockiness) rtn += "-withGaps";
-		return rtn;
+		return "Blockiness";
 	}
 	public static float evaluate(FacetAlignment a, Configuration c){
 		int distance_matrix[][] = new int[a.width+1][a.width+1];
@@ -17,11 +14,10 @@ public class Blockiness {
 		int max_min = (min_h>min_e && min_h>min_c)?min_h:((min_c>min_e)?min_c:min_h);
 		for(int i=0;i<a.width;i++){
 			boolean rowIn[][] = new boolean[a.numberOfSequences][3];
-			int numNotDash[] = new int[3];
 			for(int k=0;k<a.numberOfSequences;k++){
-				rowIn[k][0] = c.hasStructureType(a.structure[k].charAt(i), 'H');
-				rowIn[k][1] = c.hasStructureType(a.structure[k].charAt(i), 'E');
-				rowIn[k][2] = c.hasStructureType(a.structure[k].charAt(i), 'C');
+				rowIn[k][0] = c.hasStructureType(a.structure[k].charAt(i), 'H');;
+				rowIn[k][1] = c.hasStructureType(a.structure[k].charAt(i), 'E');;
+				rowIn[k][2] = c.hasStructureType(a.structure[k].charAt(i), 'C');;
 			}
 			for(int j=i+1;j<min(i+2*max_min+1,a.width);j++){
 				int ct[] = new int[3];
