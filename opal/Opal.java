@@ -5,11 +5,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.FileNotFoundException;
 
+import opal.IO.Configuration;
 import opal.IO.CostMatrix;
 import opal.IO.OpalLogWriter;
 
 import com.traviswheeler.libs.*;
-//import facet.*;
 
 import opal.makers.*;
 import opal.polish.Polisher;
@@ -19,6 +19,7 @@ import opal.exceptions.GenericOpalException;
 import opal.IO.*;
 import facet.FacetAlignment;
 import facet.Facet;
+import opal.realignment.realignmentDriver;
 
 class runAlignment extends Thread{
 	Configuration conf;
@@ -26,10 +27,17 @@ class runAlignment extends Thread{
 	AlignmentMaker am;
 	int[][] alignmentInstance;
 	double facetScore =-1;
+	Configuration[] configList = null;
+	
+	
 	
 	runAlignment(Configuration c, Inputs i){
 		conf = c;
 		in = i;
+	}
+	runAlignment(Configuration c, Inputs i, Configuration[] cList){
+		this(c,i);
+		configList = cList;
 	}
 	
 	public void run(){
@@ -97,6 +105,9 @@ class runAlignment extends Thread{
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
 					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure, configList, conf, Facet.defaultValue(fa));
+					realigner.simpleRealignment(5);
+					alignmentInstance = realigner.newAlignment();
 				}
 			}
 			
@@ -200,7 +211,7 @@ public class Opal {
 		
 		int maxIndex = 0;
 		for(int i=0;i<config.length;i++){
-			thread[i] = new runAlignment(config[i],input);
+			thread[i] = new runAlignment(config[i],input, config);
 			//thread[i] = new printLine(config[i],i);
 			thread[i].start();
 			if(i-last_joined>=max_threads){
