@@ -41,13 +41,15 @@ public class ArgumentHandler {
 	int lambda = -1;
 	int gammaTerm = -1;
 	int lambdaTerm = -1;
-	Configuration[] configs;
+	Configuration[] advising_configs;
+	Configuration[] realignment_configs;
 	int repeat_config = 1;
 	int max_threads = -1;
 
 	public String configOutputFile = null;
 	public String bestOutputFile = null;
 	public String featureOutputFile = null;
+	public String preRealignmentOutputFile = null;
 		
 	int verbosity = 1;
 	boolean toUpper = false; 
@@ -72,7 +74,7 @@ public class ArgumentHandler {
 		*/
 		
 		
-		LongOpt[] longopts = new LongOpt[68];
+		LongOpt[] longopts = new LongOpt[71];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -89,6 +91,8 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("gamma_term", LongOpt.REQUIRED_ARGUMENT, null, 'e');
 		longopts[longopts_index++] = new LongOpt("lambda_term", LongOpt.REQUIRED_ARGUMENT, null, 'f');
 		longopts[longopts_index++] = new LongOpt("configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
+		longopts[longopts_index++] = new LongOpt("realignment_configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
+		longopts[longopts_index++] = new LongOpt("advisisng_configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		longopts[longopts_index++] = new LongOpt("repeat_configurations", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		longopts[longopts_index++] = new LongOpt("max_threads", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		
@@ -109,6 +113,7 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("out_best", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_config", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_feature", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_prerealignment", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		
 		longopts[longopts_index++] = new LongOpt("linear_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'z'); // default = 20
 		longopts[longopts_index++] = new LongOpt("mixed_alignment_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'm');
@@ -185,9 +190,9 @@ public class ArgumentHandler {
             		fileB = arg.toString();
             		break;	
             	case 'c' :
-            		if(configs != null){
-            			LogWriter.stdErrLogln("If the configuration list file is specified, then you cannot also specify a single parameter.");
-        				throw new GenericOpalException("If the configuration list file is specified, then you cannot also specify a single parameter.");
+            		if(advising_configs != null){
+            			LogWriter.stdErrLogln("If the advisisng configuration list file is specified, then you cannot also specify a single parameter.");
+        				throw new GenericOpalException("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
             		}
             		costName = arg.toString();
             		break;
@@ -226,16 +231,16 @@ public class ArgumentHandler {
             		}
 		            break;
             	case 'e' :
-            		if(configs != null){
-            			LogWriter.stdErrLogln("If the configuration list file is specified, then you cannot also specify a single parameter.");
-        				throw new GenericOpalException("If the configuration list file is specified, then you cannot also specify a single parameter.");
+            		if(advising_configs != null){
+            			LogWriter.stdErrLogln("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
+        				throw new GenericOpalException("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
             		}
             		gammaTerm = Integer.parseInt(arg.toString());
             		break;            
             	case 'f' :
-            		if(configs != null){
-            			LogWriter.stdErrLogln("If the configuration list file is specified, then you cannot also specify a single parameter.");
-        				throw new GenericOpalException("If the configuration list file is specified, then you cannot also specify a single parameter.");
+            		if(advising_configs != null){
+            			LogWriter.stdErrLogln("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
+        				throw new GenericOpalException("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
             		}
             		lambdaTerm = Integer.parseInt(arg.toString());
             		break;            
@@ -246,16 +251,16 @@ public class ArgumentHandler {
   		          	break;
 
             	case 'g' :
-            		if(configs != null){
+            		if(advising_configs != null){
             			LogWriter.stdErrLogln("If the configuration list file is specified, then you cannot also specify a single parameter.");
         				throw new GenericOpalException("If the configuration list file is specified, then you cannot also specify a single parameter.");
             		}
             		gamma = Integer.parseInt(arg.toString());
             		break;            
             	case 'l' :
-            		if(configs != null){
-            			LogWriter.stdErrLogln("If the configuration list file is specified, then you cannot also specify a single parameter.");
-        				throw new GenericOpalException("If the configuration list file is specified, then you cannot also specify a single parameter.");
+            		if(advising_configs != null){
+            			LogWriter.stdErrLogln("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
+        				throw new GenericOpalException("If the advising configuration list file is specified, then you cannot also specify a single parameter.");
             		}
             		lambda = Integer.parseInt(arg.toString());
             		break;            
@@ -292,6 +297,8 @@ public class ArgumentHandler {
             			configOutputFile = arg.toString();
             		} else if (optName.equals("out_feature")) {
             			featureOutputFile = arg.toString();
+            		} else if (optName.equals("out_prerealignment")) {
+            			preRealignmentOutputFile = arg.toString();
             		} else if (optName.equals("out")) {
             			if(configOutputFile == null) configOutputFile = arg.toString();
             			if(bestOutputFile == null) bestOutputFile = arg.toString();
@@ -404,16 +411,25 @@ public class ArgumentHandler {
 		            	}
 		            } else if (optName.startsWith("structure_file")) {
 		            	
-		            	if(configs == null){
-		            		configs = new Configuration[1];
-		            		configs[0] = new Configuration();
+		            	if(advising_configs == null){
+		            		advising_configs = new Configuration[1];
+		            		advising_configs[0] = new Configuration();
 		            	}
-		            	if (!configs[0].useStructure) // if model hasn't already been set
-		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,configs[0]);
+		            	if (!advising_configs[0].useStructure) // if model hasn't already been set
+		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,advising_configs[0]);
 
-	            		Aligner.linearCutoff = Integer.MAX_VALUE;
+		            	if(realignment_configs == null){
+		            		realignment_configs = new Configuration[1];
+		            		realignment_configs[0] = new Configuration();
+		            	}
+		            	if (!realignment_configs[0].useStructure) // if model hasn't already been set
+		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,realignment_configs[0]);
+
 		            	
-		            	configs[0].useStructure = true;
+	            		Aligner.linearCutoff = Integer.MAX_VALUE;
+
+		            	advising_configs[0].useStructure = true;
+		            	realignment_configs[0].useStructure = true;
 		            	if (optName.equals("structure_file")) {
 		            		if(structFileA!=null){
 			            		LogWriter.stdErrLogln("Only 'facet_structure' or 'structure_file' can be specified. Alignment structure is used for Facet.");
@@ -425,17 +441,25 @@ public class ArgumentHandler {
 			            	structFileB = arg.toString();
 		            	}
 		            } else if (optName.equals("structure_model")) {
-		            	if(configs == null){
-		            		configs = new Configuration[1];
-		            		configs[0] = new Configuration();
+		            	if(realignment_configs == null){
+		            		realignment_configs = new Configuration[1];
+		            		realignment_configs[0] = new Configuration();
 		            	}
 		            	
-		            	configs[0].useStructure = true;
+		            	realignment_configs[0].useStructure = true;
+		            	
+		            	if(advising_configs == null){
+		            		advising_configs = new Configuration[1];
+		            		advising_configs[0] = new Configuration();
+		            	}
+		            	
+		            	advising_configs[0].useStructure = true;
 		            	String s = arg.toString();
 		            	boolean isSet = false;
 		            	for (StructureAlignment.ParamModel type : StructureAlignment.ParamModel.values()) {
 		            		if (s.equalsIgnoreCase(type.toString())) {
-		            			StructureAlignment.setParams(type, configs[0]);
+		            			StructureAlignment.setParams(type, realignment_configs[0]);
+		            			StructureAlignment.setParams(type, advising_configs[0]);
 		            			isSet = true;
 		            			break;
 		            		}
@@ -541,40 +565,73 @@ public class ArgumentHandler {
             		if (g.getLongind() == -1)  optName = "";	
             		else  optName = longopts[g.getLongind()].getName(); 
             		
-        			if(optName.equals("configuration_file")){
-	            		if(gamma != -1 || gammaTerm != -1 || lambda != -1 || lambdaTerm != -1 || !costName.equals("")){
-	            			LogWriter.stdErrLogln("If the configuration list file is specified, then you cannot also specify a single parameter.");
-	        				throw new GenericOpalException("If the configuration list file is specified, then you cannot also specify a single parameter.");
-	            		}
-	            		
-	            		InputStream is = null;
-	        			
-	        			try {
-	        				is = new FileInputStream(arg.toString());
-	        			} catch (FileNotFoundException e) {
-	        				LogWriter.stdErrLogln("The file '" + arg.toString() + "' cannot be found.  Qutting");
-	        				throw new GenericOpalException(e.getMessage());
-	        			}
-	        			
-	        			byte b[] = null;
-	        			try {
-	        				int x = is.available();
-	        				b = new byte[x];
-	        				is.read(b);
-	        			} catch ( IOException e) {
-	        				LogWriter.stdErrLogln("Error reading file '" + arg.toString() + "'");
-	        				throw new GenericOpalException(e.getMessage());
-	        			}
-	        			String content = new String(b);
-	        			//System.err.println("File:\n" + content);
-	        			
-	        			String[] cstrings = content.split("\n");
-	        		
-	        			configs = new Configuration[cstrings.length];
-	        			for(int i=0;i<cstrings.length;i++){
-	        				//System.err.println("Configuration: " + cstrings[i]);
-	        				configs[i] = new Configuration(cstrings[i]);
-	        			}
+        			if(optName.equals("configuration_file") || optName.equals("advising_configuration_file") || optName.equals("realignment_configuration_file")){
+        				if(optName.equals("configuration_file") || optName.equals("advising_configuration_file")){
+		            		if(gamma != -1 || gammaTerm != -1 || lambda != -1 || lambdaTerm != -1 || !costName.equals("")){
+		            			LogWriter.stdErrLogln("If the advisisng configuration list file is specified, then you cannot also specify a single parameter.");
+		        				throw new GenericOpalException("If the advisisng configuration list file is specified, then you cannot also specify a single parameter.");
+		            		}
+		            		
+		            		InputStream is = null;
+		        			
+		        			try {
+		        				is = new FileInputStream(arg.toString());
+		        			} catch (FileNotFoundException e) {
+		        				LogWriter.stdErrLogln("The file '" + arg.toString() + "' cannot be found.  Qutting");
+		        				throw new GenericOpalException(e.getMessage());
+		        			}
+		        			
+		        			byte b[] = null;
+		        			try {
+		        				int x = is.available();
+		        				b = new byte[x];
+		        				is.read(b);
+		        			} catch ( IOException e) {
+		        				LogWriter.stdErrLogln("Error reading file '" + arg.toString() + "'");
+		        				throw new GenericOpalException(e.getMessage());
+		        			}
+		        			String content = new String(b);
+		        			//System.err.println("File:\n" + content);
+		        			
+		        			String[] cstrings = content.split("\n");
+		        		
+		        			advising_configs = new Configuration[cstrings.length];
+		        			for(int i=0;i<cstrings.length;i++){
+		        				//System.err.println("Configuration: " + cstrings[i]);
+		        				advising_configs[i] = new Configuration(cstrings[i]);
+		        			}
+        				}
+        				if(optName.equals("configuration_file") || optName.equals("realignment_configuration_file")){
+		            		
+		            		InputStream is = null;
+		        			
+		        			try {
+		        				is = new FileInputStream(arg.toString());
+		        			} catch (FileNotFoundException e) {
+		        				LogWriter.stdErrLogln("The file '" + arg.toString() + "' cannot be found.  Qutting");
+		        				throw new GenericOpalException(e.getMessage());
+		        			}
+		        			
+		        			byte b[] = null;
+		        			try {
+		        				int x = is.available();
+		        				b = new byte[x];
+		        				is.read(b);
+		        			} catch ( IOException e) {
+		        				LogWriter.stdErrLogln("Error reading file '" + arg.toString() + "'");
+		        				throw new GenericOpalException(e.getMessage());
+		        			}
+		        			String content = new String(b);
+		        			//System.err.println("File:\n" + content);
+		        			
+		        			String[] cstrings = content.split("\n");
+		        		
+		        			realignment_configs = new Configuration[cstrings.length];
+		        			for(int i=0;i<cstrings.length;i++){
+		        				//System.err.println("Configuration: " + cstrings[i]);
+		        				realignment_configs[i] = new Configuration(cstrings[i]);
+		        			}
+        				}
         			}else if(optName.equals("repeat_configurations")){
         				repeat_config = Integer.parseInt(arg.toString());
         			}
@@ -639,15 +696,15 @@ public class ArgumentHandler {
 		return lambdaTerm;
 	}*/
 	
-	public Configuration[] getConfigs(){
-		if(configs != null){
+	public Configuration[] getAdvisingConfigs(){
+		if(advising_configs != null){
 			if(repeat_config==1){
-				return configs;
+				return advising_configs;
 			}else{
-				Configuration temp[] = new Configuration[configs.length * repeat_config];
-				for(int i=0;i<configs.length;i++){
+				Configuration temp[] = new Configuration[advising_configs.length * repeat_config];
+				for(int i=0;i<advising_configs.length;i++){
 					for(int j=0;j<repeat_config;j++){
-						temp[repeat_config*i + j] = new Configuration(configs[i]);
+						temp[repeat_config*i + j] = new Configuration(advising_configs[i]);
 						temp[repeat_config*i + j].repetition = j+1;
 					}
 				}
@@ -655,16 +712,44 @@ public class ArgumentHandler {
 			}
 		}
 		
-		configs = new Configuration[repeat_config];
+		advising_configs = new Configuration[repeat_config];
 		for(int j=0;j<repeat_config;j++){
-			configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
+			advising_configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
 			if(repeat_config>1){
-				configs[j].repetition = j+1;
+				advising_configs[j].repetition = j+1;
 			}
 		}
 
-		return configs;
+		return advising_configs;
 	}
+	
+	public Configuration[] getRealignmentConfigs(){
+		if(realignment_configs != null){
+			if(repeat_config==1){
+				return realignment_configs;
+			}else{
+				Configuration temp[] = new Configuration[realignment_configs.length * repeat_config];
+				for(int i=0;i<realignment_configs.length;i++){
+					for(int j=0;j<repeat_config;j++){
+						temp[repeat_config*i + j] = new Configuration(realignment_configs[i]);
+						temp[repeat_config*i + j].repetition = j+1;
+					}
+				}
+				return temp;
+			}
+		}
+		
+		realignment_configs = new Configuration[repeat_config];
+		for(int j=0;j<repeat_config;j++){
+			realignment_configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
+			if(repeat_config>1){
+				realignment_configs[j].repetition = j+1;
+			}
+		}
+
+		return realignment_configs;
+	}
+	
 
 	public Inputs getInputs(){
 		Inputs in = new Inputs();
@@ -680,6 +765,7 @@ public class ArgumentHandler {
 		in.configOutputFile = configOutputFile;
 		in.bestOutputFile = bestOutputFile;
 		in.featureOutputFile = featureOutputFile;
+		in.preRealignmentOutputFile = preRealignmentOutputFile;
 		if (in.structFileA != null)
 			StructureFileReader.initialize(in.structFileA, in.structFileB);
 		return in;

@@ -37,6 +37,8 @@ public class Configuration {
 	public int gapLevelCnt = 1;
  	public int[] gapOpenMods;
 	public int[] gapExtMods;
+	
+	public String realignmentLog = "";
 
 	public String toString(){
 		if(useStructure){

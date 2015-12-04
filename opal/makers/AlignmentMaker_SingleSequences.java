@@ -462,6 +462,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			if (conf.useStructure) {
 				LogWriter.stdErrLogln("Using structure model: " + conf.modelType);
 			}
+			LogWriter.stdErrLog(conf.realignmentLog);
 
 		}
 
