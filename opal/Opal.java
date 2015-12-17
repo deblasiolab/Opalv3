@@ -1,20 +1,13 @@
 package opal;
 
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.FileNotFoundException;
-
 import opal.IO.Configuration;
-import opal.IO.CostMatrix;
 import opal.IO.OpalLogWriter;
 
 import com.traviswheeler.libs.*;
 
 import opal.makers.*;
-import opal.polish.Polisher;
 import opal.tree.Tree;
-import opal.align.*;
 import opal.exceptions.GenericOpalException;
 import opal.IO.*;
 import facet.FacetAlignment;
@@ -26,7 +19,9 @@ class runAlignment extends Thread{
 	Inputs in;
 	AlignmentMaker am;
 	int[][] alignmentInstance;
+	int[][] preRealignmentAlignmentInstance;
 	double facetScore =-1;
+	double preRealignmentFacetScore =-1;
 	Configuration[] realignmentConfigList = null;
 	
 	
@@ -104,19 +99,19 @@ class runAlignment extends Thread{
 
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
 					
-					if(in.preRealignmentOutputFile != null){
-						String fname = in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
-						if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-						if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
-						am.printOutput(alignmentInstance, fname);
+					if(realignmentConfigList != null){
+						preRealignmentAlignmentInstance = alignmentInstance.clone();
+						preRealignmentFacetScore = Facet.defaultValue(
+								new FacetAlignment(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),StructureFileReader.structure)
+						);
+						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),StructureFileReader.structure, realignmentConfigList, conf, (float) preRealignmentFacetScore);
+						if(conf.realignment_window_type == Configuration.WINDOW_SIZE.VALUE) realigner.simpleRealignment((int)conf.realignment_window_value);
+						alignmentInstance = realigner.newAlignment();
 						
 					}
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
 					
-					realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure, realignmentConfigList, conf, Facet.defaultValue(fa));
-					realigner.simpleRealignment(5);
-					alignmentInstance = realigner.newAlignment();
 				}
 			}
 			
@@ -160,12 +155,38 @@ class runAlignment extends Thread{
 	
 	public void printBest(){
 		if (in.verbosity>-1) {
-			System.err.printf("best facet value --  %.6f (%s)\n",facetScore, conf );
+			System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
 		}
 
 		am.printOutput(alignmentInstance, in.bestOutputFile);
 	}
 	
+	public void printPreRealignment(){
+		if(in.preRealignmentOutputFile != null){
+			String fname = in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
+			am.printOutput(preRealignmentAlignmentInstance, fname);
+		}else{
+			am.printOutput(preRealignmentAlignmentInstance, null);
+		}
+	}
+	
+	public void printBestPreRealignment(){
+		if (in.verbosity>-1) {
+			System.err.printf("\nbest pre-realignment facet value --  %.6f (%s)",preRealignmentFacetScore, conf );
+		}
+			
+		am.printOutput(preRealignmentAlignmentInstance, in.bestPreRealignmentOutputFile);
+	}	
+	
+	public void printBestPreRealignmentsRealignment(){
+		if (in.verbosity>-1) {
+			System.err.printf("\nbest pre-realignments realignment facet value --  %.6f (%s)",facetScore, conf );
+		}
+			
+		am.printOutput(alignmentInstance, in.bestPreRealignmentsRealignmentOutputFile);
+	}
 }
 
 public class Opal {
@@ -220,6 +241,7 @@ public class Opal {
 		}
 		
 		int maxIndex = 0;
+		int maxPreRealignmentIndex = 0;
 		for(int i=0;i<advising_config.length;i++){
 			thread[i] = new runAlignment(advising_config[i],input, realignment_config);
 			//thread[i] = new printLine(config[i],i);
@@ -229,11 +251,16 @@ public class Opal {
 				try{
 					thread[last_joined].join();
 					thread[last_joined].print();
+					if(realignment_config != null) thread[last_joined].printPreRealignment(); 
 					if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
-						thread[maxIndex] = null;
+						if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 						maxIndex = last_joined;
+					} 
+					if(thread[last_joined].preRealignmentFacetScore > thread[maxPreRealignmentIndex].preRealignmentFacetScore){
+						if(maxPreRealignmentIndex != maxIndex) thread[maxPreRealignmentIndex] = null;
+						maxPreRealignmentIndex = last_joined;
 					}
-					else if(last_joined != maxIndex) thread[last_joined] = null;
+					if(last_joined != maxIndex && last_joined != maxPreRealignmentIndex) thread[last_joined] = null;
 				}catch(InterruptedException e){
 					OpalLogWriter.stdErrLogln("InterruptedException "+e.toString());
 					throw new GenericOpalException("InterruptedException "+e.toString());
@@ -245,19 +272,29 @@ public class Opal {
 			try{
 				thread[last_joined].join();
 				thread[last_joined].print();
+				if(realignment_config != null) thread[last_joined].printPreRealignment(); 
 				if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
-					thread[maxIndex] = null;
+					if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 					maxIndex = last_joined;
+				} 
+				if(thread[last_joined].preRealignmentFacetScore > thread[maxPreRealignmentIndex].preRealignmentFacetScore){
+					if(maxPreRealignmentIndex != maxIndex) thread[maxPreRealignmentIndex] = null;
+					maxPreRealignmentIndex = last_joined;
 				}
-				else if(last_joined != maxIndex) thread[last_joined] = null;
+				if(last_joined != maxIndex && last_joined != maxPreRealignmentIndex) thread[last_joined] = null;
 			}catch(InterruptedException e){
 				OpalLogWriter.stdErrLogln("InterruptedException "+e.toString());
 				throw new GenericOpalException("InterruptedException "+e.toString());
 			}
 		}
 		
-		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0) thread[maxIndex].printBest();
 		
+		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0) thread[maxIndex].printBest();
+		if(advising_config.length>1 && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
+				thread[maxPreRealignmentIndex].printBestPreRealignment();
+				thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignment();
+		}
+		System.err.println("advising_config.length: " + advising_config.length + "\tmaxPreRealignmentIndex:" + maxPreRealignmentIndex + "\tthread[maxPreRealignmentIndex]:" + thread[maxPreRealignmentIndex]);
 		if (input.verbosity>0) {
 			Date now = new Date();
 			long diff = now.getTime() - start.getTime();

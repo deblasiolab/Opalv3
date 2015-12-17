@@ -25,6 +25,8 @@ public class Inputs {
 	public String bestOutputFile;
 	public String featureOutputFile;
 	public String preRealignmentOutputFile;
+	public String bestPreRealignmentOutputFile;
+	public String bestPreRealignmentsRealignmentOutputFile;
 	
 	public Inputs() {
 		// TODO Auto-generated constructor stub

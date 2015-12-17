@@ -2,7 +2,6 @@ package opal.IO;
 
 import java.util.ArrayList;
 
-import com.traviswheeler.libs.LogWriter;
 
 import opal.align.Aligner;
 

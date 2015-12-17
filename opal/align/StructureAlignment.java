@@ -1,10 +1,8 @@
 package opal.align;
 
-import opal.IO.OpalLogWriter;
 import opal.IO.SequenceConverter;
 import opal.IO.StructureFileReader;
 import opal.IO.Configuration;
-import opal.exceptions.GenericOpalException;
 
 public class StructureAlignment extends Alignment {
 
@@ -136,48 +134,48 @@ public class StructureAlignment extends Alignment {
 		if (type == ParamModel.G1) {
 			conf.gapLevelCnt = 1;
 			conf.gamma = 62;
-			conf.gammaTerm = 27;
+			conf.setGammaTerm(27);
 			int[] open = {0};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 37;
-			conf.lambdaTerm = 34;
+			conf.setLambdaTerm(34);
 			int[] ext = {0};
 			conf.gapExtMods = ext;
 			
 		} else if (type == ParamModel.G4) {
 			conf.gapLevelCnt = 4;
 			conf.gamma = 51;
-			conf.gammaTerm = 23;
+			conf.setGammaTerm(23);
 			int[] open = {0, 9, 32, 32};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 36;
-			conf.lambdaTerm = 36;
+			conf.setLambdaTerm(36);
 			int[] ext = {0, 2, 4, 4};
 			conf.gapExtMods = ext;
 			
 		} else if (type == ParamModel.G6) {
 			conf.gapLevelCnt = 6;
 			conf.gamma = 45;
-			conf.gammaTerm = 11;
+			conf.setGammaTerm(11);
 			int[] open = {0, 6, 19, 30, 49, 49};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 36;
-			conf.lambdaTerm = 35;
+			conf.setLambdaTerm(35);
 			int[] ext = {0, 1, 2, 2, 2, 2 };
 			conf.gapExtMods = ext;	
 
 		} else if (type == ParamModel.G8) {
 			conf.gapLevelCnt = 8;
 			conf.gamma = 47;
-			conf.gammaTerm = 19;
+			conf.setGammaTerm(19);
 			int[] open = {0, 0, 12, 19, 33, 36, 57, 57};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 38;
-			conf.lambdaTerm = 37;
+			conf.setLambdaTerm(37);
 			int[] ext = {0, 0, 1, 1, 1, 2, 4, 4};
 			conf.gapExtMods = ext;		
 		}

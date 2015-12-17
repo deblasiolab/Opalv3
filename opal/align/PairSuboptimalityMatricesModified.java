@@ -1,7 +1,6 @@
 package opal.align;
 
 import com.traviswheeler.libs.LogWriter;
-import opal.IO.SequenceConverter;
 import opal.exceptions.GenericOpalException;
 import opal.IO.Configuration;
 

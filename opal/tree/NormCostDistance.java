@@ -6,7 +6,6 @@ import opal.IO.SequenceConverter;
 import opal.align.Aligner;
 import opal.align.Alignment;
 import opal.exceptions.GenericOpalException;
-import opal.IO.Configuration;
 
 public class NormCostDistance extends Distance {
 	

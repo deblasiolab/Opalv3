@@ -1,12 +1,8 @@
 package opal.IO;
 
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintStream;
-import java.util.Scanner;
-import java.io.File;
 import java.io.FileNotFoundException;
 
 import opal.IO.AlignmentWriter.OutputType;
@@ -50,6 +46,8 @@ public class ArgumentHandler {
 	public String bestOutputFile = null;
 	public String featureOutputFile = null;
 	public String preRealignmentOutputFile = null;
+	public String bestPreRealignmentOutputFile = null;
+	public String bestPreRealignmentsRealignmentOutputFile = null;
 		
 	int verbosity = 1;
 	boolean toUpper = false; 
@@ -59,6 +57,13 @@ public class ArgumentHandler {
 	boolean justDoSubOpt= false;
 	boolean justTree= false;
 
+	Configuration.THRESHOLD_TYPE temp_threshold_type = null;
+	Configuration.WINDOW_SIZE_MINIMUM temp_window_minimum_type = null;
+	Configuration.WINDOW_SIZE temp_window_type = null;
+	Configuration.REALIGNMENT_TERMINALS temp_realignment_terminals = null;
+	float temp_realign_threshold = -1;
+	float temp_realign_window_size = -1;
+	float temp_realign_minimum_value = -1;
 	
 	
 	public ArgumentHandler (String argString) {
@@ -74,7 +79,7 @@ public class ArgumentHandler {
 		*/
 		
 		
-		LongOpt[] longopts = new LongOpt[71];
+		LongOpt[] longopts = new LongOpt[85];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -92,7 +97,7 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("lambda_term", LongOpt.REQUIRED_ARGUMENT, null, 'f');
 		longopts[longopts_index++] = new LongOpt("configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		longopts[longopts_index++] = new LongOpt("realignment_configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
-		longopts[longopts_index++] = new LongOpt("advisisng_configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
+		longopts[longopts_index++] = new LongOpt("advising_configuration_file", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		longopts[longopts_index++] = new LongOpt("repeat_configurations", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		longopts[longopts_index++] = new LongOpt("max_threads", LongOpt.REQUIRED_ARGUMENT, null, 'j');
 		
@@ -114,6 +119,8 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("out_config", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_feature", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_prerealignment", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_prerealignment_best", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_prerealignment_best_realignment", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		
 		longopts[longopts_index++] = new LongOpt("linear_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'z'); // default = 20
 		longopts[longopts_index++] = new LongOpt("mixed_alignment_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'm');
@@ -159,7 +166,22 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("dnaCT", LongOpt.REQUIRED_ARGUMENT, null, 'd');
 		longopts[longopts_index++] = new LongOpt("dnaCU", LongOpt.REQUIRED_ARGUMENT, null, 'd');
 
-		Getopt g = new Getopt("opal", argv, "a:b:c:d:e:f:g:hi:j:l:m:n:o:pqr:s:t:uw:y:z:1", longopts);		
+		longopts[longopts_index++] = new LongOpt("realignmentMinimumSizeTypeMultiplier", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentMinimumSizeTypeValue", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentMinimumSizeValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentWindowSizeTypeValue", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentWindowSizeValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeValue", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeAverage", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeWhole", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentThresholdValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		//realignmentAlwaysTerminals
+
+		longopts[longopts_index++] = new LongOpt("realignmentAlwaysTerminals", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentNeverTerminals", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentPositionalTerminals", LongOpt.NO_ARGUMENT, null, 'k');
+
+		Getopt g = new Getopt("opal", argv, "k:a:b:c:d:e:f:g:hi:j:l:m:n:o:pqr:s:t:uw:y:z:1", longopts);		
 		 
 		String optName;
 		while ((c = g.getopt()) != -1) {
@@ -299,7 +321,11 @@ public class ArgumentHandler {
             			featureOutputFile = arg.toString();
             		} else if (optName.equals("out_prerealignment")) {
             			preRealignmentOutputFile = arg.toString();
-            		} else if (optName.equals("out")) {
+            		} else if (optName.equals("out_prerealignment_best")) {
+            			bestPreRealignmentOutputFile = arg.toString();
+            		} else if (optName.equals("out_prerealignment_best_realignment")) {
+            			bestPreRealignmentsRealignmentOutputFile = arg.toString();
+        		} else if (optName.equals("out")) {
             			if(configOutputFile == null) configOutputFile = arg.toString();
             			if(bestOutputFile == null) bestOutputFile = arg.toString();
 		            	/*try {
@@ -561,6 +587,34 @@ public class ArgumentHandler {
             		Aligner.linearCutoff = (new Integer(arg.toString())).intValue();
             		break; 
             		
+            	case 'k':	
+            		
+            		
+            		
+            		
+            		if (g.getLongind() == -1)  optName = "";	
+            		else  optName = longopts[g.getLongind()].getName(); 
+            		// --realignmentMinimumSizeTypeValue --realignmentMinimumSizeValue 10 --realignmentWindowSizeValue 3 --realignmentThresholdTypeAverage --realignmentThresholdValue 0.5
+					if (optName.equals("realignmentMinimumSizeTypeMultiplier")){ temp_window_minimum_type = Configuration.WINDOW_SIZE_MINIMUM.WINDOW_MULTIPLIER; }
+					if (optName.equals("realignmentMinimumSizeTypeValue")){ temp_window_minimum_type = Configuration.WINDOW_SIZE_MINIMUM.VALUE; }
+					if (optName.equals("realignmentMinimumSizeValue")){ temp_realign_minimum_value = Float.parseFloat(arg.toString()); }
+					
+					
+					if (optName.equals("realignmentWindowSizeTypeValue")){ temp_window_type = Configuration.WINDOW_SIZE.VALUE; }
+					if (optName.equals("realignmentWindowSizeValue")){ temp_realign_window_size = Float.parseFloat(arg.toString()); }
+					
+					if (optName.equals("realignmentThresholdTypeValue")){ temp_threshold_type = Configuration.THRESHOLD_TYPE.VALUE; }
+					if (optName.equals("realignmentThresholdTypeAverage")){ temp_threshold_type = Configuration.THRESHOLD_TYPE.AVERAGE_WINDOW; }
+            		if (optName.equals("realignmentThresholdTypeWhole")){temp_threshold_type = Configuration.THRESHOLD_TYPE.WHOLE_ALIGNMENT;}
+            		if (optName.equals("realignmentThresholdValue")){ temp_realign_threshold = Float.parseFloat(arg.toString());}
+
+            		if (optName.equals("realignmentAlwaysTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.ALWAYS; }
+            		if (optName.equals("realignmentNeverTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.NEVER; }
+            		if (optName.equals("realignmentPositionalTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.POSITIONAL; }
+            		
+            		
+            		break; 
+        		
             	case 'j':
             		if (g.getLongind() == -1)  optName = "";	
             		else  optName = longopts[g.getLongind()].getName(); 
@@ -586,9 +640,11 @@ public class ArgumentHandler {
 		        				int x = is.available();
 		        				b = new byte[x];
 		        				is.read(b);
+		        				is.close();
 		        			} catch ( IOException e) {
 		        				LogWriter.stdErrLogln("Error reading file '" + arg.toString() + "'");
 		        				throw new GenericOpalException(e.getMessage());
+		        				
 		        			}
 		        			String content = new String(b);
 		        			//System.err.println("File:\n" + content);
@@ -600,6 +656,7 @@ public class ArgumentHandler {
 		        				//System.err.println("Configuration: " + cstrings[i]);
 		        				advising_configs[i] = new Configuration(cstrings[i]);
 		        			}
+		        			
         				}
         				if(optName.equals("configuration_file") || optName.equals("realignment_configuration_file")){
 		            		
@@ -617,6 +674,7 @@ public class ArgumentHandler {
 		        				int x = is.available();
 		        				b = new byte[x];
 		        				is.read(b);
+		        				is.close();
 		        			} catch ( IOException e) {
 		        				LogWriter.stdErrLogln("Error reading file '" + arg.toString() + "'");
 		        				throw new GenericOpalException(e.getMessage());
@@ -631,6 +689,7 @@ public class ArgumentHandler {
 		        				//System.err.println("Configuration: " + cstrings[i]);
 		        				realignment_configs[i] = new Configuration(cstrings[i]);
 		        			}
+		        		
         				}
         			}else if(optName.equals("repeat_configurations")){
         				repeat_config = Integer.parseInt(arg.toString());
@@ -696,8 +755,24 @@ public class ArgumentHandler {
 		return lambdaTerm;
 	}*/
 	
+	/*Configuration.THRESHOLD_TYPE temp_threshold_type = null;
+	Configuration.WINDOW_SIZE_MINIMUM temp_window_minimum_type = null;
+	Configuration.WINDOW_SIZE temp_window_type = null;
+	float temp_realign_threshold = -1;
+	float temp_realign_window_size = -1;
+	float temp_realign_minimum_value = -1;*/
+	
 	public Configuration[] getAdvisingConfigs(){
 		if(advising_configs != null){
+			for(int i=0;i<advising_configs.length;i++){
+				if(temp_threshold_type != null) advising_configs[i].realignment_threshold_type = temp_threshold_type;
+				if(temp_realign_threshold != -1) advising_configs[i].realignment_threshold_value = temp_realign_threshold;
+				if(temp_window_minimum_type != null) advising_configs[i].realignment_minimum_type = temp_window_minimum_type;
+				if(temp_realign_minimum_value != -1) advising_configs[i].realignment_minimum_window_value = temp_realign_minimum_value;
+				if(temp_window_type != null) advising_configs[i].realignment_window_type = temp_window_type;
+				if(temp_realign_window_size != -1) advising_configs[i].realignment_window_value = temp_realign_window_size;
+				if(temp_realignment_terminals != null) advising_configs[i].realignment_use_terminals = temp_realignment_terminals;
+			}
 			if(repeat_config==1){
 				return advising_configs;
 			}else{
@@ -715,6 +790,15 @@ public class ArgumentHandler {
 		advising_configs = new Configuration[repeat_config];
 		for(int j=0;j<repeat_config;j++){
 			advising_configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
+			
+			if(temp_threshold_type != null) advising_configs[j].realignment_threshold_type = temp_threshold_type;
+			if(temp_realign_threshold != -1) advising_configs[j].realignment_threshold_value = temp_realign_threshold;
+			if(temp_window_minimum_type != null) advising_configs[j].realignment_minimum_type = temp_window_minimum_type;
+			if(temp_realign_minimum_value != -1) advising_configs[j].realignment_minimum_window_value = temp_realign_minimum_value;
+			if(temp_window_type != null) advising_configs[j].realignment_window_type = temp_window_type;
+			if(temp_realign_window_size != -1) advising_configs[j].realignment_window_value = temp_realign_window_size;
+			if(temp_realignment_terminals != null) advising_configs[j].realignment_use_terminals = temp_realignment_terminals;
+			
 			if(repeat_config>1){
 				advising_configs[j].repetition = j+1;
 			}
@@ -738,15 +822,6 @@ public class ArgumentHandler {
 				return temp;
 			}
 		}
-		
-		realignment_configs = new Configuration[repeat_config];
-		for(int j=0;j<repeat_config;j++){
-			realignment_configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
-			if(repeat_config>1){
-				realignment_configs[j].repetition = j+1;
-			}
-		}
-
 		return realignment_configs;
 	}
 	
@@ -766,6 +841,8 @@ public class ArgumentHandler {
 		in.bestOutputFile = bestOutputFile;
 		in.featureOutputFile = featureOutputFile;
 		in.preRealignmentOutputFile = preRealignmentOutputFile;
+		in.bestPreRealignmentOutputFile = bestPreRealignmentOutputFile;
+		in.bestPreRealignmentsRealignmentOutputFile = bestPreRealignmentsRealignmentOutputFile;
 		if (in.structFileA != null)
 			StructureFileReader.initialize(in.structFileA, in.structFileB);
 		return in;

@@ -12,7 +12,6 @@ import opal.align.Alignment;
 import opal.align.PairAligner;
 import opal.align.ProfileAligner;
 import opal.align.Aligner.AlignmentType;
-import opal.exceptions.GenericOpalException;
 
 public abstract class Tree {
 

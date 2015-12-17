@@ -1,7 +1,5 @@
 package opal.tree;
 
-import com.traviswheeler.libs.LogWriter;
-
 import opal.IO.SequenceConverter;
 import opal.align.Aligner;
 import opal.align.Alignment;

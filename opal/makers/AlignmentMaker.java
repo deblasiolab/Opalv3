@@ -4,7 +4,6 @@ import opal.align.Aligner;
 
 import opal.IO.Configuration;
 import opal.IO.Inputs;
-import opal.IO.SequenceConverter;
 
 
 public abstract class AlignmentMaker {

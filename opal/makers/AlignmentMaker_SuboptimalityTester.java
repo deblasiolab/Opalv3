@@ -3,10 +3,7 @@ package opal.makers;
 import opal.IO.AlignmentWriter;
 import opal.IO.ClustalWriter;
 import opal.IO.FastaWriter;
-import opal.IO.OpalLogWriter;
-
 import com.traviswheeler.libs.LogWriter;
-import opal.IO.SequenceConverter;
 import opal.IO.SequenceFileReader;
 import opal.IO.AlignmentWriter.OutputType;
 import opal.align.Aligner;

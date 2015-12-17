@@ -3,7 +3,6 @@ package opal.IO;
 import java.io.*;
 import java.util.regex.Pattern;
 
-import opal.align.StructureAlignment;
 import opal.exceptions.GenericOpalException;
 import com.traviswheeler.libs.LogWriter;
 

@@ -4,7 +4,6 @@ import facet.Facet;
 import facet.FacetAlignment;
 import opal.IO.Configuration;
 import opal.makers.AlignmentMaker_SingleSequences;
-import opal.makers.AlignmentMaker;
 import opal.IO.Inputs;
 
 public class realignmentDriver {
@@ -41,8 +40,8 @@ public class realignmentDriver {
 		
 		configList = cList.clone();
 		for(int i=0;i<configList.length;i++){
-			configList[i].gammaTerm = configList[i].gamma;
-			configList[i].lambdaTerm = configList[i].lambda;
+			configList[i].useLeftTerminal = false;
+			configList[i].useRightTerminal = false;
 		}
 	}
 	
@@ -66,14 +65,15 @@ public class realignmentDriver {
 				}
 			}
 		}
-		return Facet.defaultValue(new FacetAlignment(windowSequences, windowStructure));
+		float value = Facet.defaultValue(new FacetAlignment(windowSequences, windowStructure));
+		return (Float.isNaN(value))?0:value;
 	}
 
 	private char[][] realignWindow(int startIndex, int endIndex){
 		
 		// because the region may be larger than the windows we tested earlier
 		float originalScore = evaluateWindow(startIndex, endIndex);
-
+		
 		
 		char[][] originalWindowSequences = new char[sequence.length][endIndex-startIndex+1];
 		String[] names = new String[sequence.length];
@@ -120,10 +120,22 @@ public class realignmentDriver {
 		String bestConfig = "";
 		
 		for(int i=0; numberOfNonBlankSequences > 1 && i<configList.length; i++){
+			
+			configList[i].useLeftTerminal = (startIndex == 0);
+			configList[i].useRightTerminal = (endIndex == sequence[0].length-1);
+			if(globalConfiguration.realignment_use_terminals == Configuration.REALIGNMENT_TERMINALS.NEVER) 
+				configList[i].useRightTerminal = configList[i].useLeftTerminal = false;
+			if(globalConfiguration.realignment_use_terminals == Configuration.REALIGNMENT_TERMINALS.ALWAYS) 
+				configList[i].useRightTerminal = configList[i].useLeftTerminal = true;
+			
+			//System.err.println("Window: [" + startIndex + "," + endIndex + "] " + configList[i].useLeftTerminal + " " + configList[i].useRightTerminal);
+			
 			AlignmentMaker_SingleSequences am = new AlignmentMaker_SingleSequences();
 			am.initialize(configList[i].sc.convertSeqsToInts(windowSequences), names, configList[i], in);
 			int[][] subAlignmentInstance = am.buildAlignment();
+			//am.printOutput(subAlignmentInstance, null);
 			float score = Facet.defaultValue(new FacetAlignment(configList[i].sc.convertIntsToSeqs(subAlignmentInstance),windowStructure));
+			
 			//globalConfiguration.realignmentLog += "Best Score:" + bestScore + "\tcurrent score:" + score + "\n";
 			if(score>bestScore){
 				bestScore = score;
@@ -140,7 +152,7 @@ public class realignmentDriver {
 					}
 					if(numberOfNonGaps[j] > 0) putInIndex++;
 				}
-				bestConfig = "used " + configList[i].toString() + "(" + numberOfNonBlankSequences + " of " + sequence.length + " sequences)";
+				bestConfig = "used " + configList[i].toString() + " (" + numberOfNonBlankSequences + " of " + sequence.length + " sequences)";
 			}
 		}
 		if(bestSubAlignment == null){
@@ -154,8 +166,10 @@ public class realignmentDriver {
 	
 	public void simpleRealignment(int windowSize){
 		float[] scores = new float[sequence[0].length-windowSize];
+		float scoreTotal = 0;
 		for(int i=0;i<sequence[0].length-windowSize;i++){
 			scores[i] = evaluateWindow(i,i+windowSize);
+			scoreTotal += scores[i];
 		}
 		
 		String[] newAlignment = new String[sequence.length];
@@ -164,7 +178,24 @@ public class realignmentDriver {
 		}
 		
 		// TODO threshold scores
-		float threshold = (float)0.75 * wholeAlignmentScore;
+		float threshold = 0;
+		//(float)0.75 * wholeAlignmentScore;
+		
+		//threshold = (float)0.75 * (scoreTotal/scores.length);
+		
+		if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.AVERAGE_WINDOW) 
+			threshold = (float)globalConfiguration.realignment_threshold_value * (scoreTotal/scores.length);
+		if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.WHOLE_ALIGNMENT) 
+			threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
+		if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.VALUE)
+			threshold = globalConfiguration.realignment_threshold_value;
+		
+		System.err.println(scoreTotal + "/" + scores.length + " = " + (scoreTotal/scores.length) + "\t" + wholeAlignmentScore + "\t" 
+				+ globalConfiguration.realignment_threshold_type + "," + globalConfiguration.realignment_threshold_value + "(" + threshold + ")\t" 
+				+ globalConfiguration.realignment_window_type + "," + globalConfiguration.realignment_window_value + "\t" 
+				+ globalConfiguration.realignment_minimum_type + "," + globalConfiguration.realignment_minimum_window_value
+				);
+		
 		int[] countGood = new int[sequence[0].length];
 		for(int i=0;i<sequence[0].length-windowSize;i++){
 			if(scores[i]>threshold){
@@ -175,7 +206,13 @@ public class realignmentDriver {
 		}
 			
 		// TODO merge low scoring windows
-		int minimumBlockSize = windowSize;
+		int minimumBlockSize = 0;
+		if(globalConfiguration.realignment_minimum_type == Configuration.WINDOW_SIZE_MINIMUM.VALUE)
+			minimumBlockSize = (int)globalConfiguration.realignment_minimum_window_value;
+		if(globalConfiguration.realignment_minimum_type == Configuration.WINDOW_SIZE_MINIMUM.WINDOW_MULTIPLIER)
+			minimumBlockSize = (int)globalConfiguration.realignment_minimum_window_value * windowSize;
+		
+		//2*windowSize;
 		boolean[] includeInRealignment = new boolean[sequence[0].length];
 		for(int i=0;i<sequence[0].length;i++){
 			includeInRealignment[i] = (countGood[i]<windowSize);
