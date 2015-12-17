@@ -6,6 +6,7 @@ import opal.exceptions.GenericOpalException;
 import opal.tree.Tree;
 import opal.tree.TreeNode;
 
+import opal.IO.CostMatrix;
 import opal.IO.Configuration;
 import com.traviswheeler.libs.LogWriter; 
 import opal.IO.SequenceConverter;
@@ -21,7 +22,7 @@ public abstract class Aligner  {
 	public static int mixedAlignmentCutoff = 40;
 	public static int linearCutoff = 100;
 	public Configuration config;
-	//public static SequenceConverter seqConv;
+	public static SequenceConverter seqConv;
 	
 	
 	// DD July 2015 moved to configuration.
@@ -50,16 +51,14 @@ public abstract class Aligner  {
 	
 	
 	
-	/*public static void setSequenceConverter (SequenceConverter sc) {
+	public static void setSequenceConverter (SequenceConverter sc) {
 		seqConv = sc;	
-	}*/
+	}
 
 	public Aligner( Aligner al) {
 		this(al.A, al.B, al.isPessimistic);	
 		this.node = al.node;
-		this.config = new Configuration(al.config);
 		this.config = al.config;
-		
 	}
 	
 	public Aligner( Alignment A, Alignment B) {
@@ -167,7 +166,7 @@ public abstract class Aligner  {
 	protected static long calcCost(int[][] C, int K, int L, int[] ids, boolean allRows, Configuration config) {
 		int len = C[0].length;	
 		double[] colCosts = new double[len];
-		
+		seqConv = new SequenceConverter(config.cost.getChars());
 		
 		int a,b;
 		Direction inGap = null;
@@ -185,22 +184,22 @@ public abstract class Aligner  {
 				while (SequenceConverter.GAP_VAL == C[x][i] && SequenceConverter.GAP_VAL == C[y][i]) i++;
 				if (SequenceConverter.GAP_VAL == C[x][i] && SequenceConverter.GAP_VAL != C[y][i]) {
 					//cc2 += gammaTerm;
-					colCosts[i] += config.leftGammaTerm();
+					colCosts[i] += config.gammaTerm;
 					while (SequenceConverter.GAP_VAL == C[x][i]) {
 						if (SequenceConverter.GAP_VAL != C[y][i]) {
 							//cc2 += lambdaTerm;
-							colCosts[i] += config.leftLambdaTerm();
+							colCosts[i] += config.lambdaTerm;
 							yPos++;
 						}
 						i++;
 					}
 				} else if (SequenceConverter.GAP_VAL != C[x][i] && SequenceConverter.GAP_VAL == C[y][i]) {
 					//cc2 += gammaTerm;
-					colCosts[i] += config.leftGammaTerm();
+					colCosts[i] += config.gammaTerm;
 					while ( SequenceConverter.GAP_VAL == C[y][i]) {
 						if (SequenceConverter.GAP_VAL != C[x][i]){
 							//cc2 += lambdaTerm;
-							colCosts[i] += config.leftLambdaTerm();
+							colCosts[i] += config.lambdaTerm;
 							xPos++;
 						}
 						i++;
@@ -214,21 +213,21 @@ public abstract class Aligner  {
 				while (SequenceConverter.GAP_VAL == C[x][i] && SequenceConverter.GAP_VAL == C[y][i]) i--;
 				if (SequenceConverter.GAP_VAL == C[x][i] && SequenceConverter.GAP_VAL != C[y][i]) {
 					//cc2 += gammaTerm;
-					colCosts[i] += config.rightGammaTerm();
+					colCosts[i] += config.gammaTerm;
 					while (SequenceConverter.GAP_VAL == C[x][i]) {
 						if (SequenceConverter.GAP_VAL != C[y][i]){
 							//cc2 += lambdaTerm;
-							colCosts[i] += config.rightLambdaTerm();
+							colCosts[i] += config.lambdaTerm;
 						}
 						i--;
 					}
 				} else if (SequenceConverter.GAP_VAL != C[x][i] && SequenceConverter.GAP_VAL == C[y][i]) {
 					//cc2 += gammaTerm;
-					colCosts[i] += config.rightGammaTerm();
+					colCosts[i] += config.gammaTerm;
 					while ( SequenceConverter.GAP_VAL == C[y][i]) {
 						if (SequenceConverter.GAP_VAL != C[x][i]){
 							//cc2 += lambdaTerm;
-							colCosts[i] += config.rightLambdaTerm();
+							colCosts[i] += config.lambdaTerm;
 						}
 						i--;
 					}					

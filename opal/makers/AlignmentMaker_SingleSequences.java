@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.PrintStream;
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.io.FileOutputStream;
+
 import opal.polish.*;
 import opal.polish.Polisher.PolishType;
 import opal.tree.*;
@@ -16,6 +18,8 @@ import opal.align.Aligner.AlignmentType;
 import opal.exceptions.GenericOpalException;
 
 import com.traviswheeler.libs.LogWriter;
+
+import opal.IO.SequenceConverter;
 
 public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 
@@ -319,8 +323,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			return false;
 		
 		int K = seqs.length;
-		//char[][] result = Aligner.seqConv.convertIntArrayToCharAlignment(reorderedSeqs,chars);
-		char[][] result = conf.sc.convertIntArrayToCharAlignment(reorderedSeqs,chars);
+		char[][] result = Aligner.seqConv.convertIntArrayToCharAlignment(reorderedSeqs,chars);
 		 
 		AlignmentWriter wr;
 		if ( AlignmentWriter.outFormat == OutputType.fasta)
@@ -371,13 +374,9 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	protected void printParams (int length, Alignment example /* used in subclass*/) {
 		if (verbosity>0) {
 			LogWriter.stdErrLogln("gamma is " + conf.gamma + " and lambda is " + conf.lambda);
-			if (conf.useLeftTerminal && conf.useRightTerminal && (conf.leftGammaTerm() != conf.gamma  ||  conf.leftLambdaTerm() != conf.lambda))
-				LogWriter.stdErrLogln("gamma_term is " + conf.leftGammaTerm() + " and lambda_term is " + conf.leftLambdaTerm());
-			else if (conf.useLeftTerminal && (conf.leftGammaTerm() != conf.gamma  ||  conf.leftLambdaTerm() != conf.lambda))
-				LogWriter.stdErrLogln("left gamma_term is " + conf.leftGammaTerm() + " and left lambda_term is " + conf.leftLambdaTerm());
-			else if (conf.useRightTerminal && (conf.rightGammaTerm() != conf.gamma  ||  conf.rightLambdaTerm() != conf.lambda))
-				LogWriter.stdErrLogln("right gamma_term is " + conf.rightGammaTerm() + " and right lambda_term is " + conf.rightLambdaTerm());
-	
+			if (conf.gammaTerm != conf.gamma  ||  conf.lambdaTerm != conf.lambda)
+				LogWriter.stdErrLogln("gamma_term is " + conf.gammaTerm + " and lambda_term is " + conf.lambdaTerm);
+					
 			LogWriter.stdErrLogln("Solution alignment length is " + length);
 	
 			if (!Polisher.justPolish) {
@@ -463,7 +462,6 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			if (conf.useStructure) {
 				LogWriter.stdErrLogln("Using structure model: " + conf.modelType);
 			}
-			LogWriter.stdErrLog(conf.realignmentLog);
 
 		}
 

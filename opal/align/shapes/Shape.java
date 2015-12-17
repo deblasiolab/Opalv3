@@ -153,47 +153,25 @@ abstract public class Shape {
 		}
 		
 		if (a<0) {//horiz	
-			int termLeftA = A.gapsBeforeFirst[aPos] ;
-			int termRightA = A.gapsAfterLast[aPos] + A.lastLetterCount[aPos];
-			if(aPos == 0){
-				termLeftA = K;
-				termRightA = 0;
-			}else if(aPos == M){
-				termLeftA = 0;
-				termRightA = K;
-			}
-			
-			cost = B.f1[b] * (config.lambda * (K-termLeftA-termRightA)  +  config.leftLambdaTerm() * termLeftA +  config.rightLambdaTerm() * termRightA );
+			int termA = (aPos == M || aPos == 0) ? K : A.gapsBeforeFirst[aPos] + A.gapsAfterLast[aPos] + A.lastLetterCount[aPos];
+			cost = B.f1[b] * (config.lambda * (K-termA)  +  config.lambdaTerm * termA );
 			if (config.useStructure) {
 				cost += Aligner.getStructGapExtModifer(structA, structB, aPos, bPos, Aligner.Direction.horiz);
 			}
 
 		} else if (b<0) { //vert
-			int termLeftB = B.gapsBeforeFirst[bPos];
-			int termRightB =  B.gapsAfterLast[bPos] + B.lastLetterCount[bPos];
-			if(bPos == 0){
-				termLeftB = L;
-				termRightB = 0;
-			}else if(bPos == N){
-				termLeftB = 0;
-				termRightB = L;
-			}
-			
-			cost = A.f1[a] * (config.lambda * (L-termLeftB-termRightB) +  config.leftLambdaTerm() * termLeftB +  config.rightLambdaTerm() * termRightB );
+			int termB = (bPos == N || bPos == 0) ? L : B.gapsBeforeFirst[bPos] + B.gapsAfterLast[bPos] + B.lastLetterCount[bPos];
+			cost = A.f1[a] * (config.lambda * (L-termB) +  config.lambdaTerm * termB );
 			if (config.useStructure) {
 				cost += Aligner.getStructGapExtModifer(structA, structB, aPos, bPos, Aligner.Direction.vert);
 			}
 
 		} else { //dir == DIAG
-			int termLeftA = A.gapsBeforeFirst[a];
-			int termLeftB = B.gapsBeforeFirst[b];
-			int termRightA = A.gapsAfterLast[a];
-			int termRightB = B.gapsAfterLast[b];
+			int termA = A.gapsBeforeFirst[a]+A.gapsAfterLast[a];
+			int termB = B.gapsBeforeFirst[b]+B.gapsAfterLast[b];
 			// all substitution letter combos, including gap extensions
-			int internalExtensionCount = (A.f0[a]-termLeftA-termRightA) * B.f1[b] + A.f1[a] * (B.f0[b]-termLeftB-termRightB) ;
-			cost = config.lambda * ( internalExtensionCount ) 
-					+ config.leftLambdaTerm() * (termLeftA * B.f1[b] + termLeftB * A.f1[a])
-					+ config.rightLambdaTerm() * (termRightA * B.f1[b] + termRightB * A.f1[a]);
+			int internalExtensionCount = (A.f0[a]-termA) * B.f1[b] + A.f1[a] * (B.f0[b]-termB) ;
+			cost = config.lambda * ( internalExtensionCount ) + config.lambdaTerm * (termA * B.f1[b] + termB * A.f1[a]);
 			
 			for (int x=0; x<A.chars[a].length; x++){
 				for (int y=0; y<B.chars[b].length; y++){

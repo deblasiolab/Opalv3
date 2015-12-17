@@ -39,7 +39,7 @@ public class ShapeQuadratic extends Shape {
 			for (int j = 0; j < L; j++) {
 				if (Aligner.Direction.horiz == dir)  {
 					if (seqBlocks[i] >= seqBlocks[j+K]  &&  SequenceConverter.GAP_VAL != B.seqs[j][b-1]) {
-						cost += (aPos < A.firstLetterLoc[i] || aPos >= A.lastLetterLoc[i]) ? ((aPos < A.firstLetterLoc[i]) ? config.leftGammaTerm() : config.rightGammaTerm()) : config.gamma;
+						cost += (aPos < A.firstLetterLoc[i] || aPos >= A.lastLetterLoc[i]) ? config.gammaTerm : config.gamma;
 						if (config.useStructure && aPos > 0) {
 							int pos = ((StructureAlignment)A).origSeqIndices[i][aPos-1];
 							if (pos>0)
@@ -48,7 +48,7 @@ public class ShapeQuadratic extends Shape {
 					}
 				} else if (Aligner.Direction.vert == dir)  {
 					if (seqBlocks[j+K] >= seqBlocks[i]  &&  SequenceConverter.GAP_VAL != A.seqs[i][a-1]) {
-						cost += (bPos < B.firstLetterLoc[j] || bPos >= B.lastLetterLoc[j]) ? ((bPos < B.firstLetterLoc[j]) ? config.leftGammaTerm() : config.rightGammaTerm()) : config.gamma;					
+						cost += (bPos < B.firstLetterLoc[j] || bPos >= B.lastLetterLoc[j]) ? config.gammaTerm : config.gamma;					
 						if (config.useStructure && bPos > 0) {
 							int pos = ((StructureAlignment)B).origSeqIndices[j][bPos-1];
 							if (pos>0)
@@ -57,14 +57,14 @@ public class ShapeQuadratic extends Shape {
 					}
 				} else { //if (Aligner.DIAG == dir)
 					if ( seqBlocks[i] >= seqBlocks[j+K]  &&  SequenceConverter.GAP_VAL != B.seqs[j][b-1] && SequenceConverter.GAP_VAL == A.seqs[i][a-1]) { 
-							cost += (aPos < A.firstLetterLoc[i] || aPos >= A.lastLetterLoc[i]) ? ((aPos < A.firstLetterLoc[i]) ? config.leftGammaTerm() : config.rightGammaTerm()) : config.gamma;						
+							cost += (aPos < A.firstLetterLoc[i] || aPos >= A.lastLetterLoc[i]) ? config.gammaTerm : config.gamma;						
 							if (config.useStructure && aPos > 0) {
 								int pos = ((StructureAlignment)A).origSeqIndices[i][aPos-1];
 								if (pos>0)
 									cost += config.gapOpenMods[ config.getStructureLevelFromProbability( StructureFileReader.structureNeighborLevels[A.seqIds[i]][pos] ) ] ;
 							}
 					} else if (seqBlocks[j+K] >= seqBlocks[i]  &&  SequenceConverter.GAP_VAL != A.seqs[i][a-1] && SequenceConverter.GAP_VAL == B.seqs[j][b-1])  {
-							cost += (bPos < B.firstLetterLoc[j] || bPos >= B.lastLetterLoc[j]) ? ((bPos < B.firstLetterLoc[j]) ? config.leftGammaTerm() : config.rightGammaTerm()) : config.gamma;						
+							cost += (bPos < B.firstLetterLoc[j] || bPos >= B.lastLetterLoc[j]) ? config.gammaTerm : config.gamma;						
 							if (config.useStructure && bPos > 0) {
 								int pos = ((StructureAlignment)B).origSeqIndices[j][bPos-1];
 								if (pos>0)

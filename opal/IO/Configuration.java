@@ -24,8 +24,8 @@ import opal.exceptions.GenericOpalException;
 public class Configuration {
 	public int gamma = -1;
 	public int lambda = -1;
-	private int gammaTerm = -1;
-	private int lambdaTerm = -1;
+	public int gammaTerm = -1;
+	public int lambdaTerm = -1;
 	public boolean useLeftTerminal = true;
 	public boolean useRightTerminal = true;
 	public CostMatrix cost;
@@ -270,7 +270,7 @@ public class Configuration {
 		return lvl;
 	}
 	
-	public int leftLambdaTerm(){
+	/*public int leftLambdaTerm(){
 		return (useLeftTerminal)?lambdaTerm:lambda;
 	}
 	public int leftGammaTerm(){
@@ -281,7 +281,7 @@ public class Configuration {
 	}
 	public int rightGammaTerm(){
 		return (useRightTerminal)?gammaTerm:gamma;
-	}
+	}*/
 	public void setGammaTerm(int gT){ gammaTerm = gT; }
 	public void setLambdaTerm(int lT){ lambdaTerm = lT; }
 }
