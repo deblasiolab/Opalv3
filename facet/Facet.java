@@ -13,16 +13,21 @@ import java.io.PrintWriter;
 public class Facet {
 
 	public static float defaultValue(FacetAlignment a){
-		double total = 0.171730397;
-		Configuration c = new Configuration();
-		c.normalizeBigN = true;
-		total += 0.105434529 * PercentIdentity.replacement_score(a, c);
-		total += 0.172122922 * GapDensity.open(a, c);
-		total += 0.174107269 * Blockiness.evaluate(a, c);
-		total += 0.176015402 * PercentIdentity.structure(a, c);
-		total += 0.200589481 * Support.probability(a, c);
-		return (float) total;
-		 /*
+		return defaultValue(a,true);
+	}
+	public static float defaultValue(FacetAlignment a, boolean useLegacyFacetFunction){
+		if(useLegacyFacetFunction){
+			double total = 0.171730397;
+			Configuration c = new Configuration();
+			c.normalizeBigN = true;
+			total += 0.105434529 * PercentIdentity.replacement_score(a, c);
+			total += 0.172122922 * GapDensity.open(a, c);
+			total += 0.174107269 * Blockiness.evaluate(a, c);
+			total += 0.176015402 * PercentIdentity.structure(a, c);
+			total += 0.200589481 * Support.probability(a, c);
+			return (float) total;
+		}
+		
 		Configuration c6 = new Configuration();
 		Configuration c10 = new Configuration();
 		Configuration c20 = new Configuration();
@@ -50,7 +55,7 @@ public class Facet {
 		total +=  0.20416796078871755 * PercentIdentity.sequence(a, c10);
 		total +=  0.039875954173829012 * PercentIdentity.structure(a, c10) ;
 		total +=  0.23897573022221946 * Support.probability(a, c10);
-		return (float) total;*/
+		return (float) total;
 	}
 	
 	public static void outputDefaultFeatures(String fname, FacetAlignment a){

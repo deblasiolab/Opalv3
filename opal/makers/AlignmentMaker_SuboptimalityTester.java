@@ -90,7 +90,7 @@ public class AlignmentMaker_SuboptimalityTester extends AlignmentMaker {
 		return null;
 	}
 
-	public boolean printOutput(int[][] input, String fname){
+	public boolean printOutput(int[][] input, String fname, boolean printRealignmentLines){
 		return true;
 	}
 	

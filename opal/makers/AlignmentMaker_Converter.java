@@ -51,7 +51,7 @@ public class AlignmentMaker_Converter extends AlignmentMaker {
 		//return null;
 	}
 
-	public boolean printOutput(int[][] num, String fname){
+	public boolean printOutput(int[][] num, String fname, boolean printRealignmentLines){
 		PrintStream stdout = System.out;
 		if(fname!=null){
 			try{

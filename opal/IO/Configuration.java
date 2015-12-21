@@ -39,13 +39,16 @@ public class Configuration {
 	public int[] gapExtMods;
 	
 	public enum THRESHOLD_TYPE{
-		VALUE, AVERAGE_WINDOW, WHOLE_ALIGNMENT
+		VALUE, AVERAGE_WINDOW, WHOLE_ALIGNMENT,
+		TWO_VALUE, TWO_AVERAGE, TWO_WHOLE,
+		TWO_SD
 	}
 	public THRESHOLD_TYPE realignment_threshold_type = THRESHOLD_TYPE.WHOLE_ALIGNMENT;
 	public float realignment_threshold_value = 1;
+	public float realignment_threshold_value_lower = 1;
 	
 	public enum WINDOW_SIZE_MINIMUM{
-		VALUE, WINDOW_MULTIPLIER
+		VALUE, WINDOW_MULTIPLIER, NONE
 	}
 	public WINDOW_SIZE_MINIMUM realignment_minimum_type = WINDOW_SIZE_MINIMUM.WINDOW_MULTIPLIER;
 	public float realignment_minimum_window_value = 2;
@@ -62,6 +65,8 @@ public class Configuration {
 	public REALIGNMENT_TERMINALS realignment_use_terminals = REALIGNMENT_TERMINALS.NEVER;
 	
 	public String realignmentLog = "";
+	
+	public boolean useLegacyFacetFunction = true;
 
 	public String toString(){
 		
@@ -110,7 +115,7 @@ public class Configuration {
 		realignment_threshold_type = c.realignment_threshold_type;
 		realignment_threshold_value = c.realignment_threshold_value;
 		realignment_use_terminals = c.realignment_use_terminals;
-		
+		useLegacyFacetFunction = c.useLegacyFacetFunction;
 		
 	
 	}

@@ -304,7 +304,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 		return reorderedSeqs;
 	}
 	
-	public boolean printOutput (int[][] reorderedSeqs, String fname) {
+	public boolean printOutput (int[][] reorderedSeqs, String fname, boolean printRealignmentLines) {
 
 		PrintStream stdout = System.out;
 		PrintStream out = null;
@@ -361,6 +361,9 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			if (showCost) {
 				long cost = Aligner.calcCost(result, ids, conf); 
 				LogWriter.stdErrLogln("Alignment cost:      " + NumberFormat.getInstance().format( cost ));
+			}
+			if(printRealignmentLines){
+				LogWriter.stdErrLog(conf.realignmentLog);
 			}
 			LogWriter.stdErrLogln("================================");
 		}

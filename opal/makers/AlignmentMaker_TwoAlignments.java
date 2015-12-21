@@ -65,7 +65,7 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 		//return null;
 	}
 	
-	public boolean printOutput(int[][] result_i, String fname){
+	public boolean printOutput(int[][] result_i, String fname, boolean printRealignmentLines){
 		PrintStream stdout = System.out;
 		if(fname!=null){
 			try{
