@@ -244,7 +244,8 @@ public class realignmentDriver {
 		}else if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_AVERAGE ||
 				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_VALUE ||
 				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_WHOLE ||
-				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD ){
+				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD ||
+				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
 			
 			float good_threshold = 0;
 			float bad_threshold = 0;
@@ -275,8 +276,8 @@ public class realignmentDriver {
 			
 			float window_column_value[] = new float[windowSize];
 			for(int j=0;j<=windowSize/2;j++){
-				window_column_value[j] = (float)Math.pow(2, j);
-				window_column_value[windowSize-j-1] = (float)Math.pow(2, j);
+				window_column_value[j] = (float)Math.pow(globalConfiguration.realignmentWindowWeightDecay, (windowSize/2)-j);
+				window_column_value[windowSize-j-1] = (float)Math.pow(globalConfiguration.realignmentWindowWeightDecay, (windowSize/2)-j);
 			}
 			
 			float[] column_scores = new float[sequence[0].length];

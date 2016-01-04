@@ -47,6 +47,7 @@ public class Configuration {
 	public THRESHOLD_TYPE realignment_threshold_type = THRESHOLD_TYPE.WHOLE_ALIGNMENT;
 	public float realignment_threshold_value = 1;
 	public float realignment_threshold_value_lower = 1;
+	public float realignmentWindowWeightDecay = (float)0.5;
 	
 	public enum WINDOW_SIZE_MINIMUM{
 		VALUE, WINDOW_MULTIPLIER, NONE

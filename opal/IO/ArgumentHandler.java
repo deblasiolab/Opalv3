@@ -46,10 +46,12 @@ public class ArgumentHandler {
 	
 	public String configOutputFile = null;
 	public String bestOutputFile = null;
+	public String bestOutputFileIncludePreRealignment = null;
 	public String featureOutputFile = null;
 	public String preRealignmentOutputFile = null;
 	public String bestPreRealignmentOutputFile = null;
 	public String bestPreRealignmentsRealignmentOutputFile = null;
+	public String bestPreRealignmentsRealignmentOutputFileIncludePreRealignment = null;
 		
 	int verbosity = 1;
 	boolean toUpper = false; 
@@ -67,6 +69,7 @@ public class ArgumentHandler {
 	float temp_realign_threshold_lower = -1;
 	float temp_realign_window_size = -1;
 	float temp_realign_minimum_value = -1;
+	float temp_realignmentWindowWeightDecay = -1;
 	
 	
 	public ArgumentHandler (String argString) {
@@ -82,7 +85,7 @@ public class ArgumentHandler {
 		*/
 		
 		
-		LongOpt[] longopts = new LongOpt[94];
+		LongOpt[] longopts = new LongOpt[97];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -120,12 +123,14 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("tree_order", LongOpt.NO_ARGUMENT, null, 'o'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("input_order", LongOpt.NO_ARGUMENT, null, 'o'); //<<<<<<<<<
 		longopts[longopts_index++] = new LongOpt("show_cost", LongOpt.NO_ARGUMENT, null, 's'); //<<<<<<<<<
-		longopts[longopts_index++] = new LongOpt("out_best", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_best", LongOpt.REQUIRED_ARGUMENT, null, 'o');
+		longopts[longopts_index++] = new LongOpt("out_best_include_pre", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_config", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_feature", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_prerealignment", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_prerealignment_best", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		longopts[longopts_index++] = new LongOpt("out_prerealignment_best_realignment", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
+		longopts[longopts_index++] = new LongOpt("out_prerealignment_best_realignment_include_pre", LongOpt.REQUIRED_ARGUMENT, null, 'o'); 
 		
 		longopts[longopts_index++] = new LongOpt("linear_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'z'); // default = 20
 		longopts[longopts_index++] = new LongOpt("mixed_alignment_cutoff", LongOpt.REQUIRED_ARGUMENT, null, 'm');
@@ -185,6 +190,8 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoSD", LongOpt.NO_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoWhole", LongOpt.NO_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoPercentage", LongOpt.NO_ARGUMENT, null, 'k');
+
+		longopts[longopts_index++] = new LongOpt("realignmentWindowWeightDecay", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdLowerValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
@@ -328,6 +335,8 @@ public class ArgumentHandler {
             		
             		if (optName.equals("out_best")) {
             			bestOutputFile = arg.toString();
+            		} else if (optName.equals("out_best_include_pre")) {
+            			bestOutputFileIncludePreRealignment = arg.toString();
             		} else if (optName.equals("out_config")) {
             			configOutputFile = arg.toString();
             		} else if (optName.equals("out_feature")) {
@@ -338,7 +347,9 @@ public class ArgumentHandler {
             			bestPreRealignmentOutputFile = arg.toString();
             		} else if (optName.equals("out_prerealignment_best_realignment")) {
             			bestPreRealignmentsRealignmentOutputFile = arg.toString();
-        		} else if (optName.equals("out")) {
+            		}  else if (optName.equals("out_prerealignment_best_realignment_include_pre")) {
+            			bestPreRealignmentsRealignmentOutputFileIncludePreRealignment = arg.toString();
+        			} else if (optName.equals("out")) {
             			if(configOutputFile == null) configOutputFile = arg.toString();
             			if(bestOutputFile == null) bestOutputFile = arg.toString();
 		            	/*try {
@@ -628,6 +639,8 @@ public class ArgumentHandler {
             		if (optName.equals("realignmentThresholdValue")){ temp_realign_threshold = Float.parseFloat(arg.toString());}
             		if (optName.equals("realignmentThresholdLowerValue")){ temp_realign_threshold_lower = Float.parseFloat(arg.toString());}
 
+            		if (optName.equals("realignmentWindowWeightDecay")){ temp_realignmentWindowWeightDecay = Float.parseFloat(arg.toString());}
+
             		if (optName.equals("realignmentAlwaysTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.ALWAYS; /*LogWriter.stdErrLogln("always and positional terminals are dissabled due to an error"); System.exit(1);*/ }
             		if (optName.equals("realignmentNeverTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.NEVER; }
             		if (optName.equals("realignmentPositionalTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.POSITIONAL; /*LogWriter.stdErrLogln("always and positional terminals are dissabled due to an error"); System.exit(1);*/ }
@@ -799,6 +812,7 @@ public class ArgumentHandler {
 				if(temp_window_type != null) advising_configs[i].realignment_window_type = temp_window_type;
 				if(temp_realign_window_size != -1) advising_configs[i].realignment_window_value = temp_realign_window_size;
 				if(temp_realignment_terminals != null) advising_configs[i].realignment_use_terminals = temp_realignment_terminals;
+				if(temp_realignmentWindowWeightDecay != -1) advising_configs[i].realignmentWindowWeightDecay = temp_realignmentWindowWeightDecay;
 				advising_configs[i].useLegacyFacetFunction = useLegacyFacetFunction;
 				advising_configs[i].doReverse = doReverse;
 			}
@@ -828,6 +842,7 @@ public class ArgumentHandler {
 			if(temp_window_type != null) advising_configs[j].realignment_window_type = temp_window_type;
 			if(temp_realign_window_size != -1) advising_configs[j].realignment_window_value = temp_realign_window_size;
 			if(temp_realignment_terminals != null) advising_configs[j].realignment_use_terminals = temp_realignment_terminals;
+			if(temp_realignmentWindowWeightDecay != -1) advising_configs[j].realignmentWindowWeightDecay = temp_realignmentWindowWeightDecay;
 			advising_configs[j].useLegacyFacetFunction = useLegacyFacetFunction;
 			advising_configs[j].doReverse = doReverse;
 			if(repeat_config>1){
@@ -874,10 +889,12 @@ public class ArgumentHandler {
 		in.structFileB = getStructFileB();
 		in.configOutputFile = configOutputFile;
 		in.bestOutputFile = bestOutputFile;
+		in.bestOutputFileIncludePreRealignment = bestOutputFileIncludePreRealignment;
 		in.featureOutputFile = featureOutputFile;
 		in.preRealignmentOutputFile = preRealignmentOutputFile;
 		in.bestPreRealignmentOutputFile = bestPreRealignmentOutputFile;
 		in.bestPreRealignmentsRealignmentOutputFile = bestPreRealignmentsRealignmentOutputFile;
+		in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment = bestPreRealignmentsRealignmentOutputFileIncludePreRealignment;
 		
 		if (in.structFileA != null)
 			in.structure = new StructureFileReader(in.structFileA, in.structFileB);

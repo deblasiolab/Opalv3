@@ -169,6 +169,23 @@ class runAlignment extends Thread{
 		return am.printOutput(alignmentInstance, in.bestOutputFile);
 	}
 	
+	public boolean printBestIncludePreRealignment(){
+		if(facetScore>preRealignmentFacetScore){
+			if (in.verbosity>-1) {
+				System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
+			}
+
+			return am.printOutput(alignmentInstance, in.bestOutputFileIncludePreRealignment);
+		}else{
+			if (in.verbosity>0 && facetScore>-1) {
+				System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
+			}
+			
+			return am.printOutput(preRealignmentAlignmentInstance, in.bestOutputFileIncludePreRealignment, false);
+			
+		}
+	}
+	
 	public boolean printPreRealignment(){
 		if (in.verbosity>0 && facetScore>-1) {
 			System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
@@ -198,6 +215,22 @@ class runAlignment extends Thread{
 		}
 			
 		return am.printOutput(alignmentInstance, in.bestPreRealignmentsRealignmentOutputFile);
+	}	
+	
+	public boolean printBestPreRealignmentsRealignmentIncludePreRealignment(){
+		if(facetScore>preRealignmentFacetScore){
+			if (in.verbosity>-1) {
+				System.err.printf("\nbest pre-realignments realignment facet value --  %.6f (%s)",facetScore, conf );
+			}
+				
+			return am.printOutput(alignmentInstance, in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment);
+		}else{
+			if (in.verbosity>-1) {
+				System.err.printf("\nbest pre-realignment facet value --  %.6f (%s)",preRealignmentFacetScore, conf );
+			}
+				
+			return am.printOutput(preRealignmentAlignmentInstance, in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment, false);
+		}
 	}
 }
 
@@ -309,7 +342,21 @@ public class Opal {
 					System.err.println("Print returned false");
 				if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignment()) 
 					System.err.println("Print returned false");
+				if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignmentIncludePreRealignment()) 
+					System.err.println("Print returned false");
 		}
+		
+		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0 
+				&& thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0 
+				&& thread[maxPreRealignmentIndex].preRealignmentFacetScore < thread[maxIndex].facetScore){
+			if(!thread[maxIndex].printBestIncludePreRealignment()) 
+				System.err.println("Print returned false");
+		}else if(advising_config.length>1 && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
+			if(!thread[maxPreRealignmentIndex].printBestIncludePreRealignment()) 
+				System.err.println("Print returned false");
+		}
+		
+		
 		System.err.println("advising_config.length: " + advising_config.length + "\tmaxPreRealignmentIndex:" + maxPreRealignmentIndex + "\tthread[maxPreRealignmentIndex]:" + thread[maxPreRealignmentIndex]);
 		if (input.verbosity>0) {
 			Date now = new Date();
