@@ -66,7 +66,7 @@ public class ArgumentHandler {
 	Configuration.WINDOW_SIZE temp_window_type = null;
 	Configuration.REALIGNMENT_TERMINALS temp_realignment_terminals = null;
 	float temp_realign_threshold = -1;
-	float temp_realign_threshold_lower = -1;
+	float temp_realign_threshold_lower = (float)-10000.0;
 	float temp_realign_window_size = -1;
 	float temp_realign_minimum_value = -1;
 	float temp_realignmentWindowWeightDecay = -1;
@@ -806,7 +806,7 @@ public class ArgumentHandler {
 			for(int i=0;i<advising_configs.length;i++){
 				if(temp_threshold_type != null) advising_configs[i].realignment_threshold_type = temp_threshold_type;
 				if(temp_realign_threshold != -1) advising_configs[i].realignment_threshold_value = temp_realign_threshold;
-				if(temp_realign_threshold_lower != -1) advising_configs[i].realignment_threshold_value_lower = temp_realign_threshold_lower;
+				if(temp_realign_threshold_lower != (float)-10000.0) advising_configs[i].realignment_threshold_value_lower = temp_realign_threshold_lower;
 				if(temp_window_minimum_type != null) advising_configs[i].realignment_minimum_type = temp_window_minimum_type;
 				if(temp_realign_minimum_value != -1) advising_configs[i].realignment_minimum_window_value = temp_realign_minimum_value;
 				if(temp_window_type != null) advising_configs[i].realignment_window_type = temp_window_type;
@@ -836,7 +836,7 @@ public class ArgumentHandler {
 			
 			if(temp_threshold_type != null) advising_configs[j].realignment_threshold_type = temp_threshold_type;
 			if(temp_realign_threshold != -1) advising_configs[j].realignment_threshold_value = temp_realign_threshold;
-			if(temp_realign_threshold_lower != -1) advising_configs[j].realignment_threshold_value_lower = temp_realign_threshold_lower;
+			if(temp_realign_threshold_lower != (float)-10000.0) advising_configs[j].realignment_threshold_value_lower = temp_realign_threshold_lower;
 			if(temp_window_minimum_type != null) advising_configs[j].realignment_minimum_type = temp_window_minimum_type;
 			if(temp_realign_minimum_value != -1) advising_configs[j].realignment_minimum_window_value = temp_realign_minimum_value;
 			if(temp_window_type != null) advising_configs[j].realignment_window_type = temp_window_type;
