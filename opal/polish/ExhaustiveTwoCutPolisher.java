@@ -43,7 +43,7 @@ public class ExhaustiveTwoCutPolisher extends TreePolisher {
 		if (verbosity>1) {
 			LogWriter.stdErrLog("Initial alignment formed"); 
 			if (AlignmentMaker.showCost) {
-				prevCost = Aligner.calcCost(fullAlignment, alignment.seqIds, aligner.config);
+				prevCost = Aligner.calcCost(fullAlignment, alignment.seqIds, aligner.config, alignment.in);
 				LogWriter.stdErrLog(", with a cost of " + NumberFormat.getInstance().format( prevCost ));
 			}
 			LogWriter.stdErrLogln("");
@@ -116,11 +116,11 @@ public class ExhaustiveTwoCutPolisher extends TreePolisher {
 				System.arraycopy(idsA, 0, idsAB, 0, idsA.length);
 				System.arraycopy(idsB, 0, idsAB, idsA.length, idsB.length);
 				
-				prevCost = Aligner.calcCost(AB, sizeA, sizeB, idsAB, aligner.config);
+				prevCost = Aligner.calcCost(AB, sizeA, sizeB, idsAB, aligner.config, alignment.in);
 				
 				
-				Alignment alA = Alignment.buildNewAlignment(Alignment.getDegappedCopy(A), idsA, aligner.config);
-				Alignment alB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(B), idsB, aligner.config);
+				Alignment alA = Alignment.buildNewAlignment(Alignment.getDegappedCopy(A), idsA, aligner.config, alignment.in);
+				Alignment alB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(B), idsB, aligner.config, alignment.in);
 				
 				boolean usedExactCost;
 				if (Polisher.polishAligmentMethod == AlignmentType.mixed &&
@@ -182,7 +182,7 @@ public class ExhaustiveTwoCutPolisher extends TreePolisher {
 					if (verbosity>1) {
 						LogWriter.stdErrLog("\nPass " + passCnt + " complete.");
 						if (AlignmentMaker.showCost) {
-							long c = Aligner.calcCost(fullAlignment, root.alignment.seqIds, aligner.config); // I think those ids are right
+							long c = Aligner.calcCost(fullAlignment, root.alignment.seqIds, aligner.config, alignment.in); // I think those ids are right
 							LogWriter.stdErrLog(" Current cost is " + NumberFormat.getInstance().format( c ));
 						}
 						LogWriter.stdErrLog("\n");
@@ -212,7 +212,7 @@ public class ExhaustiveTwoCutPolisher extends TreePolisher {
 					if (verbosity>1) {
 						LogWriter.stdErrLogln("\nPass " + passCnt + " complete (other edges have already been tested).");
 						if (AlignmentMaker.showCost) { 
-							long c = Aligner.calcCost(fullAlignment, root.alignment.seqIds, aligner.config);
+							long c = Aligner.calcCost(fullAlignment, root.alignment.seqIds, aligner.config, alignment.in);
 							LogWriter.stdErrLog(" Current cost is " + NumberFormat.getInstance().format( c ));
 						}
 						LogWriter.stdErrLog("\n");

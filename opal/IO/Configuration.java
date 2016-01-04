@@ -24,14 +24,15 @@ import opal.exceptions.GenericOpalException;
 public class Configuration {
 	public int gamma = -1;
 	public int lambda = -1;
-	public int gammaTerm = -1;
-	public int lambdaTerm = -1;
+	private int gammaTerm = -1;
+	private int lambdaTerm = -1;
 	public boolean useLeftTerminal = true;
 	public boolean useRightTerminal = true;
 	public CostMatrix cost;
 	public SequenceConverter sc;
 	public int repetition = -1;
 	public boolean useStructure = false;
+	public boolean doReverse;
 	
 	public opal.align.StructureAlignment.ParamModel modelType;
 	public int gapLevelCnt = 1;
@@ -41,7 +42,7 @@ public class Configuration {
 	public enum THRESHOLD_TYPE{
 		VALUE, AVERAGE_WINDOW, WHOLE_ALIGNMENT,
 		TWO_VALUE, TWO_AVERAGE, TWO_WHOLE,
-		TWO_SD
+		TWO_SD, TWO_PERCENTAGE
 	}
 	public THRESHOLD_TYPE realignment_threshold_type = THRESHOLD_TYPE.WHOLE_ALIGNMENT;
 	public float realignment_threshold_value = 1;
@@ -116,7 +117,7 @@ public class Configuration {
 		realignment_threshold_value = c.realignment_threshold_value;
 		realignment_use_terminals = c.realignment_use_terminals;
 		useLegacyFacetFunction = c.useLegacyFacetFunction;
-		
+		doReverse = c.doReverse;
 	
 	}
 	
@@ -275,7 +276,7 @@ public class Configuration {
 		return lvl;
 	}
 	
-	/*public int leftLambdaTerm(){
+	public int leftLambdaTerm(){
 		return (useLeftTerminal)?lambdaTerm:lambda;
 	}
 	public int leftGammaTerm(){
@@ -286,7 +287,7 @@ public class Configuration {
 	}
 	public int rightGammaTerm(){
 		return (useRightTerminal)?gammaTerm:gamma;
-	}*/
+	}
 	public void setGammaTerm(int gT){ gammaTerm = gT; }
 	public void setLambdaTerm(int lT){ lambdaTerm = lT; }
 }

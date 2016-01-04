@@ -5,6 +5,7 @@ import opal.align.Aligner;
 import opal.align.Alignment;
 import opal.IO.Configuration;
 import opal.align.Alignment;
+import opal.IO.Inputs;
 
 public class ShapeLinear extends Shape {
 
@@ -33,8 +34,10 @@ public class ShapeLinear extends Shape {
 		int i = 0;
 		int[] Ta = new int[maxBlock+1]; //Ta[i] := num gap chars in block i of alignment A
 		int[] Tb = new int[maxBlock+1]; //Tb[i] := num gap chars in block i of alignment B
-		int[] Ta_term = new int[maxBlock+1]; //Ta_term[i] := num gap chars in block i of alignment A that are outside the boundaries of the string for their seqs
-		int[] Tb_term = new int[maxBlock+1]; //Tb_term[i] := num gap chars in block i of alignment B that are outside the boundaries of the string for their seqs
+		int[] Ta_term_left = new int[maxBlock+1]; //Ta_term[i] := num gap chars in block i of alignment A that are outside the boundaries of the string for their seqs
+		int[] Ta_term_right = new int[maxBlock+1]; //Ta_term[i] := num gap chars in block i of alignment A that are outside the boundaries of the string for their seqs
+		int[] Tb_term_left = new int[maxBlock+1]; //Tb_term[i] := num gap chars in block i of alignment B that are outside the boundaries of the string for their seqs
+		int[] Tb_term_right = new int[maxBlock+1]; //Tb_term[i] := num gap chars in block i of alignment B that are outside the boundaries of the string for their seqs
 
 		int[] Sa = new int[maxBlock+1]; //Sa[i] := (1) num non-gap chars in block i of alignment A
 		 								//   then (2) num strings whose final non-gap char occurs at or before block i in A.
@@ -48,8 +51,10 @@ public class ShapeLinear extends Shape {
 			for (i = 0; i < K; i++) {
 				if (a == 0 || SequenceConverter.GAP_VAL == A.seqs[i][a-1]) { 
 					Ta[seqBlocks[i]]++;
-					if (a < A.firstLetterLoc[i] || a >= A.lastLetterLoc[i]) 
-						Ta_term[seqBlocks[i]]++;						
+					if (a < A.firstLetterLoc[i]) 
+						Ta_term_left[seqBlocks[i]]++;	
+					if (a >= A.lastLetterLoc[i]) 
+						Ta_term_right[seqBlocks[i]]++;						
 				} else { 
 					Sa[seqBlocks[i]]++; //(1) 
 				}  
@@ -63,8 +68,10 @@ public class ShapeLinear extends Shape {
 		    for (i = 0; i < L; i++) {
 			      if (b==0 || SequenceConverter.GAP_VAL == B.seqs[i][b-1]) { 
 			    	  Tb[seqBlocks[i+K]]++; 
-			    	  if (b < B.firstLetterLoc[i] || b >= B.lastLetterLoc[i]) 
-							Tb_term[seqBlocks[i+K]]++;	
+			    	  if (b < B.firstLetterLoc[i]) 
+							Tb_term_left[seqBlocks[i+K]]++;	
+			    	  if (b >= B.lastLetterLoc[i]) 
+							Tb_term_right[seqBlocks[i+K]]++;	
 			      } else { 
 			    	  Sb[seqBlocks[i+K]]++; 
 		    	  }
@@ -77,24 +84,30 @@ public class ShapeLinear extends Shape {
 		if (Aligner.Direction.vert == dir) { 		
 			for (i = 0; i < L; i++) { 
 				Tb[seqBlocks[i+K]]++;
-				if (bPos < B.firstLetterLoc[i] || bPos >= B.lastLetterLoc[i]) 
-						Tb_term[seqBlocks[i+K]]++;
+				if (bPos < B.firstLetterLoc[i]) 
+					Tb_term_left[seqBlocks[i+K]]++;
+				if (bPos >= B.lastLetterLoc[i]) 
+					Tb_term_right[seqBlocks[i+K]]++;
 			}
 		} else if (Aligner.Direction.horiz == dir) { 
 			for (i = 0; i < K; i++) { 
 		       Ta[seqBlocks[i]]++;
-				if (aPos < A.firstLetterLoc[i] || aPos >= A.lastLetterLoc[i]) 
-					Ta_term[seqBlocks[i]]++;						
+				if (aPos < A.firstLetterLoc[i]) 
+					Ta_term_left[seqBlocks[i]]++;	
+				if (aPos >= A.lastLetterLoc[i]) 
+					Ta_term_right[seqBlocks[i]]++;						
 			}
 		}
 		
 		long gammaCount = 0;
-		long termGammaCount = 0;
+		long termGammaCountLeft = 0;
+		long termGammaCountRight = 0;
 		for (i = 0; i <= maxBlock; i++) {
-			gammaCount += ( (Ta[i]-Ta_term[i]) * Sb[i] + (Tb[i]-Tb_term[i]) * Sa[i]);
-			termGammaCount += ( Ta_term[i] * Sb[i] + Tb_term[i] * Sa[i]);
+			gammaCount += ( (Ta[i]-Ta_term_left[i]-Ta_term_right[i]) * Sb[i] + (Tb[i]-Tb_term_left[i]-Tb_term_right[i]) * Sa[i]);
+			termGammaCountLeft += ( Ta_term_left[i] * Sb[i] + Tb_term_left[i] * Sa[i]);
+			termGammaCountRight += ( Ta_term_right[i] * Sb[i] + Tb_term_right[i] * Sa[i]);
 		}
-		return gammaCount * config.gamma + termGammaCount * config.gammaTerm;
+		return gammaCount * config.gamma + termGammaCountLeft * config.leftGammaTerm() + termGammaCountRight * config.rightGammaTerm();
 	}
 
 

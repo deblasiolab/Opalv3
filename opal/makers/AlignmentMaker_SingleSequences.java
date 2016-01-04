@@ -122,7 +122,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			
 			int[] ids = new int[res.length];
 			for (int i=0; i<res.length; i++) ids[i] = i;
-			alignments[0] = Alignment.buildNewAlignment(res, ids, conf);
+			alignments[0] = Alignment.buildNewAlignment(res, ids, conf, in);
 
 			if (verbosity > 1) {
 				if (initAlignmentProvided) {
@@ -131,7 +131,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 					LogWriter.stdErrLog("\nFinished draft alignment #" + (Tree.iterations-currIteration) + " of " + Tree.iterations + "  " );
 				}
 				if (showCost) {
-					long cost = Aligner.calcCost(res, ids, conf); 
+					long cost = Aligner.calcCost(res, ids, conf, in); 
 					LogWriter.stdErrLogln("Alignment cost:      " + NumberFormat.getInstance().format( cost ));
 				}
 				LogWriter.stdErrLogln("Entering next phase\n======================\n");
@@ -323,7 +323,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			return false;
 		
 		int K = seqs.length;
-		char[][] result = Aligner.seqConv.convertIntArrayToCharAlignment(reorderedSeqs,chars);
+		char[][] result = conf.sc.convertIntArrayToCharAlignment(reorderedSeqs,chars);
 		 
 		AlignmentWriter wr;
 		if ( AlignmentWriter.outFormat == OutputType.fasta)
@@ -359,7 +359,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			int[] ids = new int[result.length];
 			for (int i=0; i<result.length; i++) ids[i] = i;
 			if (showCost) {
-				long cost = Aligner.calcCost(result, ids, conf); 
+				long cost = Aligner.calcCost(result, ids, conf, in); 
 				LogWriter.stdErrLogln("Alignment cost:      " + NumberFormat.getInstance().format( cost ));
 			}
 			if(printRealignmentLines){
@@ -377,9 +377,13 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	protected void printParams (int length, Alignment example /* used in subclass*/) {
 		if (verbosity>0) {
 			LogWriter.stdErrLogln("gamma is " + conf.gamma + " and lambda is " + conf.lambda);
-			if (conf.gammaTerm != conf.gamma  ||  conf.lambdaTerm != conf.lambda)
-				LogWriter.stdErrLogln("gamma_term is " + conf.gammaTerm + " and lambda_term is " + conf.lambdaTerm);
-					
+			if (conf.useLeftTerminal && conf.useRightTerminal)
+				LogWriter.stdErrLogln("gamma_term is " + conf.leftGammaTerm() + " and lambda_term is " + conf.leftLambdaTerm());
+			else if (conf.useLeftTerminal)
+				LogWriter.stdErrLogln("left gamma_term is " + conf.leftGammaTerm() + " and left lambda_term is " + conf.leftLambdaTerm());
+			else if (conf.useRightTerminal)
+				LogWriter.stdErrLogln("right gamma_term is " + conf.rightGammaTerm() + " and right lambda_term is " + conf.rightLambdaTerm());
+				
 			LogWriter.stdErrLogln("Solution alignment length is " + length);
 	
 			if (!Polisher.justPolish) {
@@ -559,11 +563,11 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			alignments = new Alignment[1];
 			int[] ids = new int[seqs.length];
 			for (int i=0; i<seqs.length; i++) ids[i] = i;
-			alignments[0] = Alignment.buildNewAlignment(seqs, ids, conf);
+			alignments[0] = Alignment.buildNewAlignment(seqs, ids, conf, in);
 		} else {
 			alignments = new Alignment[seqs.length];
 			for (int i=0; i<seqs.length; i++) {
-				alignments[i] = Alignment.buildNewAlignment(seqs[i], i, conf);
+				alignments[i] = Alignment.buildNewAlignment(seqs[i], i, conf, in );
 			}
 		}
 		return alignments;

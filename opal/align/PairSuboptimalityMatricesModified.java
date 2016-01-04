@@ -36,8 +36,8 @@ public class PairSuboptimalityMatricesModified {
 
 		
 		//flip modpair
-		Alignment Arev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(A.seqs), A.seqIds, config);
-		Alignment Brev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(B.seqs), B.seqIds, config);
+		Alignment Arev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(A.seqs), A.seqIds, config, A.in);
+		Alignment Brev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(B.seqs), B.seqIds, config, B.in);
 		backward = new ConsistencyHeuristicAligner( new ConsistencyModifiers_AllPairs(modpair));  
 		backward.setAlignments(Arev,Brev);
 		backward.setReverseMode(true);

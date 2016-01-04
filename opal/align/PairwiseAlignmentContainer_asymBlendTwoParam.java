@@ -34,7 +34,9 @@ public class PairwiseAlignmentContainer_asymBlendTwoParam extends
 	}
 	
 	protected int calcVLambda(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt) {
-		int v_ext = (j==0||j==N?config.lambdaTerm : config.lambda);
+		int v_ext = config.lambda;
+		if(j==0) v_ext = config.leftLambdaTerm();
+		if(j==N) v_ext = config.rightLambdaTerm();
 		float mod;
 		if (neighborCnt==0)
 			mod = modpair.vLambdasAB[i][j]/normalizer;
@@ -44,7 +46,9 @@ public class PairwiseAlignmentContainer_asymBlendTwoParam extends
 	}
 	
 	protected int calcVGammaOpen(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int v_open = ( (j==0&&i==1)||j==N ? config.gammaTerm : config.gamma)/2;
+		int v_open = config.gamma/2;
+		if(j==0 && i==1) v_open = config.leftGammaTerm()/2;
+		if(j==N) v_open = config.rightGammaTerm()/2;
 		float mod;
 		if (neighborCnt==0)
 			mod = modpair.vGammaOpensAB[i][j]/normalizer;
@@ -55,7 +59,9 @@ public class PairwiseAlignmentContainer_asymBlendTwoParam extends
 	}
 	
 	protected int calcVGammaClose(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int v_close = ( j==0||(j==N&&i==M) ? config.gammaTerm : config.gamma)/2;
+		int v_close = config.gamma/2;
+		if(j==0) v_close = config.leftGammaTerm()/2;
+		if(j==N&&i==M) v_close = config.rightGammaTerm()/2;
 		float mod;
 		if (neighborCnt==0)
 			mod = modpair.vGammaClosesAB[i][j]/normalizer;
@@ -67,7 +73,9 @@ public class PairwiseAlignmentContainer_asymBlendTwoParam extends
 
 	
 	protected int calcHLambda(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_ext = (i==0||i==M?config.lambdaTerm : config.lambda);
+		int h_ext = config.lambda;
+		if(i==0) h_ext = config.leftLambdaTerm();
+		if(i==M) h_ext = config.rightLambdaTerm();
 		float mod;
 		if (neighborCnt==0)
 			mod = modpair.hLambdasAB[i][j]/normalizer;
@@ -77,7 +85,9 @@ public class PairwiseAlignmentContainer_asymBlendTwoParam extends
 	}
 	
 	protected int calcHGammaOpen(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_open = ( (i==0&&j==1)||i==M ? config.gammaTerm : config.gamma)/2;
+		int h_open = config.gamma/2;
+		if(i==0&&j==1) h_open = config.leftGammaTerm()/2;
+		if(i==M) h_open = config.rightGammaTerm()/2;
 		float mod;
 		if (neighborCnt==0)
 			mod = modpair.hGammaOpensAB[i][j]/normalizer;
@@ -87,7 +97,9 @@ public class PairwiseAlignmentContainer_asymBlendTwoParam extends
 	}
 	
 	protected int calcHGammaClose(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_close = ( i==0||(j==N&&i==M) ? config.gammaTerm : config.gamma)/2;
+		int h_close = config.gamma/2;
+		if(i==0) h_close = config.leftGammaTerm()/2;
+		if(j==N&i==M) h_close = config.rightGammaTerm()/2;
 		float mod;
 		if (neighborCnt==0)
 			mod = modpair.hGammaClosesAB[i][j]/normalizer;

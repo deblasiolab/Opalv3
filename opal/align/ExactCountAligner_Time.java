@@ -62,12 +62,12 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 		int[][] revA = config.sc.buildReverseAlignment(A.seqs);
 		int[][] revB = config.sc.buildReverseAlignment(B.seqs);
 		
-		Alignment alA = Alignment.buildNewAlignment(revA, A.seqIds, true, config);
-		Alignment alB = Alignment.buildNewAlignment(revB, B.seqIds, true, config);
+		Alignment alA = Alignment.buildNewAlignment(revA, A.seqIds, true, config, A.in);
+		Alignment alB = Alignment.buildNewAlignment(revB, B.seqIds, true, config, B.in);
 		
 		
 		ProfileAligner al = new ProfileAligner( alA, alB);
-		al.config = config;
+		al.config = new Configuration(config);
 		al.setPessimistic(false);
 		al.align();
 		
@@ -77,13 +77,13 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 
 		
 		int[][] alignedSeqs = null;
-		if (config.useStructure) { // structure is stored in forward orientation. This is easiest way to get correct score calculated
-			alignedSeqs = config.sc.buildReverseAlignment(al.getAlignment().seqs);
+		if (al.config.useStructure) { // structure is stored in forward orientation. This is easiest way to get correct score calculated
+			alignedSeqs = al.config.sc.buildReverseAlignment(al.getAlignment().seqs);
 		} else {
 			alignedSeqs = al.getAlignment().seqs;
 		}
 				
-		costUpperBound = Aligner.calcCost(alignedSeqs,A.K,B.K,idsAB, config);
+		costUpperBound = Aligner.calcCost(alignedSeqs,A.K,B.K,idsAB, al.config, A.in);
 		
 		if(al.config.useLeftTerminal != al.config.useRightTerminal){
 			float costUpperBoundsArray[] = new float[3];
@@ -113,7 +113,7 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 					alignedSeqs_temp = al_temp.getAlignment().seqs;
 				}
 						
-				costUpperBoundsArray[terminal_index] = Aligner.calcCost(alignedSeqs_temp,A.K,B.K,idsAB_temp, al_temp.config);
+				costUpperBoundsArray[terminal_index] = Aligner.calcCost(alignedSeqs_temp,A.K,B.K,idsAB_temp, al_temp.config, A.in);
 				
 			}
 			System.err.print("");
@@ -131,9 +131,9 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 
 		
 		if (A.seqs.length * B.seqs.length > Aligner.linearCutoff)
-			shapeTester = new ShapeTesterLinear (costUpperBound, al.getD(), al.getH(), al.getV(), config);
+			shapeTester = new ShapeTesterLinear (costUpperBound, al.getD(), al.getH(), al.getV(), al.config);
 		else
-			shapeTester = new ShapeTesterQuadratic (costUpperBound, al.getD(), al.getH(), al.getV(), config);
+			shapeTester = new ShapeTesterQuadratic (costUpperBound, al.getD(), al.getH(), al.getV(), al.config);
 		
 
 		// let the GC clean these up
@@ -146,7 +146,7 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 		al.setPessimistic(true);
 		al.align();
 		
-		long pessimisticUpperBound = Aligner.calcCost(al.getAlignment().seqs,A.K,B.K, idsAB, config);
+		long pessimisticUpperBound = Aligner.calcCost(al.getAlignment().seqs,A.K,B.K, idsAB, al.config, A.in);
 		long alValuePess = al.getEstimatedCost();
 		if (pessimisticUpperBound > al.getEstimatedCost()) {
 			LogWriter.stdErrLogln("Surprise: actual cost of alignment is worse than pessimistic estimate");

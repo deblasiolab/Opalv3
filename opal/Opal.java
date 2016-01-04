@@ -28,7 +28,7 @@ class runAlignment extends Thread{
 	
 	runAlignment(Configuration c, Inputs i){
 		conf = c;
-		in = i;
+		in = new Inputs(i);
 	}
 	runAlignment(Configuration c, Inputs i, Configuration[] rcList){
 		this(c,i);
@@ -63,7 +63,7 @@ class runAlignment extends Thread{
 				am.initialize(conf, in);
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),in.structure.structure);
 				}
 			} else if (in.justDoConvert) {
 				am = new AlignmentMaker_Converter();
@@ -71,7 +71,7 @@ class runAlignment extends Thread{
 				am.initialize(conf, in);
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),in.structure.structure);
 				}
 			} else if (in.fileB != null) { // alignalign call
 				am = new AlignmentMaker_TwoAlignments();
@@ -80,7 +80,7 @@ class runAlignment extends Thread{
 				am.initialize(conf, in);
 				alignmentInstance = am.buildAlignment ();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(((AlignmentMaker_TwoAlignments)am).result,StructureFileReader.structure);
+					fa = new FacetAlignment(((AlignmentMaker_TwoAlignments)am).result,in.structure.structure);
 				}
 				
 			} else if (in.justTree || Tree.justPWDists) { // 
@@ -101,17 +101,22 @@ class runAlignment extends Thread{
 				if(in.structFileA != null){
 					
 					if(realignmentConfigList != null){
+						Configuration newRealignmentConfigList[] = new Configuration[realignmentConfigList.length];
+						for(int rNum = 0; rNum < realignmentConfigList.length; rNum++){
+							newRealignmentConfigList[rNum] = new Configuration(realignmentConfigList[rNum]);
+						}
 						preRealignmentAlignmentInstance = alignmentInstance.clone();
 						preRealignmentFacetScore = Facet.defaultValue(
-								new FacetAlignment(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),StructureFileReader.structure),
+								new FacetAlignment(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure),
 								conf.useLegacyFacetFunction
 						);
-						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),StructureFileReader.structure, realignmentConfigList, conf, (float) preRealignmentFacetScore);
+						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure, newRealignmentConfigList, conf, (float) preRealignmentFacetScore);
 						if(conf.realignment_window_type == Configuration.WINDOW_SIZE.VALUE) realigner.simpleRealignment((int)conf.realignment_window_value);
 						alignmentInstance = realigner.newAlignment();
+						newRealignmentConfigList = null;
 						
 					}
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),in.structure.structure);
 					
 				}
 			}
@@ -166,7 +171,7 @@ class runAlignment extends Thread{
 	
 	public boolean printPreRealignment(){
 		if (in.verbosity>0 && facetScore>-1) {
-			System.err.printf("\nfacet score: %.6f",preRealignmentFacetScore);
+			System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
 		}
 		if(in.preRealignmentOutputFile != null){
 			String fname = in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());

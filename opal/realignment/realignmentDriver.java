@@ -1,5 +1,7 @@
 package opal.realignment;
 
+import java.util.Arrays;
+
 import facet.Facet;
 import facet.FacetAlignment;
 import opal.IO.Configuration;
@@ -141,18 +143,18 @@ public class realignmentDriver {
 		
 		for(int i=0; numberOfNonBlankSequences > 1 && i<configList.length; i++){
 			
-			configList[i].useLeftTerminal = (startIndex == 0);
-			configList[i].useRightTerminal = (endIndex == sequence[0].length-1);
+			configList[i].useLeftTerminal = (startIndex <= 0);
+			configList[i].useRightTerminal = (endIndex >= sequence[0].length-1);
 			if(globalConfiguration.realignment_use_terminals == Configuration.REALIGNMENT_TERMINALS.NEVER) 
 				configList[i].useRightTerminal = configList[i].useLeftTerminal = false;
 			if(globalConfiguration.realignment_use_terminals == Configuration.REALIGNMENT_TERMINALS.ALWAYS) 
 				configList[i].useRightTerminal = configList[i].useLeftTerminal = true;
 			
 			/** Workaround, because I reverted back to single terminal gap penalties **/
-			configList[i].setGammaTerm(configList[i].gamma);
-			configList[i].setLambdaTerm(configList[i].lambda);
+			//configList[i].setGammaTerm(configList[i].gamma);
+			//configList[i].setLambdaTerm(configList[i].lambda);
 			
-			//System.err.println("Window: [" + startIndex + "," + endIndex + "] " + configList[i].useLeftTerminal + " " + configList[i].useRightTerminal);
+			System.err.println("Window: [" + startIndex + "," + endIndex + "] " + configList[i].useLeftTerminal + " " + configList[i].useRightTerminal);
 			
 			AlignmentMaker_SingleSequences am = new AlignmentMaker_SingleSequences();
 			am.initialize(configList[i].sc.convertSeqsToInts(windowSequences), names, configList[i], in);
@@ -263,6 +265,12 @@ public class realignmentDriver {
 			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_VALUE){
 				good_threshold = globalConfiguration.realignment_threshold_value;
 				bad_threshold = globalConfiguration.realignment_threshold_value_lower;
+			}
+			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
+				float[] sort_scores = scores.clone();
+				Arrays.sort(sort_scores);
+				good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value)];
+				bad_threshold = sort_scores[(int)(scores.length * globalConfiguration.realignment_threshold_value_lower)];
 			}
 			
 			float window_column_value[] = new float[windowSize];

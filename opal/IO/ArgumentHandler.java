@@ -42,7 +42,8 @@ public class ArgumentHandler {
 	int repeat_config = 1;
 	int max_threads = -1;
 	boolean useLegacyFacetFunction = true;
-
+	boolean doReverse = false;
+	
 	public String configOutputFile = null;
 	public String bestOutputFile = null;
 	public String featureOutputFile = null;
@@ -81,7 +82,7 @@ public class ArgumentHandler {
 		*/
 		
 		
-		LongOpt[] longopts = new LongOpt[93];
+		LongOpt[] longopts = new LongOpt[94];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -183,6 +184,7 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoAverage", LongOpt.NO_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoSD", LongOpt.NO_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoWhole", LongOpt.NO_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentThresholdTypeTwoPercentage", LongOpt.NO_ARGUMENT, null, 'k');
 		
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdLowerValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
@@ -425,7 +427,7 @@ public class ArgumentHandler {
 		            if (optName.equals("polish_reps_exhaustive")) {
 	            		Polisher.polishIterations_exact = Integer.parseInt(arg.toString());
 		            } else if (optName.equals("pess_do_reverse")) {
-	            		ProfileAligner.doReverse = true;
+	            		doReverse = true;
 		            } else {// reps
 		            	Polisher.polishIterations = Integer.parseInt(arg.toString());
 		            }
@@ -622,12 +624,13 @@ public class ArgumentHandler {
             		if (optName.equals("realignmentThresholdTypeTwoAverage")){ temp_threshold_type = Configuration.THRESHOLD_TYPE.TWO_AVERAGE; }
             		if (optName.equals("realignmentThresholdTypeTwoSD")){ temp_threshold_type = Configuration.THRESHOLD_TYPE.TWO_SD; }
             		if (optName.equals("realignmentThresholdTypeTwoWhole")){temp_threshold_type = Configuration.THRESHOLD_TYPE.TWO_WHOLE;}
+            		if (optName.equals("realignmentThresholdTypeTwoPercentage")){temp_threshold_type = Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE;}
             		if (optName.equals("realignmentThresholdValue")){ temp_realign_threshold = Float.parseFloat(arg.toString());}
             		if (optName.equals("realignmentThresholdLowerValue")){ temp_realign_threshold_lower = Float.parseFloat(arg.toString());}
 
-            		if (optName.equals("realignmentAlwaysTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.ALWAYS; LogWriter.stdErrLogln("always and positional terminals are dissabled due to an error"); System.exit(1); }
+            		if (optName.equals("realignmentAlwaysTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.ALWAYS; /*LogWriter.stdErrLogln("always and positional terminals are dissabled due to an error"); System.exit(1);*/ }
             		if (optName.equals("realignmentNeverTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.NEVER; }
-            		if (optName.equals("realignmentPositionalTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.POSITIONAL; LogWriter.stdErrLogln("always and positional terminals are dissabled due to an error"); System.exit(1); }
+            		if (optName.equals("realignmentPositionalTerminals")){ temp_realignment_terminals = Configuration.REALIGNMENT_TERMINALS.POSITIONAL; /*LogWriter.stdErrLogln("always and positional terminals are dissabled due to an error"); System.exit(1);*/ }
             		
             		
             		break; 
@@ -797,6 +800,7 @@ public class ArgumentHandler {
 				if(temp_realign_window_size != -1) advising_configs[i].realignment_window_value = temp_realign_window_size;
 				if(temp_realignment_terminals != null) advising_configs[i].realignment_use_terminals = temp_realignment_terminals;
 				advising_configs[i].useLegacyFacetFunction = useLegacyFacetFunction;
+				advising_configs[i].doReverse = doReverse;
 			}
 			if(repeat_config==1){
 				return advising_configs;
@@ -825,6 +829,7 @@ public class ArgumentHandler {
 			if(temp_realign_window_size != -1) advising_configs[j].realignment_window_value = temp_realign_window_size;
 			if(temp_realignment_terminals != null) advising_configs[j].realignment_use_terminals = temp_realignment_terminals;
 			advising_configs[j].useLegacyFacetFunction = useLegacyFacetFunction;
+			advising_configs[j].doReverse = doReverse;
 			if(repeat_config>1){
 				advising_configs[j].repetition = j+1;
 			}
@@ -866,15 +871,16 @@ public class ArgumentHandler {
 		in.fileA = getFileA();
 		in.fileB = getFileB();
 		in.structFileA = getStructFileA();
-		in. structFileB = getStructFileB();
+		in.structFileB = getStructFileB();
 		in.configOutputFile = configOutputFile;
 		in.bestOutputFile = bestOutputFile;
 		in.featureOutputFile = featureOutputFile;
 		in.preRealignmentOutputFile = preRealignmentOutputFile;
 		in.bestPreRealignmentOutputFile = bestPreRealignmentOutputFile;
 		in.bestPreRealignmentsRealignmentOutputFile = bestPreRealignmentsRealignmentOutputFile;
+		
 		if (in.structFileA != null)
-			StructureFileReader.initialize(in.structFileA, in.structFileB);
+			in.structure = new StructureFileReader(in.structFileA, in.structFileB);
 		return in;
 	}
 	
