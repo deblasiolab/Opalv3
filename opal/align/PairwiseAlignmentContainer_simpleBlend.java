@@ -1,5 +1,6 @@
 package opal.align;
 
+import com.traviswheeler.libs.LogWriter;
 
 import opal.tree.Tree;
 import opal.IO.Configuration;
@@ -24,39 +25,51 @@ public class PairwiseAlignmentContainer_simpleBlend extends
 	}
 	
 	protected int calcVLambda(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt) {
-		int v_ext = (j==0||j==N?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.lambda);
+		int v_ext = config.lambda;
+		if(j==0) v_ext = config.leftLambdaTerm();
+		if(j==N) v_ext = config.rightLambdaTerm();
 		float mod = normalizer * modpair.vLambdas[i][j];
 		return Math.round( v_ext * (1 + c_weight * mod));
 	}
 	
 	protected int calcVGammaOpen(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int v_open = ( (j==0&&i==1)||j==N ? ((j==N)?config.rightLambdaTerm():config.leftLambdaTerm()) : config.gamma)/2;
+		int v_open = config.gamma/2;
+		if(j==0&&i==1) v_open = config.leftGammaTerm()/2;
+		if(j==N) v_open = config.rightGammaTerm()/2;
 		float mod = normalizer * modpair.vGammaOpens[i][j];
 		return Math.round( v_open * (1 + c_weight * mod));
 	}
 	
 	protected int calcVGammaClose(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int v_close = ( j==0||(j==N&&i==M) ? ((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+		int v_close = config.gamma/2;
+		if(j==0) v_close = config.leftGammaTerm()/2;
+		if(j==N&&i==M) v_close = config.rightGammaTerm()/2;
 		float mod = normalizer * modpair.vGammaCloses[i][j];
 		return Math.round( v_close * (1 + c_weight * mod));
 	}
 	
 	
 	protected int calcHLambda(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_ext = (i==0||i==M?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.lambda);
+		int h_ext = config.lambda;
+		if(i==0) h_ext = config.leftLambdaTerm();
+		if(i==M) h_ext = config.rightLambdaTerm();
 		float mod = normalizer * modpair.hLambdas[i][j];
 		return Math.round( h_ext * (1 + c_weight * mod));
 	}
 	
 	protected int calcHGammaOpen(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_open = ( (i==0&&j==1)||i==M ? ((i==M)?config.rightLambdaTerm():config.leftLambdaTerm()) : config.gamma)/2;
+		int h_open = config.gamma/2;
+		if(i==0&&j==1) h_open = config.leftGammaTerm()/2;
+		if(i==M) h_open = config.rightGammaTerm()/2;
 		float mod = normalizer * modpair.hGammaOpens[i][j];
 		return Math.round( h_open * (1 + c_weight * mod));
 
 	}
 	
 	protected int calcHGammaClose(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_close = ( i==0||(j==N&&i==M) ? ((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()): config.gamma)/2;
+		int h_close = config.gamma/2;
+		if(i==0) h_close = config.leftGammaTerm()/2;
+		if(j==N&&i==M) h_close = config.rightGammaTerm()/2;
 		float mod = normalizer * modpair.hGammaCloses[i][j];
 		return Math.round( h_close * (1 + c_weight * mod));
 	}

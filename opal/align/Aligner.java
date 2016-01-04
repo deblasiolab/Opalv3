@@ -6,10 +6,12 @@ import opal.exceptions.GenericOpalException;
 import opal.tree.Tree;
 import opal.tree.TreeNode;
 
+import opal.IO.CostMatrix;
 import opal.IO.Configuration;
 import com.traviswheeler.libs.LogWriter; 
 import opal.IO.SequenceConverter;
 import opal.IO.StructureFileReader;
+import opal.IO.Inputs;
 
 public abstract class Aligner  {
 
@@ -21,7 +23,6 @@ public abstract class Aligner  {
 	public static int mixedAlignmentCutoff = 40;
 	public static int linearCutoff = 100;
 	public Configuration config;
-	//public static SequenceConverter seqConv;
 	
 	
 	// DD July 2015 moved to configuration.
@@ -58,8 +59,6 @@ public abstract class Aligner  {
 		this(al.A, al.B, al.isPessimistic);	
 		this.node = al.node;
 		this.config = new Configuration(al.config);
-		this.config = al.config;
-		
 	}
 	
 	public Aligner( Alignment A, Alignment B) {
@@ -135,7 +134,7 @@ public abstract class Aligner  {
 			return trueCost;
 		} else {
 			Alignment al = getAlignment();
-			trueCost = Aligner.calcCost(al.seqs, al.seqIds, al.conf);
+			trueCost = Aligner.calcCost(al.seqs, al.seqIds, al.conf, al.in);
 			return trueCost;
 		}
 	}
@@ -145,29 +144,28 @@ public abstract class Aligner  {
 	}
 	
 
-	public static long calcCost(char[][] alignment, int[] ids , Configuration c) {
-		return calcCost(alignment, alignment.length, 0, ids, true, c);
+	public static long calcCost(char[][] alignment, int[] ids , Configuration c, Inputs in) {
+		return calcCost(alignment, alignment.length, 0, ids, true, c, in);
 	}
-	public static long calcCost(char[][] alignment, int K, int L, int[] ids, Configuration c ) {
-		return calcCost(alignment, K, L, ids, false, c);
+	public static long calcCost(char[][] alignment, int K, int L, int[] ids, Configuration c, Inputs in ) {
+		return calcCost(alignment, K, L, ids, false, c, in);
 	}
-	private static long calcCost(char[][] alignment, int K, int L, int[] ids, boolean allRows, Configuration c) {
+	private static long calcCost(char[][] alignment, int K, int L, int[] ids, boolean allRows, Configuration c, Inputs in) {
 		int[][]C = c.sc.convertSeqsToInts(alignment);
-		return calcCost(C, K, L, ids, allRows, c);
+		return calcCost(C, K, L, ids, allRows, c, in);
 	}	
 	
-	public static long calcCost(int[][] alignment, int[] ids, Configuration c) {
-		return calcCost(alignment, alignment.length, 0, ids, true, c);
+	public static long calcCost(int[][] alignment, int[] ids, Configuration c, Inputs in) {
+		return calcCost(alignment, alignment.length, 0, ids, true, c, in);
 	}
 
-	public static long calcCost(int[][] alignment, int K, int L, int[] ids , Configuration c) {
-		return calcCost(alignment, K, L, ids, false, c);
+	public static long calcCost(int[][] alignment, int K, int L, int[] ids , Configuration c, Inputs in) {
+		return calcCost(alignment, K, L, ids, false, c, in);
 	}
 
-	protected static long calcCost(int[][] C, int K, int L, int[] ids, boolean allRows, Configuration config) {
+	protected static long calcCost(int[][] C, int K, int L, int[] ids, boolean allRows, Configuration config, Inputs in) {
 		int len = C[0].length;	
 		double[] colCosts = new double[len];
-		
 		
 		int a,b;
 		Direction inGap = null;
@@ -246,27 +244,27 @@ public abstract class Aligner  {
 						cc += config.cost.costs[a][b];
 						xPos++;
 						yPos++;
-						if (config.useStructure) cc += getStructSubModifierPair(ids[x],ids[y],xPos,yPos, config);
+						if (config.useStructure) cc += getStructSubModifierPair(ids[x],ids[y],xPos,yPos, config, in);
 						
 						inGap = null;
 					} else if (a != SequenceConverter.GAP_VAL) { //gap in B, i.e. VERT
 						xPos++;
 						cc += config.lambda;
-						if (config.useStructure) cc += getStructGapExtModiferPair (ids[x],xPos, config);
+						if (config.useStructure) cc += getStructGapExtModiferPair (ids[x],xPos, config, in);
 						if (inGap != Direction.vert) { 
 							cc += config.gamma; 
 							inGap = Direction.vert;	
-							if (config.useStructure) cc += getStructGapOpenModiferPair (ids[y],yPos, config);
+							if (config.useStructure) cc += getStructGapOpenModiferPair (ids[y],yPos, config, in);
 						}						
 					} else if (b != SequenceConverter.GAP_VAL) { //gap in A, i.e. HORIZ
 						yPos++;
 						cc += config.lambda;
-						if (config.useStructure) cc += getStructGapExtModiferPair (ids[y],yPos, config);
+						if (config.useStructure) cc += getStructGapExtModiferPair (ids[y],yPos, config, in);
 						
 						if (inGap != Direction.horiz) { 
 							cc += config.gamma; 
 							inGap = Direction.horiz;
-							if (config.useStructure) cc += getStructGapOpenModiferPair (ids[x],xPos, config);
+							if (config.useStructure) cc += getStructGapOpenModiferPair (ids[x],xPos, config, in);
 						}
 					} // otherwise, it's a double-dash column 
 
@@ -294,7 +292,7 @@ public abstract class Aligner  {
 			int[] ids = new int[A.seqIds.length + B.seqIds.length];
 			for (int i=0; i<A.seqIds.length; i++) ids[i] = A.seqIds[i];
 			for (int i=0; i<B.seqIds.length; i++) ids[A.seqIds.length+i] = B.seqIds[i];
-			resultAlignment = Alignment.buildNewAlignment(result, ids, config);
+			resultAlignment = Alignment.buildNewAlignment(result, ids, config, A.in);
 		}
 
 		if (null != node)
@@ -441,14 +439,14 @@ public abstract class Aligner  {
 	}
 
 	
-	protected static double getStructSubModifierPair (int k, int l, int i, int j, Configuration config) {
+	protected static double getStructSubModifierPair (int k, int l, int i, int j, Configuration config, Inputs in) {
 		
-		double hA = StructureFileReader.helices[k][i];
-		double hB = StructureFileReader.helices[l][j];
-		double sA = StructureFileReader.sheets[k][i];
-		double sB = StructureFileReader.sheets[l][j];
-		double lA = StructureFileReader.loops[k][i];
-		double lB = StructureFileReader.loops[l][j];
+		double hA = in.structure.helices[k][i];
+		double hB = in.structure.helices[l][j];
+		double sA = in.structure.sheets[k][i];
+		double sB = in.structure.sheets[l][j];
+		double lA = in.structure.loops[k][i];
+		double lB = in.structure.loops[l][j];
 
 		
 		//limit the significant digits
@@ -475,24 +473,24 @@ public abstract class Aligner  {
 		return x;
 	}
 
-	protected static double getStructGapOpenModiferPair (int seqid, int i, Configuration config) {
+	protected static double getStructGapOpenModiferPair (int seqid, int i, Configuration config, Inputs in) {
 		/*
 		 * A    x
 		 * B  x -      seqid
  		 *    i
 		 */
 			
-		return config.gapOpenMods[ config.getStructureLevelFromProbability(StructureFileReader.structureNeighborLevels[seqid][i]) ] ;
+		return config.gapOpenMods[ config.getStructureLevelFromProbability(in.structure.structureNeighborLevels[seqid][i]) ] ;
 	}
 
-	protected static double getStructGapExtModiferPair (int seqid, int i, Configuration config) {
+	protected static double getStructGapExtModiferPair (int seqid, int i, Configuration config, Inputs in) {
 		/*     
 		 *     i
 		 * A   x     seqid
 		 * B   -
 		 */
 		
-		return config.gapExtMods[ config.getStructureLevelFromProbability(StructureFileReader.structureLevels[seqid][i]) ] ;
+		return config.gapExtMods[ config.getStructureLevelFromProbability(in.structure.structureLevels[seqid][i]) ] ;
 	}
 
 }

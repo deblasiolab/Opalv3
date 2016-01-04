@@ -8,12 +8,16 @@ import java.text.NumberFormat;
 import opal.IO.AlignmentWriter;
 import opal.IO.ClustalWriter;
 import opal.IO.FastaWriter;
+import opal.IO.OpalLogWriter;
+
 import com.traviswheeler.libs.LogWriter;
 
+import opal.IO.SequenceConverter;
 import opal.IO.SequenceFileReader;
 import opal.IO.AlignmentWriter.OutputType;
 import opal.align.Aligner;
 import opal.align.Alignment;
+import opal.align.ConsistencyAligner;
 import opal.align.ExactCountAligner_Time;
 import opal.align.PairAligner;
 import opal.align.ProfileAligner;
@@ -61,7 +65,7 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 		//return null;
 	}
 	
-	public boolean printOutput(int[][] result_i, String fname){
+	public boolean printOutput(int[][] result_i, String fname, boolean printRealignmentLines){
 		PrintStream stdout = System.out;
 		if(fname!=null){
 			try{
@@ -99,7 +103,7 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 				long totalCost = al.getTrueCost();
 				int[] ids = new int[result.length];
 				for (int i=0; i<result.length; i++) ids[i] = i;
-				long cost = Aligner.calcCost(result, K, L, ids, conf);
+				long cost = Aligner.calcCost(result, K, L, ids, conf, in);
 			
 				LogWriter.stdErrLogln("A-to-B alignment cost:      " + NumberFormat.getInstance().format( cost ));
 				LogWriter.stdErrLogln("All rows cost:  " + NumberFormat.getInstance().format( totalCost ) );
@@ -157,7 +161,7 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 		int[] ids = new int[seqs.length];
 		for (int i=0; i<seqs.length; i++) ids[i] = i;
 		
-		return Alignment.buildNewAlignment(seqs, ids, conf, startIndex);
+		return Alignment.buildNewAlignment(seqs, ids, conf, in, startIndex);
 
 	}
 
@@ -180,11 +184,11 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 	
 	protected void printParams (Alignment example /* used in subclass*/) {
 		LogWriter.stdErrLogln("gamma is " + conf.gamma + " and lambda is " + conf.lambda);
-		if (conf.useLeftTerminal && conf.useRightTerminal && (conf.leftGammaTerm() != conf.gamma  ||  conf.leftLambdaTerm() != conf.lambda))
+		if (conf.useLeftTerminal && conf.useRightTerminal)
 			LogWriter.stdErrLogln("gamma_term is " + conf.leftGammaTerm() + " and lambda_term is " + conf.leftLambdaTerm());
-		else if (conf.useLeftTerminal && (conf.leftGammaTerm() != conf.gamma  ||  conf.leftLambdaTerm() != conf.lambda))
+		else if (conf.useLeftTerminal)
 			LogWriter.stdErrLogln("left gamma_term is " + conf.leftGammaTerm() + " and left lambda_term is " + conf.leftLambdaTerm());
-		else if (conf.useRightTerminal && (conf.rightGammaTerm() != conf.gamma  ||  conf.rightLambdaTerm() != conf.lambda))
+		else if (conf.useRightTerminal)
 			LogWriter.stdErrLogln("right gamma_term is " + conf.rightGammaTerm() + " and right lambda_term is " + conf.rightLambdaTerm());
 		LogWriter.stdErrLogln("Solution alignment length is " + al.getPath().size());
 

@@ -6,6 +6,7 @@ import com.traviswheeler.libs.LogWriter;
 import opal.IO.SequenceConverter;
 import opal.exceptions.GenericOpalException;
 import opal.IO.Configuration;
+import opal.IO.Inputs;
 
 public class Alignment {
 
@@ -42,12 +43,13 @@ public class Alignment {
 	public int[] f00, f01, f10, f11;
 			
 	public Configuration conf;
+	public Inputs in;
 		
-	public Alignment (int[] A, int id, Configuration c){
-		this(A,id,c,0);
+	public Alignment (int[] A, int id, Configuration c, Inputs ipt){
+		this(A,id,c, ipt,0);
 	}
 	
-	public Alignment (int[] A, int id, Configuration c, int startIndex) { // single sequence		
+	public Alignment (int[] A, int id, Configuration c, Inputs ipt, int startIndex) { // single sequence		
 		K = 1;
 		seqs = new int[1][];
 		seqs[0] = A;
@@ -55,6 +57,7 @@ public class Alignment {
 		seqIds[0] = id + startIndex;
 		M = A.length;
 		conf = c;
+		in = ipt;
 		alphabetLength = conf.cost.getChars().length;
 		sequencesStartAtInStructure = startIndex;
 		
@@ -68,15 +71,16 @@ public class Alignment {
 		makeProfile();
 	}
 
-	public Alignment (int[][] A, int[] ids, boolean isReverse, Configuration c) {
-		this(A,ids, isReverse, c, 0);
+	public Alignment (int[][] A, int[] ids, boolean isReverse, Configuration c, Inputs ipt) {
+		this(A,ids, isReverse, c, ipt, 0);
 	}
 	
-	public Alignment (int[][] A, int[] ids, boolean isReverse, Configuration c, int startIndex) {
+	public Alignment (int[][] A, int[] ids, boolean isReverse, Configuration c, Inputs ipt, int startIndex) {
 			
 	
 		this.isReverse = isReverse;
 		conf = c;
+		in = ipt;
 
 		alphabetLength = conf.cost.getChars().length;
 		
@@ -91,12 +95,12 @@ public class Alignment {
 		makeProfile();
 	}
 
-	public Alignment (int[][] A, int[] ids, Configuration c) {
-		this(A, ids, false, c, 0);
+	public Alignment (int[][] A, int[] ids, Configuration c, Inputs ipt) {
+		this(A, ids, false, c, ipt, 0);
 	}
 	
-	public Alignment (int[][] A, int[] ids, Configuration c, int startIndex) {
-		this(A, ids, false, c, startIndex);
+	public Alignment (int[][] A, int[] ids, Configuration c, Inputs ipt, int startIndex) {
+		this(A, ids, false, c, ipt, startIndex);
 	}
 
 	
@@ -298,34 +302,34 @@ public class Alignment {
 		}
 	}
 
-	public static Alignment buildNewAlignment (int[] seq, int seqId, Configuration c){
-		return buildNewAlignment(seq, seqId, c, 0);
+	public static Alignment buildNewAlignment (int[] seq, int seqId, Configuration c, Inputs ipt){
+		return buildNewAlignment(seq, seqId, c, ipt, 0);
 	}
 	
-	public static Alignment buildNewAlignment (int[] seq, int seqId, Configuration c, int startIndex) {
+	public static Alignment buildNewAlignment (int[] seq, int seqId, Configuration c, Inputs ipt, int startIndex) {
 		if (c.useStructure)
-			return new StructureAlignment(seq, seqId, c, startIndex);
+			return new StructureAlignment(seq, seqId, c, ipt, startIndex);
 		else
-			return  new Alignment(seq, seqId, c, startIndex);
+			return  new Alignment(seq, seqId, c, ipt, startIndex);
 	}	
 
 
-	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, boolean isReverse, Configuration c) {
-		return buildNewAlignment(seqs, seqIds, isReverse, c, 0);
+	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, boolean isReverse, Configuration c, Inputs ipt) {
+		return buildNewAlignment(seqs, seqIds, isReverse, c, ipt, 0);
 	}
 	
-	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, boolean isReverse, Configuration c, int startIndex) {
+	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, boolean isReverse, Configuration c, Inputs ipt, int startIndex) {
 		if (c.useStructure)
-			return new StructureAlignment(seqs, seqIds, isReverse,c, startIndex );
+			return new StructureAlignment(seqs, seqIds, isReverse,c, ipt, startIndex );
 		else
-			return  new Alignment(seqs, seqIds, isReverse, c, startIndex);
+			return  new Alignment(seqs, seqIds, isReverse, c, ipt, startIndex);
 	}
 	
-	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, Configuration c, int startIndex) {
-		return buildNewAlignment(seqs, seqIds, false, c, startIndex);
+	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, Configuration c, Inputs ipt, int startIndex) {
+		return buildNewAlignment(seqs, seqIds, false, c, ipt, startIndex);
 	}	
 	
-	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, Configuration c) {
-		return buildNewAlignment(seqs, seqIds, false, c, 0);
+	public static Alignment buildNewAlignment (int[][] seqs, int[] seqIds, Configuration c, Inputs ipt) {
+		return buildNewAlignment(seqs, seqIds, false, c, ipt, 0);
 	}
 }

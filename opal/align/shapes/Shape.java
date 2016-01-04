@@ -6,6 +6,7 @@ import opal.align.StructureAlignment;
 import com.traviswheeler.libs.LogWriter;
 import opal.IO.SequenceConverter;
 import opal.IO.Configuration;
+import opal.IO.Inputs;
 
 abstract public class Shape {
 	protected int[] seqBlocks; //for each seq, the block it belongs to
@@ -36,7 +37,7 @@ abstract public class Shape {
 		shapeCost = s.shapeCost;
 		aPos = s.aPos;
 		bPos = s.bPos;
-		config = s.config;
+		config = new Configuration(s.config);
 		parent = s;
 		setAlignments(s.A,s.B);
 	}
@@ -153,47 +154,29 @@ abstract public class Shape {
 		}
 		
 		if (a<0) {//horiz	
-			int termLeftA = A.gapsBeforeFirst[aPos] ;
-			int termRightA = A.gapsAfterLast[aPos] + A.lastLetterCount[aPos];
-			if(aPos == 0){
-				termLeftA = K;
-				termRightA = 0;
-			}else if(aPos == M){
-				termLeftA = 0;
-				termRightA = K;
-			}
-			
-			cost = B.f1[b] * (config.lambda * (K-termLeftA-termRightA)  +  config.leftLambdaTerm() * termLeftA +  config.rightLambdaTerm() * termRightA );
+			int termAleft = (aPos == 0) ? K : A.gapsBeforeFirst[aPos];
+			int termAright = (aPos == M) ? K : A.gapsAfterLast[aPos] + A.lastLetterCount[aPos];
+			cost = B.f1[b] * (config.lambda * (K-termAleft-termAright)  +  config.leftLambdaTerm() * termAleft +  config.rightLambdaTerm() * termAright );
 			if (config.useStructure) {
 				cost += Aligner.getStructGapExtModifer(structA, structB, aPos, bPos, Aligner.Direction.horiz);
 			}
 
 		} else if (b<0) { //vert
-			int termLeftB = B.gapsBeforeFirst[bPos];
-			int termRightB =  B.gapsAfterLast[bPos] + B.lastLetterCount[bPos];
-			if(bPos == 0){
-				termLeftB = L;
-				termRightB = 0;
-			}else if(bPos == N){
-				termLeftB = 0;
-				termRightB = L;
-			}
-			
-			cost = A.f1[a] * (config.lambda * (L-termLeftB-termRightB) +  config.leftLambdaTerm() * termLeftB +  config.rightLambdaTerm() * termRightB );
+			int termBleft = (bPos == 0) ? L : B.gapsBeforeFirst[bPos];
+			int termBright = (bPos == N ) ? L : B.gapsAfterLast[bPos] + B.lastLetterCount[bPos];
+			cost = A.f1[a] * (config.lambda * (L-termBleft-termBright) +  config.leftLambdaTerm() * termBleft + config.rightLambdaTerm() * termBright );
 			if (config.useStructure) {
 				cost += Aligner.getStructGapExtModifer(structA, structB, aPos, bPos, Aligner.Direction.vert);
 			}
 
 		} else { //dir == DIAG
-			int termLeftA = A.gapsBeforeFirst[a];
-			int termLeftB = B.gapsBeforeFirst[b];
-			int termRightA = A.gapsAfterLast[a];
-			int termRightB = B.gapsAfterLast[b];
+			int termAleft = A.gapsBeforeFirst[a];
+			int termAright = A.gapsAfterLast[a];
+			int termBleft = B.gapsBeforeFirst[b];
+			int termBright = B.gapsAfterLast[b];
 			// all substitution letter combos, including gap extensions
-			int internalExtensionCount = (A.f0[a]-termLeftA-termRightA) * B.f1[b] + A.f1[a] * (B.f0[b]-termLeftB-termRightB) ;
-			cost = config.lambda * ( internalExtensionCount ) 
-					+ config.leftLambdaTerm() * (termLeftA * B.f1[b] + termLeftB * A.f1[a])
-					+ config.rightLambdaTerm() * (termRightA * B.f1[b] + termRightB * A.f1[a]);
+			int internalExtensionCount = (A.f0[a]-termAleft-termAright) * B.f1[b] + A.f1[a] * (B.f0[b]-termBleft-termBright) ;
+			cost = config.lambda * ( internalExtensionCount ) + config.leftLambdaTerm() * (termAleft * B.f1[b] + termBleft * A.f1[a]) + config.rightLambdaTerm() * (termAright * B.f1[b] + termBright * A.f1[a]);
 			
 			for (int x=0; x<A.chars[a].length; x++){
 				for (int y=0; y<B.chars[b].length; y++){

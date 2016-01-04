@@ -6,6 +6,9 @@
 .classpath
 
 *.class
+*.fa
+experements
 
-realignment_simple*
-realignment_removeBlankLines*
+temp
+
+temp2

@@ -2,6 +2,8 @@ package opal.align;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import opal.IO.Configuration;
+
 import com.traviswheeler.libs.LogWriter;
 
 public class PairAligner_SplitGamma extends Aligner {

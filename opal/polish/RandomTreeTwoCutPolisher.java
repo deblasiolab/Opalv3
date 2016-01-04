@@ -53,7 +53,7 @@ public class RandomTreeTwoCutPolisher extends TreePolisher {
 		if (verbosity>1) {
 			LogWriter.stdErrLog("Initial alignment formed"); 
 			if (AlignmentMaker.showCost) {
-				prevCost = Aligner.calcCost(fullAlignment, alignment.seqIds, aligner.config);
+				prevCost = Aligner.calcCost(fullAlignment, alignment.seqIds, aligner.config, alignment.in);
 				LogWriter.stdErrLog(", with a cost of " + NumberFormat.getInstance().format( prevCost ));
 			}
 			LogWriter.stdErrLogln("");
@@ -138,11 +138,11 @@ public class RandomTreeTwoCutPolisher extends TreePolisher {
 			System.arraycopy(idsA, 0, idsAB, 0, idsA.length);
 			System.arraycopy(idsB, 0, idsAB, idsA.length, idsB.length);
 
-			prevCost = Aligner.calcCost(AB, sizeA, sizeB, idsAB, aligner.config);
+			prevCost = Aligner.calcCost(AB, sizeA, sizeB, idsAB, aligner.config, alignment.in);
 
 			
-			Alignment alA = Alignment.buildNewAlignment(Alignment.getDegappedCopy(A), idsA, aligner.config);
-			Alignment alB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(B), idsB, aligner.config);
+			Alignment alA = Alignment.buildNewAlignment(Alignment.getDegappedCopy(A), idsA, aligner.config, alignment.in);
+			Alignment alB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(B), idsB, aligner.config, alignment.in);
 			
 			boolean usedExactCost;
 

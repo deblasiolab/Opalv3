@@ -7,9 +7,13 @@ import java.io.PrintStream;
 import opal.IO.AlignmentWriter;
 import opal.IO.ClustalWriter;
 import opal.IO.FastaWriter;
+import opal.IO.OpalLogWriter;
+
 import com.traviswheeler.libs.LogWriter;
 
+import opal.IO.SequenceConverter;
 import opal.IO.SequenceFileReader;
+import opal.IO.StructureFileReader;
 import opal.IO.AlignmentWriter.OutputType;
 import opal.align.Aligner;
 import opal.align.ProfileAligner;
@@ -47,7 +51,7 @@ public class AlignmentMaker_Converter extends AlignmentMaker {
 		//return null;
 	}
 
-	public boolean printOutput(int[][] num, String fname){
+	public boolean printOutput(int[][] num, String fname, boolean printRealignmentLines){
 		PrintStream stdout = System.out;
 		if(fname!=null){
 			try{
@@ -71,18 +75,18 @@ public class AlignmentMaker_Converter extends AlignmentMaker {
 		int[] ids = new int[names.length];
 		for (int i=0; i<names.length; i++) ids[i] = i;
 
-		long cost = Aligner.calcCost(seqs, ids, conf); 
+		long cost = Aligner.calcCost(seqs, ids, conf, in); 
 
 		
 		LogWriter.stdErrLogln("================================");
 		LogWriter.stdErrLogln("input file = " + file + "(" + K + " sequences)");
 		LogWriter.stdErrLogln("Cost matrix is " + conf.cost.costName); 
 		LogWriter.stdErrLogln("gamma is " + conf.gamma + " and lambda is " + conf.lambda);
-		if (conf.useLeftTerminal && conf.useRightTerminal && (conf.leftGammaTerm() != conf.gamma  ||  conf.leftLambdaTerm() != conf.lambda))
+		if (conf.useLeftTerminal && conf.useRightTerminal)
 			LogWriter.stdErrLogln("gamma_term is " + conf.leftGammaTerm() + " and lambda_term is " + conf.leftLambdaTerm());
-		else if (conf.useLeftTerminal && (conf.leftGammaTerm() != conf.gamma  ||  conf.leftLambdaTerm() != conf.lambda))
+		else if (conf.useLeftTerminal)
 			LogWriter.stdErrLogln("left gamma_term is " + conf.leftGammaTerm() + " and left lambda_term is " + conf.leftLambdaTerm());
-		else if (conf.useRightTerminal && (conf.rightGammaTerm() != conf.gamma  ||  conf.rightLambdaTerm() != conf.lambda))
+		else if (conf.useRightTerminal)
 			LogWriter.stdErrLogln("right gamma_term is " + conf.rightGammaTerm() + " and right lambda_term is " + conf.rightLambdaTerm());
 		LogWriter.stdErrLogln("Alignment length is " + seqs[0].length);
 		LogWriter.stdErrLogln("Alignment cost:      " + cost);

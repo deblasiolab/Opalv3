@@ -2,6 +2,7 @@ package opal.align.shapes;
 
 import opal.IO.SequenceConverter;
 import opal.IO.StructureFileReader;
+import opal.align.Aligner;
 import opal.align.Alignment;
 import opal.align.StructureAlignment;
 import opal.IO.Configuration;
@@ -36,13 +37,13 @@ public class ShapeTesterQuadratic extends ShapeTester {
 					//an extension starting with deletion could count a gap twice 
 					locGamma = config.gamma;
 					if (s.aPos < A.firstLetterLoc[i]) { 
-						locGamma = config.leftGammaTerm();
-					} else if (s.aPos > A.lastLetterLoc[i]) { 
 						locGamma = config.rightGammaTerm();
+					}else if (s.aPos > A.lastLetterLoc[i]) { 
+							locGamma = config.rightGammaTerm();
 					} else if (config.useStructure && s.aPos > 0) {
 							int pos = ((StructureAlignment)A).origSeqIndices[i][s.aPos-1];
 							if (pos>0)
-								locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability( StructureFileReader.structureNeighborLevels[A.seqIds[i]][pos] ) ] ;
+								locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability( s.A.in.structure.structureNeighborLevels[A.seqIds[i]][pos] ) ] ;
 					}
 					Hgap +=  locGamma; //* weights[i][aa_K+j]
 					if (s.aPos != M && A.seqs[i][s.aPos] == SequenceConverter.GAP_VAL) {
@@ -55,12 +56,12 @@ public class ShapeTesterQuadratic extends ShapeTester {
 					locGamma = config.gamma;
 					if (s.bPos < B.firstLetterLoc[j]) {
 						locGamma = config.leftGammaTerm();
-					} else if (s.bPos > B.lastLetterLoc[j]) {
+					}else if (s.bPos > B.lastLetterLoc[j]) {
 						locGamma = config.rightGammaTerm();
 					} else if (config.useStructure && s.bPos > 0) {
 						int pos = ((StructureAlignment)B).origSeqIndices[j][s.bPos-1];
 						if (pos>0)
-							locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability(StructureFileReader.structureNeighborLevels[B.seqIds[j]][pos]) ] ;
+							locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability(s.A.in.structure.structureNeighborLevels[B.seqIds[j]][pos]) ] ;
 					}
 					Vgap += locGamma;
 					if (s.bPos != N && B.seqs[j][s.bPos] == SequenceConverter.GAP_VAL) {
@@ -102,7 +103,7 @@ public class ShapeTesterQuadratic extends ShapeTester {
 						locGamma = config.rightGammaTerm();
 					} else if (config.useStructure && s.bPos > 0) {
 						int pos = ((StructureAlignment)B).origSeqIndices[j-K][s.bPos-1];
-						locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability( StructureFileReader.structureNeighborLevels[B.seqIds[j-K]][pos] ) ] ;
+						locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability( s.A.in.structure.structureNeighborLevels[B.seqIds[j-K]][pos] ) ] ;
 					}
 					cost += locGamma;
 				} else if ( t.seqBlocks[i]<t.seqBlocks[j] && s.seqBlocks[i]>=s.seqBlocks[j] ) {
@@ -112,7 +113,7 @@ public class ShapeTesterQuadratic extends ShapeTester {
 						locGamma = config.rightGammaTerm();
 					} else if (config.useStructure && s.aPos > 0) {
 						int pos = ((StructureAlignment)A).origSeqIndices[i][s.aPos-1];
-						locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability( StructureFileReader.structureNeighborLevels[A.seqIds[i]][pos] ) ] ;
+						locGamma += config.gapOpenMods[ config.getStructureLevelFromProbability( s.A.in.structure.structureNeighborLevels[A.seqIds[i]][pos] ) ] ;
 					}
 					cost += locGamma;		
 				}

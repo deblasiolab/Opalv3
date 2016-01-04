@@ -143,8 +143,8 @@ public class ConsistencyAligner extends ExactCountAligner_Time {
 		//A and B are reversed because the tables are computed from end to beginning
 		int[][] revA = config.sc.buildReverseAlignment(A.seqs);
 		int[][] revB = config.sc.buildReverseAlignment(B.seqs);
-		Alignment alA = Alignment.buildNewAlignment(revA, A.seqIds, config);
-		Alignment alB = Alignment.buildNewAlignment(revB, B.seqIds, config);
+		Alignment alA = Alignment.buildNewAlignment(revA, A.seqIds, config, A.in);
+		Alignment alB = Alignment.buildNewAlignment(revB, B.seqIds, config, A.in);
 		al = new ConsistencyHeuristicAligner(this);
 		al.setPessimistic(false);
 		al.setReverseMode(true);

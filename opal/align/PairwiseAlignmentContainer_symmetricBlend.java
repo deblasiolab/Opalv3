@@ -1,7 +1,11 @@
 package opal.align;
 
+import com.traviswheeler.libs.LogWriter;
+
+import opal.IO.SequenceConverter;
 import opal.tree.Tree;
 import opal.IO.Configuration;
+import opal.IO.Inputs;
 
 public class PairwiseAlignmentContainer_symmetricBlend extends PairwiseAlignmentsContainer {
 
@@ -27,43 +31,55 @@ public class PairwiseAlignmentContainer_symmetricBlend extends PairwiseAlignment
 	}
 	
 	protected int calcVLambda(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt) {
-		int v_ext = (j==0||j==N?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.lambda);
+		int v_ext = config.lambda;
+		if(j==0) v_ext = config.leftLambdaTerm();
+		if(j==N) v_ext = config.rightLambdaTerm();
 		float mod =  modpair.vLambdas[i][j]/normalizer;
 		return Math.round( v_ext * (1 + mod));
 	}
 	
 	protected int calcVGammaOpen(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int v_open = ( (j==0&&i==1)||j==N ? ((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+		int v_open = config.gamma/2;
+		if(j==0&&i==1) v_open =  config.leftGammaTerm() / 2;
+		if(j==N) v_open = config.rightGammaTerm() / 2;
 		float mod = modpair.vGammaOpens[i][j]/normalizer;
 		return Math.round( v_open * (1 + mod));
 	}
 	
 	protected int calcVGammaClose(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int v_close = ( j==0||(j==N&&i==M) ? ((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+		int v_close = config.gamma/2;
+		if(j==0) v_close = config.leftGammaTerm()/2;
+		if(j==N&&i==M) v_close = config.rightGammaTerm()/2;
 		float mod = modpair.vGammaCloses[i][j]/normalizer;
 		return Math.round( v_close * (1 + mod));
 	}
 	
 	protected int calcHLambda(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_ext = (i==0||i==M?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.lambda);
+		int h_ext = config.lambda;
+		if(i==0) h_ext = config.leftLambdaTerm();
+		if(i==M) h_ext = config.rightLambdaTerm();
 		float mod = modpair.hLambdas[i][j]/normalizer;
 		return Math.round( h_ext * (1 + mod));
 	}
 	
 	protected int calcHGammaOpen(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_open = ( (i==0&&j==1)||i==M ? ((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+		int h_open = config.gamma/2;
+		if(i==0&&j==1) h_open = config.leftGammaTerm()/2;
+		if(i==M) h_open = config.rightGammaTerm()/2;
 		float mod = modpair.hGammaOpens[i][j]/normalizer;
 		return Math.round( h_open * (1 + mod));
 	}
 	
 	protected int calcHGammaClose(int i, int j, ConsistencyModifiers_Pair modpair, int neighborCnt){
-		int h_close = ( i==0||(j==N&&i==M) ? ((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+		int h_close = config.gamma/2;
+		if(i==0) h_close = config.leftGammaTerm()/2;
+		if(j==N&&i==M) h_close = config.rightGammaTerm()/2;
 		float mod =  modpair.hGammaCloses[i][j]/normalizer;
 		return Math.round( h_close * (1 + mod));
 	}
 	
 
-	protected void postProcessAB (int a, int b, ConsistencyModifiers_Pair modpair ) {
+	protected void postProcessAB (int a, int b, ConsistencyModifiers_Pair modpair, Inputs in ) {
 
 		
 		int worstAB_Subopt = 0;
@@ -94,7 +110,7 @@ public class PairwiseAlignmentContainer_symmetricBlend extends PairwiseAlignment
 		// then get subopt for all positions of AB
 		// scale those by (cost of unmodified algnt ;/ cost of mod alignt)
 		// use below
-		int worstABC_Subopt = calcModifiedModifiers(a, b, modpair);
+		int worstABC_Subopt = calcModifiedModifiers(a, b, modpair, in);
 		// now modpair has been changed ... use it
 		
 		float ratio_AB_ABC = (float)worstAB_Subopt/worstABC_Subopt; 
@@ -110,29 +126,41 @@ public class PairwiseAlignmentContainer_symmetricBlend extends PairwiseAlignment
 				}
 				
 				if (i>0) {
-					int v_ext = (j==0||j==N?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.lambda);
+					int v_ext = config.lambda;
+					if(j==0) v_ext = config.leftLambdaTerm();
+					if(j==N) v_ext = config.rightLambdaTerm();
 					float mod = ((1-alpha) * modpair.vLambdasAB[i][j] + alpha * ratio_AB_ABC * modpair.vLambdas[i][j])/PairSuboptimalityMatrices.delta;
 					modpair.vLambdas[i][j] = Math.round( v_ext * (1 + consistency_weight * mod));
 
-					int v_open = ( (j==0&&i==1)||j==N ? ((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+					int v_open = config.gamma/2;
+					if(j==0&&i==1) v_open = config.leftGammaTerm()/2;
+					if(j==N) v_open = config.rightGammaTerm()/2;
 					mod = ((1-alpha) * modpair.vGammaOpensAB[i][j] + alpha * ratio_AB_ABC * modpair.vGammaOpens[i][j])/PairSuboptimalityMatrices.delta;
 					modpair.vGammaOpens[i][j] = Math.round( v_open * (1 + consistency_weight * mod));
 
-					int v_close = ( j==0||(j==N&&i==M) ? ((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+					int v_close = config.gamma/2;
+					if(j==0) v_close = config.leftGammaTerm()/2;
+					if(j==N&&i==M) v_close = config.rightGammaTerm()/2;
 					mod = ((1-alpha) * modpair.vGammaClosesAB[i][j] + alpha * ratio_AB_ABC * modpair.vGammaCloses[i][j])/PairSuboptimalityMatrices.delta;
 					modpair.vGammaCloses[i][j] = Math.round( v_close * (1 + consistency_weight * mod));
 				}
 				
 				if (j>0) {
-					int h_ext = (i==0||i==M?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.lambda);
+					int h_ext = config.lambda;
+					if(i==0) h_ext = config.leftLambdaTerm();
+					if(i==M) h_ext = config.rightLambdaTerm();
 					float mod = ((1-alpha) * modpair.hLambdasAB[i][j] + alpha * ratio_AB_ABC * modpair.hLambdas[i][j])/PairSuboptimalityMatrices.delta;
 					modpair.hLambdas[i][j] = Math.round( h_ext * (1 + consistency_weight * mod));
 
-					int h_open = ( (i==0&&j==1)||i==M ? ((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+					int h_open = config.gamma/2;
+					if(i==0&&j==1) h_open = config.leftGammaTerm()/2;
+					if(i==M) h_open = config.rightGammaTerm()/2;
 					mod = ((1-alpha) * modpair.hGammaOpensAB[i][j] + alpha * ratio_AB_ABC * modpair.hGammaOpens[i][j])/PairSuboptimalityMatrices.delta;
 					modpair.hGammaOpens[i][j] = Math.round( h_open * (1 + consistency_weight * mod));
 
-					int h_close = ( i==0||(j==N&&i==M) ? ((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()) : config.gamma)/2;
+					int h_close = config.gamma/2;
+					if(i==0) h_close = config.leftGammaTerm()/2;
+					if(j==N&&i==M) h_close = config.rightGammaTerm()/2;
 					mod = ((1-alpha) * modpair.hGammaClosesAB[i][j] + alpha * ratio_AB_ABC * modpair.hGammaCloses[i][j])/PairSuboptimalityMatrices.delta;
 					modpair.hGammaCloses[i][j] = Math.round( h_close * (1 + consistency_weight * mod));
 				}			
@@ -145,14 +173,14 @@ public class PairwiseAlignmentContainer_symmetricBlend extends PairwiseAlignment
 	
 	
 	
-	private int calcModifiedModifiers(int a, int b, ConsistencyModifiers_Pair modpair) {
+	private int calcModifiedModifiers(int a, int b, ConsistencyModifiers_Pair modpair, Inputs in) {
 
 		int M = origSeqs[a].length;
 		int N = origSeqs[b].length;
 		
 		PairSuboptimalityMatricesModified mat = new PairSuboptimalityMatricesModified(
-				Alignment.buildNewAlignment(origSeqs[a], a, config), 
-				Alignment.buildNewAlignment(origSeqs[b], b, config),
+				Alignment.buildNewAlignment(origSeqs[a], a, config, in), 
+				Alignment.buildNewAlignment(origSeqs[b], b, config, in),
 				modpair, config);
 
 		

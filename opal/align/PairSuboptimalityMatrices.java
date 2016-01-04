@@ -1,6 +1,7 @@
 package opal.align;
 
 import com.traviswheeler.libs.LogWriter;
+import opal.IO.SequenceConverter;
 import opal.exceptions.GenericOpalException;
 import opal.IO.Configuration;
 
@@ -37,8 +38,8 @@ public class PairSuboptimalityMatrices {
 		M = A.M;
 		P = B.M;	
 
-		Alignment Arev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(A.seqs), A.seqIds, config);
-		Alignment Brev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(B.seqs), B.seqIds, config);
+		Alignment Arev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(A.seqs), A.seqIds, config, A.in);
+		Alignment Brev = Alignment.buildNewAlignment(config.sc.buildReverseAlignment(B.seqs), B.seqIds, config, B.in);
 
 		PairAligner_SplitGamma forwardAligner, backwardAligner;
 		forwardAligner = new PairAligner_SplitGamma(A,B);
@@ -87,10 +88,17 @@ public class PairSuboptimalityMatrices {
 					int sigma = config.cost.costs[A.seqs[0][i-1]][C.seqs[0][j-1]]; 
 					best =  forwardAligner.D[i][j] + backwardAligner.D[M-(i-1)][P-(j-1)] - sigma;
 				}
+				int lambda_tmp = config.lambda;
+				if(i==0) lambda_tmp = config.leftLambdaTerm();
+				if(i==M) lambda_tmp = config.rightLambdaTerm();
 				if (j>0)
-					best = Math.min(best, forwardAligner.H[i][j] + backwardAligner.H[M-i][P-(j-1)] - ((i==0||i==M)?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda));
+					best = Math.min(best, forwardAligner.H[i][j] + backwardAligner.H[M-i][P-(j-1)] - (lambda_tmp));
+				
+				lambda_tmp = config.lambda;
+				if(j==0) lambda_tmp = config.leftLambdaTerm();
+				if(j==P) lambda_tmp = config.rightLambdaTerm();
 				if (i>0)
-					best = Math.min(best, forwardAligner.V[i][j] + backwardAligner.V[M-(i-1)][P-j] - ((j==0||j==P)?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda));
+					best = Math.min(best, forwardAligner.V[i][j] + backwardAligner.V[M-(i-1)][P-j] - (lambda_tmp));
 
 				
 				if (best <= optCost + delta) {
@@ -208,8 +216,11 @@ public class PairSuboptimalityMatrices {
 		} else {
 			int j = i; int N=M; // just to sync the code below with the graph above. In other words: read "i" as "j" in the right graph above
 			//k > 0  ,   j can be 0
+			int lambda_tmp = config.lambda;
+			if(j==0) lambda_tmp = config.leftLambdaTerm();
+			if(j==P) lambda_tmp = config.rightLambdaTerm();
 			
-			best =  forward.H[j][k-forward.shift[j]] + backward.H[N-j][P-(k-1)-backward.shift[N-j]] - ((j==0||j==N)?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+			best =  forward.H[j][k-forward.shift[j]] + backward.H[N-j][P-(k-1)-backward.shift[N-j]] - (lambda_tmp);
 		}
 						
 		return (int)(best - optCost);
@@ -263,7 +274,10 @@ public class PairSuboptimalityMatrices {
 		
 		if (isLeftGraph) {
 			//i > 0   ... from function call  (except in case where it's coopted for alignment of A-B
-			best =  forward.V[i][k-forward.shift[i]] + backward.V[M-(i-1)][P-k-backward.shift[M-(i-1)]] - ((k==0||k==P)?((k==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+			int lambda_tmp = config.lambda;
+			if(k==0) lambda_tmp = config.leftLambdaTerm();
+			if(k==P) lambda_tmp = config.rightLambdaTerm();
+			best =  forward.V[i][k-forward.shift[i]] + backward.V[M-(i-1)][P-k-backward.shift[M-(i-1)]] - (lambda_tmp);
 		} else {
 			int j = i; int N=M; // just to sync the code below with the graph above. In other words: read "i" as "j" in the right graph above
 			//k > 0   ... from function call
@@ -353,7 +367,7 @@ public class PairSuboptimalityMatrices {
 			if (j>0) 
 				best =  forward.D[j][k-1-forward.shift[j]] + (j==N?config.rightGammaTerm():config.gamma)/2 + backward.H[N-j][P-(k-1)-backward.shift[N-j]] ;
 			else 
-				best =  forward.H[0][k-forward.shift[0]] + backward.H[N][P-(k-1)-backward.shift[N]] - config.leftLambdaTerm() ;
+				best =  forward.H[0][k-forward.shift[0]] + backward.H[N][P-(k-1)-backward.shift[N]] - config.rightLambdaTerm() ;
 		}
 						
 		return (int)(best - optCost);
@@ -425,7 +439,10 @@ public class PairSuboptimalityMatrices {
 				//check this at boundaries
 				best =  forward.D[i-1][k-forward.shift[i-1]] + gamma_open + backward.V[M-(i-1)][P-k-backward.shift[M-(i-1)]];
 			} else { //if ( i==1 ) {
-				best = forward.V[1][k-forward.shift[1]] + backward.V[M][P-k-backward.shift[M]] - (k==0||k==P?((k==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+				int lambda_tmp = config.lambda;
+				if(k==0) lambda_tmp = config.leftLambdaTerm();
+				if(k==P) lambda_tmp = config.rightLambdaTerm();
+				best = forward.V[1][k-forward.shift[1]] + backward.V[M][P-k-backward.shift[M]] - (lambda_tmp);
 			}
 		} else {
 			int j = i; int N=M; // just to sync the code below with the graph above. In other words: read "i" as "j" in the right graph above
@@ -608,7 +625,10 @@ public class PairSuboptimalityMatrices {
 			if (i<M) {
 				best =  forward.V[i][k-forward.shift[i]] + (k==0?config.leftGammaTerm():config.gamma)/2 + backward.D[M-i][P-k-backward.shift[M-i]];
 			} else { //if ( i==M ) {     k==P only if i==M
-				best =  forward.V[M][k-forward.shift[M]] + backward.V[1][P-k-backward.shift[1]] - (k==0||k==P?((k==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+				int lambda_tmp = config.lambda;
+				if(k==0) lambda_tmp = config.leftLambdaTerm();
+				if(k==P) lambda_tmp = config.rightLambdaTerm();
+				best =  forward.V[M][k-forward.shift[M]] + backward.V[1][P-k-backward.shift[1]] - (lambda_tmp);
 			}
 		} else {
 			int j = i; int N=M; // just to sync the code below with the graph above. In other words: read "i" as "j" in the right graph above
@@ -683,7 +703,10 @@ public class PairSuboptimalityMatrices {
 		 * 
 		 */
 
-		long best =  forward.H[i][j-forward.shift[i]] + backward.H[M-i][P-(j-1)-backward.shift[M-i]] - ((i==0||i==M)?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);				
+		int lambda_tmp = config.lambda;
+		if(i==0) lambda_tmp = config.leftLambdaTerm();
+		if(i==M) lambda_tmp = config.rightLambdaTerm();
+		long best =  forward.H[i][j-forward.shift[i]] + backward.H[M-i][P-(j-1)-backward.shift[M-i]] - (lambda_tmp);				
 		
 		return (int)(best - optCost);
 	}
@@ -704,7 +727,10 @@ public class PairSuboptimalityMatrices {
 
 		long best=0;
 		if (j==1) {
-			best =  forward.H[i][1-forward.shift[i]] + backward.H[M-i][P-backward.shift[M-i]] - ((i==0||i==M)?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+			int lambda_tmp = config.lambda;
+			if(i==0) lambda_tmp = config.leftLambdaTerm();
+			if(i==M) lambda_tmp = config.rightLambdaTerm();
+			best =  forward.H[i][1-forward.shift[i]] + backward.H[M-i][P-backward.shift[M-i]] - (lambda_tmp);
 		} else {
 			best =  forward.D[i][j-1-forward.shift[i]] + backward.H[M-i][P-(j-1)-backward.shift[M-i]] + (i==M?config.rightGammaTerm():config.gamma);;
 		}
@@ -728,9 +754,12 @@ public class PairSuboptimalityMatrices {
 
 		long best=0;
 		if (j==P) {
-			best =  forward.H[i][P-forward.shift[i]] + backward.H[M-i][1-backward.shift[M-i]] - ((i==0||i==M)?((i==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+			int lambda_tmp = config.lambda;
+			if(i==0) lambda_tmp = config.leftLambdaTerm();
+			if(i==M) lambda_tmp = config.rightLambdaTerm();
+			best =  forward.H[i][P-forward.shift[i]] + backward.H[M-i][1-backward.shift[M-i]] - (lambda_tmp);
 		} else {
-			best =  forward.H[i][j-forward.shift[i]] + backward.D[M-i][P-j-backward.shift[M-i]] + (i==0?config.leftGammaTerm():config.gamma);;
+			best =  forward.H[i][j-forward.shift[i]] + backward.D[M-i][P-j-backward.shift[M-i]] + (i==0?config.rightGammaTerm():config.gamma);;
 		}
 		
 		return (int)(best - optCost);
@@ -750,8 +779,10 @@ public class PairSuboptimalityMatrices {
 		 *    -------------- 
 		 * 
 		 */
-
-		long best =  forward.V[i][j-forward.shift[i]] + backward.V[M-(i-1)][P-j-backward.shift[M-(i-1)]] - ((j==0||j==P)?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);				
+		int lambda_tmp = config.lambda;
+		if(j==0) lambda_tmp = config.leftLambdaTerm();
+		if(j==P) lambda_tmp = config.rightLambdaTerm();
+		long best =  forward.V[i][j-forward.shift[i]] + backward.V[M-(i-1)][P-j-backward.shift[M-(i-1)]] - (lambda_tmp);				
 
 		return (int)(best - optCost);
 	}
@@ -773,7 +804,10 @@ public class PairSuboptimalityMatrices {
 
 		long best;
 		if (i==1) {
-			best =  forward.V[1][j-forward.shift[1]] + backward.V[M][P-j-backward.shift[M]] - ((j==0||j==P)?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+			int lambda_tmp = config.lambda;
+			if(j==0) lambda_tmp = config.leftLambdaTerm();
+			if(j==P) lambda_tmp = config.rightLambdaTerm();
+			best =  forward.V[1][j-forward.shift[1]] + backward.V[M][P-j-backward.shift[M]] - (lambda_tmp);
 		} else {
 			best =  forward.D[i-1][j-forward.shift[i-1]] + backward.V[M-(i-1)][P-j-backward.shift[M-(i-1)]] + (j==P?config.rightGammaTerm():config.gamma);
 		}
@@ -797,9 +831,12 @@ public class PairSuboptimalityMatrices {
 
 		long best;
 		if (i==M) {
-			best =  forward.V[M][j-forward.shift[M]] + backward.V[1][P-j-backward.shift[1]] - ((j==0||j==P)?((j==0)?config.leftLambdaTerm():config.rightLambdaTerm()):config.lambda);
+			int lambda_tmp = config.lambda;
+			if(j==0) lambda_tmp = config.leftLambdaTerm();
+			if(j==P) lambda_tmp = config.rightLambdaTerm();
+			best =  forward.V[M][j-forward.shift[M]] + backward.V[1][P-j-backward.shift[1]] - (lambda_tmp);
 		} else {
-			best =  forward.V[i][j-forward.shift[i]] + backward.D[M-i][P-j-backward.shift[M-i]] + (j==0?config.leftGammaTerm():config.gamma);
+			best =  forward.V[i][j-forward.shift[i]] + backward.D[M-i][P-j-backward.shift[M-i]] + (j==0?config.rightGammaTerm():config.gamma);
 		}
 
 		return (int)(best - optCost);
