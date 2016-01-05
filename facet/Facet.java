@@ -1,9 +1,6 @@
 package facet;
 
-import java.io.FileNotFoundException;
 import java.io.File;
-import java.util.*;
-import java.lang.StringBuffer;
 import java.io.PrintWriter;
 /**
  * 
@@ -16,15 +13,49 @@ import java.io.PrintWriter;
 public class Facet {
 
 	public static float defaultValue(FacetAlignment a){
-		double total = 0.171730397;
-		Configuration c = new Configuration();
-		c.normalizeBigN = true;
-		total += 0.105434529 * PercentIdentity.replacement_score(a, c);
-		total += 0.172122922 * GapDensity.open(a, c);
-		total += 0.174107269 * Blockiness.evaluate(a, c);
-		total += 0.176015402 * PercentIdentity.structure(a, c);
-		total += 0.200589481 * Support.probability(a, c);
-		 return (float) total;
+		return defaultValue(a,true);
+	}
+	public static float defaultValue(FacetAlignment a, boolean useLegacyFacetFunction){
+		if(useLegacyFacetFunction){
+			double total = 0.171730397;
+			Configuration c = new Configuration();
+			c.normalizeBigN = true;
+			total += 0.105434529 * PercentIdentity.replacement_score(a, c);
+			total += 0.172122922 * GapDensity.open(a, c);
+			total += 0.174107269 * Blockiness.evaluate(a, c);
+			total += 0.176015402 * PercentIdentity.structure(a, c);
+			total += 0.200589481 * Support.probability(a, c);
+			return (float) total;
+		}
+		
+		Configuration c6 = new Configuration();
+		Configuration c10 = new Configuration();
+		Configuration c20 = new Configuration();
+		c6.normalizeBigN = true;
+		c10.normalizeBigN = true;
+		c20.normalizeBigN = true;
+		c6.equivelanceClassSize = 6;
+		c10.equivelanceClassSize = 10;
+		c20.equivelanceClassSize = 20;
+		if(a.type == FacetAlignment.AlignmentType.DNA){
+			c6.matrix = Configuration.ReplacementMatrix.DNA;
+			c10.matrix = Configuration.ReplacementMatrix.DNA;
+			c20.matrix = Configuration.ReplacementMatrix.DNA;
+		}
+		if(a.type == FacetAlignment.AlignmentType.RNA){
+			c6.matrix = Configuration.ReplacementMatrix.RNA;
+			c10.matrix = Configuration.ReplacementMatrix.RNA;
+			c20.matrix = Configuration.ReplacementMatrix.RNA;
+		}
+			
+		float total = 0;
+		total += 0.1410924954165966 * Blockiness.evaluate(a, c6);
+		total += 0.0036230596053536332 * CoreColumn.percentage(a, c10);
+		total +=  0.46472100224308432 * GapDensity.open(a, c6);
+		total +=  0.20416796078871755 * PercentIdentity.sequence(a, c10);
+		total +=  0.039875954173829012 * PercentIdentity.structure(a, c10) ;
+		total +=  0.23897573022221946 * Support.probability(a, c10);
+		return (float) total;
 	}
 	
 	public static void outputDefaultFeatures(String fname, FacetAlignment a){

@@ -19,26 +19,64 @@ import java.util.regex.Pattern;
 
 import com.traviswheeler.libs.LogWriter;
 
-import opal.align.Aligner;
-import opal.align.Alignment;
 import opal.align.StructureAlignment;
 import opal.exceptions.GenericOpalException;
 public class Configuration {
 	public int gamma = -1;
 	public int lambda = -1;
-	public int gammaTerm = -1;
-	public int lambdaTerm = -1;
+	private int gammaTerm = -1;
+	private int lambdaTerm = -1;
+	public boolean useLeftTerminal = true;
+	public boolean useRightTerminal = true;
 	public CostMatrix cost;
 	public SequenceConverter sc;
 	public int repetition = -1;
 	public boolean useStructure = false;
+	public boolean doReverse;
 	
 	public opal.align.StructureAlignment.ParamModel modelType;
 	public int gapLevelCnt = 1;
  	public int[] gapOpenMods;
 	public int[] gapExtMods;
+	
+	public enum THRESHOLD_TYPE{
+		VALUE, AVERAGE_WINDOW, WHOLE_ALIGNMENT,
+		TWO_VALUE, TWO_AVERAGE, TWO_WHOLE,
+		TWO_SD, TWO_PERCENTAGE
+	}
+	public THRESHOLD_TYPE realignment_threshold_type = THRESHOLD_TYPE.WHOLE_ALIGNMENT;
+	public float realignment_threshold_value = 1;
+	public float realignment_threshold_value_lower = 1;
+	public float realignmentWindowWeightDecay = (float)0.5;
+	
+	public enum WINDOW_SIZE_MINIMUM{
+		VALUE, WINDOW_MULTIPLIER, NONE
+	}
+	public WINDOW_SIZE_MINIMUM realignment_minimum_type = WINDOW_SIZE_MINIMUM.WINDOW_MULTIPLIER;
+	public float realignment_minimum_window_value = 2;
+	
+	public enum WINDOW_SIZE{
+		VALUE
+	}
+	public WINDOW_SIZE realignment_window_type = WINDOW_SIZE.VALUE;
+	public float realignment_window_value = 5;
+	
+	public enum REALIGNMENT_TERMINALS{
+		ALWAYS, NEVER, POSITIONAL
+	}
+	public REALIGNMENT_TERMINALS realignment_use_terminals = REALIGNMENT_TERMINALS.NEVER;
+	
+	public String realignmentLog = "";
+	
+	public boolean useLegacyFacetFunction = true;
 
 	public String toString(){
+		
+		String terminalString = "";
+		if(!useLeftTerminal && !useRightTerminal){ terminalString = ".noTerm"; }
+		else if(!useLeftTerminal){ terminalString = ".noLeftTerm"; }
+		else if(!useRightTerminal){ terminalString = ".noRightTerm"; }
+		
 		if(useStructure){
 			//if(modelType != null) return modelType.toString();
 			/*String rtn = gapLevelCnt + "." + gamma + "." + gammaTerm + ".";
@@ -56,9 +94,9 @@ public class Configuration {
 			
 			rtn += "." + subHelixHelix + "." + subHelixSheet + "." + subSheetSheet + "." + subHelixLoop + "." + subSheetLoop + "." + subLoopLoop;
 			return rtn;*/
-			return modelType.toString() + "." + cost.costName + "." + gamma + "." + gammaTerm + "." + lambda + "." + lambdaTerm;
+			return modelType.toString() + "." + cost.costName + "." + gamma + "." + gammaTerm + "." + lambda + "." + lambdaTerm + terminalString;
 		}
-		return cost.costName + "." + gamma + "." + gammaTerm + "." + lambda + "." + lambdaTerm;
+		return cost.costName + "." + gamma + "." + gammaTerm + "." + lambda + "." + lambdaTerm + terminalString;
 	}
 	
 	public Configuration(){
@@ -71,7 +109,19 @@ public class Configuration {
 	
 	public Configuration(Configuration c){
 		initialize(c.cost.costName, c.gamma, c.gammaTerm, c.lambda, c.lambdaTerm);
+		
+		realignment_window_type = c.realignment_window_type;
+		realignment_window_value = c.realignment_minimum_window_value;
+		realignment_minimum_type = c.realignment_minimum_type;
+		realignment_minimum_window_value = c.realignment_minimum_window_value;
+		realignment_threshold_type = c.realignment_threshold_type;
+		realignment_threshold_value = c.realignment_threshold_value;
+		realignment_use_terminals = c.realignment_use_terminals;
+		useLegacyFacetFunction = c.useLegacyFacetFunction;
+		doReverse = c.doReverse;
+	
 	}
+	
 
 	public Configuration(String matrix, int ga, int ga_t, int la, int la_t, String fileA){
 		if(matrix == null || matrix.equals("")){
@@ -226,4 +276,19 @@ public class Configuration {
 		if (lvl == gapLevelCnt) lvl--;
 		return lvl;
 	}
+	
+	public int leftLambdaTerm(){
+		return (useLeftTerminal)?lambdaTerm:lambda;
+	}
+	public int leftGammaTerm(){
+		return (useLeftTerminal)?gammaTerm:gamma;
+	}
+	public int rightLambdaTerm(){
+		return (useRightTerminal)?lambdaTerm:lambda;
+	}
+	public int rightGammaTerm(){
+		return (useRightTerminal)?gammaTerm:gamma;
+	}
+	public void setGammaTerm(int gT){ gammaTerm = gT; }
+	public void setLambdaTerm(int lT){ lambdaTerm = lT; }
 }

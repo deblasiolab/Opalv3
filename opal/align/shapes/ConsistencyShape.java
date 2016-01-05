@@ -6,6 +6,7 @@ import opal.IO.Configuration;
 import opal.align.Aligner;
 import opal.align.ConsistencyModifiers_AllPairs;
 import opal.align.ConsistencyModifiers_Pair;
+import opal.IO.Inputs;
 
 public class ConsistencyShape extends Shape {
 

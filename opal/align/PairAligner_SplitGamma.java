@@ -47,12 +47,12 @@ public class PairAligner_SplitGamma extends Aligner {
 		V[0][0] = H[0][0] = D[0][0] = 0; 
 		long bigNumber = Long.MAX_VALUE/2; // half, to ensure no overflow from the next row/column 
 		for (int j=1; j<=N; j++) {
-			H[0][j] = H[0][j-1] + config.lambdaTerm + (j==1?config.gammaTerm/2:0);
+			H[0][j] = H[0][j-1] + config.leftLambdaTerm() + (j==1?config.leftGammaTerm()/2:0);
 			D[0][j] = V[0][j] = bigNumber; //H[0][j] + gamma;
 		//	LogWriter.stdOutLogln("V[0][" + j + "] = " + V[0][j] + ";  H[0][" + j + "] = " + H[0][j] + ";  D[0][" + j + "] = " + D[0][j]);
 		}
 		for (int i=1; i<=M; i++) {
-			V[i][0] = V[i-1][0] + config.lambdaTerm + (i==1?config.gammaTerm/2:0);
+			V[i][0] = V[i-1][0] + config.leftLambdaTerm() + (i==1?config.leftGammaTerm()/2:0);
 			D[i][0] = H[i][0] = bigNumber;//= V[i][0] + gamma ;
 		//	LogWriter.stdOutLogln("V[" + i + "][0] = " + V[i][0] + ";  H[" + i + "][0] = " + H[i][0] + ";  D[" + i + "][0] = " + D[i][0]);
 		}
@@ -65,12 +65,12 @@ public class PairAligner_SplitGamma extends Aligner {
 		for (int i=1; i<=M; i++){
 			for (int j=1; j<=N; j++){
 					if (i==1 || j==1) {
-						gamma_close_tmp = config.gammaTerm/2;
+						gamma_close_tmp = config.leftGammaTerm()/2;
 					} else {
 						gamma_close_tmp = config.gamma/2;
 					}	
-					gamma_h_open_tmp = (i==M?config.gammaTerm:config.gamma)/2;
-					gamma_v_open_tmp = (j==N?config.gammaTerm:config.gamma)/2;
+					gamma_h_open_tmp = (i==M?config.rightGammaTerm():config.gamma)/2;
+					gamma_v_open_tmp = (j==N?config.rightGammaTerm():config.gamma)/2;
 					
 					H[i][j] = min ( H[i][j-1], 
 					                V[i][j-1] + gamma_h_open_tmp + gamma_close_tmp,
@@ -90,16 +90,16 @@ public class PairAligner_SplitGamma extends Aligner {
 					       );
 				
 
-				H[i][j] += (i==M ? config.lambdaTerm : config.lambda); 
-				V[i][j] += (j==N ? config.lambdaTerm : config.lambda); 
+				H[i][j] += (i==M ? config.rightLambdaTerm() : config.lambda); 
+				V[i][j] += (j==N ? config.rightLambdaTerm() : config.lambda); 
 
 				//substitution cost
 				D[i][j] += config.cost.costs[A.seqs[0][i-1]][B.seqs[0][j-1]];
 			}
 		}
 		//close terminal gap
-		H[M][N] += config.gammaTerm/2;
-		V[M][N] += config.gammaTerm/2;		
+		H[M][N] += config.rightGammaTerm()/2;
+		V[M][N] += config.rightGammaTerm()/2;		
 	}	
 
 	
@@ -115,7 +115,7 @@ public class PairAligner_SplitGamma extends Aligner {
 		
 		//clean up the extra cost added at end of terminal gaps
 		if (Direction.horiz == dir || Direction.vert == dir) {
-				cost -= config.gammaTerm/2;
+				cost -= config.rightGammaTerm()/2;
 		}
 		
 //		int base=0;
@@ -126,19 +126,19 @@ public class PairAligner_SplitGamma extends Aligner {
 		
 			if (Direction.diag != dir) {
 				if ( (Direction.horiz == dir && i==M) || (Direction.vert == dir && j==N) ) {
-					gamma_open_tmp = config.gammaTerm/2;
+					gamma_open_tmp = config.rightGammaTerm()/2;
 				} else {
 					gamma_open_tmp = config.gamma/2;		
 				}
 			}
 			if (i==1 || j==1) {
-				gamma_close_tmp = config.gammaTerm/2;
+				gamma_close_tmp = config.leftGammaTerm()/2;
 			} else {
 				gamma_close_tmp = config.gamma/2;
 			}
 			
 			if (Direction.horiz == dir){
-				int ext = (i==M?config.lambdaTerm : config.lambda);
+				int ext = (i==M?config.rightLambdaTerm() : config.lambda);
 				if ( cost == H[i][j-1] + ext )				
 					nextdir = Direction.horiz;
 				else if ( cost == V[i][j-1] + ext + gamma_open_tmp + gamma_close_tmp)
@@ -151,7 +151,7 @@ public class PairAligner_SplitGamma extends Aligner {
 				}
 				j--;
 			} else if (Direction.vert == dir) {
-				int ext = (j==N?config.lambdaTerm : config.lambda);
+				int ext = (j==N?config.rightLambdaTerm() : config.lambda);
 				if ( cost == H[i-1][j] + ext + gamma_open_tmp + gamma_close_tmp)
 					nextdir = Direction.horiz;
 				else if ( cost == V[i-1][j] + ext )				

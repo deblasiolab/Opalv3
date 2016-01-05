@@ -62,7 +62,7 @@ public class RandomThreeCutPolisher_restricted_edges extends TreePolisher {
 		PolishHelper helper;
 
 		int[][] fullAlignment = alignment.seqs;
-		long prevCost = Aligner.calcCost(fullAlignment, alignment.seqIds, aligner.config);
+		long prevCost = Aligner.calcCost(fullAlignment, alignment.seqIds, aligner.config, alignment.in);
 		int startExhaustive = polishIterations - polishIterations_exact + 1;
 
 		if (verbosity>1) {
@@ -178,12 +178,12 @@ public class RandomThreeCutPolisher_restricted_edges extends TreePolisher {
 			}			
 			
 			//now make copies (removing gap columns), so we don't break the original			
-			Alignment alA = Alignment.buildNewAlignment(Alignment.getDegappedCopy(A), idsA, aligner.config);
-			Alignment alB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(B), idsB, aligner.config);
-			Alignment alC = Alignment.buildNewAlignment(Alignment.getDegappedCopy(C), idsC, aligner.config);
-			Alignment alAB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(AB), idsAB, aligner.config);
-			Alignment alAC = Alignment.buildNewAlignment(Alignment.getDegappedCopy(AC), idsAC, aligner.config);
-			Alignment alBC = Alignment.buildNewAlignment(Alignment.getDegappedCopy(BC), idsBC, aligner.config);
+			Alignment alA = Alignment.buildNewAlignment(Alignment.getDegappedCopy(A), idsA, aligner.config, alignment.in);
+			Alignment alB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(B), idsB, aligner.config, alignment.in);
+			Alignment alC = Alignment.buildNewAlignment(Alignment.getDegappedCopy(C), idsC, aligner.config, alignment.in);
+			Alignment alAB = Alignment.buildNewAlignment(Alignment.getDegappedCopy(AB), idsAB, aligner.config, alignment.in);
+			Alignment alAC = Alignment.buildNewAlignment(Alignment.getDegappedCopy(AC), idsAC, aligner.config, alignment.in);
+			Alignment alBC = Alignment.buildNewAlignment(Alignment.getDegappedCopy(BC), idsBC, aligner.config, alignment.in);
 
 			boolean usedExactCost = (aligner instanceof ExactCountAligner_Time);
 

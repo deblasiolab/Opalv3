@@ -4,7 +4,6 @@ import opal.align.Aligner;
 
 import opal.IO.Configuration;
 import opal.IO.Inputs;
-import opal.IO.SequenceConverter;
 
 
 public abstract class AlignmentMaker {
@@ -39,7 +38,10 @@ public abstract class AlignmentMaker {
 					String fileB, String structFileB); 
 
 	abstract public int[][] buildAlignment ();
-	
-	abstract public boolean printOutput(int[][] alignmentInstance, String fname);
+
+	public boolean printOutput(int[][] alignmentInstance, String fname){
+		return printOutput(alignmentInstance, fname, true);
+	}
+	abstract public boolean printOutput(int[][] alignmentInstance, String fname, boolean printRealignmentLines);
 
 }

@@ -3,23 +3,42 @@ package opal.IO;
 import java.io.*;
 import java.util.regex.Pattern;
 
-import opal.align.StructureAlignment;
 import opal.exceptions.GenericOpalException;
 import com.traviswheeler.libs.LogWriter;
 
 public class StructureFileReader {
 
-	public static String[] names;
-	public static float[][] helices;
-	public static float[][] sheets;
-	public static float[][] loops;
-	public static float[][] structureLevels;
-	public static float[][] structureNeighborLevels;
-	public static float[][][] structure;
+	public String[] names;
+	public float[][] helices;
+	public float[][] sheets;
+	public float[][] loops;
+	public float[][] structureLevels;
+	public float[][] structureNeighborLevels;
+	public float[][][] structure;
 
-	public static int window = 0;
+	public int window = 0;
 	
-	private static String getContentFromFname(String filename) throws GenericOpalException{
+	StructureFileReader(String filename){
+		initialize(filename);
+	} 
+	
+	StructureFileReader(String filename, String filename2){
+		initialize(filename, filename2);
+	}
+	
+	StructureFileReader(StructureFileReader in){
+		names = in.names.clone();
+		helices = in.helices.clone();
+		sheets = in.sheets.clone();
+		loops = in.loops.clone();
+		structureLevels = in.structureLevels.clone();
+		structureNeighborLevels = in.structureNeighborLevels.clone();
+		structure = in.structure.clone();
+		
+		window = in.window;
+	}
+	
+	private String getContentFromFname(String filename) throws GenericOpalException{
 		InputStream is = null;
 		
 		try {
@@ -44,11 +63,11 @@ public class StructureFileReader {
 		
 	}
 	
-	public static void initialize (String filename){
+	public void initialize (String filename){
 		initialize(filename, null);
 	}
 	
-	public static void initialize (String filename, String filename2) {
+	public void initialize (String filename, String filename2) {
 		
 		String content = getContentFromFname(filename);
 		if(filename2 != null) content += "\n" + getContentFromFname(filename2);

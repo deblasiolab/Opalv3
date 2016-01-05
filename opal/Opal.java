@@ -1,35 +1,38 @@
 package opal;
 
 import java.util.Date;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.io.FileNotFoundException;
-
-import opal.IO.CostMatrix;
+import opal.IO.Configuration;
 import opal.IO.OpalLogWriter;
 
 import com.traviswheeler.libs.*;
-//import facet.*;
 
 import opal.makers.*;
-import opal.polish.Polisher;
 import opal.tree.Tree;
-import opal.align.*;
 import opal.exceptions.GenericOpalException;
 import opal.IO.*;
 import facet.FacetAlignment;
 import facet.Facet;
+import opal.realignment.realignmentDriver;
 
 class runAlignment extends Thread{
 	Configuration conf;
 	Inputs in;
 	AlignmentMaker am;
 	int[][] alignmentInstance;
+	int[][] preRealignmentAlignmentInstance;
 	double facetScore =-1;
+	double preRealignmentFacetScore =-1;
+	Configuration[] realignmentConfigList = null;
+	
+	
 	
 	runAlignment(Configuration c, Inputs i){
 		conf = c;
-		in = i;
+		in = new Inputs(i);
+	}
+	runAlignment(Configuration c, Inputs i, Configuration[] rcList){
+		this(c,i);
+		realignmentConfigList = rcList;
 	}
 	
 	public void run(){
@@ -60,7 +63,7 @@ class runAlignment extends Thread{
 				am.initialize(conf, in);
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),in.structure.structure);
 				}
 			} else if (in.justDoConvert) {
 				am = new AlignmentMaker_Converter();
@@ -68,7 +71,7 @@ class runAlignment extends Thread{
 				am.initialize(conf, in);
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),in.structure.structure);
 				}
 			} else if (in.fileB != null) { // alignalign call
 				am = new AlignmentMaker_TwoAlignments();
@@ -77,7 +80,7 @@ class runAlignment extends Thread{
 				am.initialize(conf, in);
 				alignmentInstance = am.buildAlignment ();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(((AlignmentMaker_TwoAlignments)am).result,StructureFileReader.structure);
+					fa = new FacetAlignment(((AlignmentMaker_TwoAlignments)am).result,in.structure.structure);
 				}
 				
 			} else if (in.justTree || Tree.justPWDists) { // 
@@ -96,7 +99,25 @@ class runAlignment extends Thread{
 
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
-					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
+					
+					if(realignmentConfigList != null){
+						Configuration newRealignmentConfigList[] = new Configuration[realignmentConfigList.length];
+						for(int rNum = 0; rNum < realignmentConfigList.length; rNum++){
+							newRealignmentConfigList[rNum] = new Configuration(realignmentConfigList[rNum]);
+						}
+						preRealignmentAlignmentInstance = alignmentInstance.clone();
+						preRealignmentFacetScore = Facet.defaultValue(
+								new FacetAlignment(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure),
+								conf.useLegacyFacetFunction
+						);
+						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure, newRealignmentConfigList, conf, (float) preRealignmentFacetScore);
+						if(conf.realignment_window_type == Configuration.WINDOW_SIZE.VALUE) realigner.simpleRealignment((int)conf.realignment_window_value);
+						alignmentInstance = realigner.newAlignment();
+						newRealignmentConfigList = null;
+						
+					}
+					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),in.structure.structure);
+					
 				}
 			}
 			
@@ -106,7 +127,7 @@ class runAlignment extends Thread{
 					if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 					Facet.outputDefaultFeatures(fname, fa);
 				}
-				facetScore = Facet.defaultValue(fa);
+				facetScore = Facet.defaultValue(fa,conf.useLegacyFacetFunction);
 			}
 			//in.structFileA = "";
 			//System.err.println("File: " + in.structFileA);
@@ -121,31 +142,96 @@ class runAlignment extends Thread{
 		}*/
 	}
 	
-	public void print(){
-		if(in.configOutputFile != null){
-			String fname = in.configOutputFile.replace("__CONFIG__", conf.toString());
-			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
-			am.printOutput(alignmentInstance, fname);
-			
-		}
-		else am.printOutput(alignmentInstance, null);
+	public boolean print(){
 		if(facetScore==-1){
 			am = null;
 		}
 		if (in.verbosity>0 && facetScore>-1) {
-			System.err.printf("facet score: %.6f\n",facetScore);
+			System.err.printf("\nfacet score: %.6f",facetScore);
 		}
+		
+		if(in.configOutputFile != null){
+			String fname = in.configOutputFile.replace("__CONFIG__", conf.toString());
+			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
+			return am.printOutput(alignmentInstance, fname);
+			
+		}
+		else return am.printOutput(alignmentInstance, null);
+		
 	}
 	
-	public void printBest(){
+	public boolean printBest(){
 		if (in.verbosity>-1) {
-			System.err.printf("best facet value --  %.6f (%s)\n",facetScore, conf );
+			System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
 		}
 
-		am.printOutput(alignmentInstance, in.bestOutputFile);
+		return am.printOutput(alignmentInstance, in.bestOutputFile);
 	}
 	
+	public boolean printBestIncludePreRealignment(){
+		if(facetScore>preRealignmentFacetScore){
+			if (in.verbosity>-1) {
+				System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
+			}
+
+			return am.printOutput(alignmentInstance, in.bestOutputFileIncludePreRealignment);
+		}else{
+			if (in.verbosity>0 && facetScore>-1) {
+				System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
+			}
+			
+			return am.printOutput(preRealignmentAlignmentInstance, in.bestOutputFileIncludePreRealignment, false);
+			
+		}
+	}
+	
+	public boolean printPreRealignment(){
+		if (in.verbosity>0 && facetScore>-1) {
+			System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
+		}
+		if(in.preRealignmentOutputFile != null){
+			String fname = in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
+			return am.printOutput(preRealignmentAlignmentInstance, fname, false);
+		}else{
+			return am.printOutput(preRealignmentAlignmentInstance, null, false);
+		}
+		
+	}
+	
+	public boolean printBestPreRealignment(){
+		if (in.verbosity>-1) {
+			System.err.printf("\nbest pre-realignment facet value --  %.6f (%s)",preRealignmentFacetScore, conf );
+		}
+			
+		return am.printOutput(preRealignmentAlignmentInstance, in.bestPreRealignmentOutputFile, false);
+	}	
+	
+	public boolean printBestPreRealignmentsRealignment(){
+		if (in.verbosity>-1) {
+			System.err.printf("\nbest pre-realignments realignment facet value --  %.6f (%s)",facetScore, conf );
+		}
+			
+		return am.printOutput(alignmentInstance, in.bestPreRealignmentsRealignmentOutputFile);
+	}	
+	
+	public boolean printBestPreRealignmentsRealignmentIncludePreRealignment(){
+		if(facetScore>preRealignmentFacetScore){
+			if (in.verbosity>-1) {
+				System.err.printf("\nbest pre-realignments realignment facet value --  %.6f (%s)",facetScore, conf );
+			}
+				
+			return am.printOutput(alignmentInstance, in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment);
+		}else{
+			if (in.verbosity>-1) {
+				System.err.printf("\nbest pre-realignment facet value --  %.6f (%s)",preRealignmentFacetScore, conf );
+			}
+				
+			return am.printOutput(preRealignmentAlignmentInstance, in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment, false);
+		}
+	}
 }
 
 public class Opal {
@@ -187,9 +273,10 @@ public class Opal {
  
 		
 
-		Configuration[] config = argHandler.getConfigs();
+		Configuration[] advising_config = argHandler.getAdvisingConfigs();
+		Configuration[] realignment_config = argHandler.getRealignmentConfigs();
 		Inputs input = argHandler.getInputs();
-		runAlignment[] thread = new runAlignment[config.length];
+		runAlignment[] thread = new runAlignment[advising_config.length];
 		
 		int last_joined = -1;
 		int max_threads = Runtime.getRuntime().availableProcessors();
@@ -199,8 +286,9 @@ public class Opal {
 		}
 		
 		int maxIndex = 0;
-		for(int i=0;i<config.length;i++){
-			thread[i] = new runAlignment(config[i],input);
+		int maxPreRealignmentIndex = 0;
+		for(int i=0;i<advising_config.length;i++){
+			thread[i] = new runAlignment(advising_config[i],input, realignment_config);
 			//thread[i] = new printLine(config[i],i);
 			thread[i].start();
 			if(i-last_joined>=max_threads){
@@ -208,11 +296,16 @@ public class Opal {
 				try{
 					thread[last_joined].join();
 					thread[last_joined].print();
+					if(realignment_config != null) thread[last_joined].printPreRealignment(); 
 					if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
-						thread[maxIndex] = null;
+						if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 						maxIndex = last_joined;
+					} 
+					if(thread[last_joined].preRealignmentFacetScore > thread[maxPreRealignmentIndex].preRealignmentFacetScore){
+						if(maxPreRealignmentIndex != maxIndex) thread[maxPreRealignmentIndex] = null;
+						maxPreRealignmentIndex = last_joined;
 					}
-					else if(last_joined != maxIndex) thread[last_joined] = null;
+					if(last_joined != maxIndex && last_joined != maxPreRealignmentIndex) thread[last_joined] = null;
 				}catch(InterruptedException e){
 					OpalLogWriter.stdErrLogln("InterruptedException "+e.toString());
 					throw new GenericOpalException("InterruptedException "+e.toString());
@@ -220,23 +313,51 @@ public class Opal {
 			}
 		}
 		
-		for(last_joined++;last_joined<config.length;last_joined++){
+		for(last_joined++;last_joined<advising_config.length;last_joined++){
 			try{
 				thread[last_joined].join();
 				thread[last_joined].print();
+				if(realignment_config != null) thread[last_joined].printPreRealignment(); 
 				if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
-					thread[maxIndex] = null;
+					if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 					maxIndex = last_joined;
+				} 
+				if(thread[last_joined].preRealignmentFacetScore > thread[maxPreRealignmentIndex].preRealignmentFacetScore){
+					if(maxPreRealignmentIndex != maxIndex) thread[maxPreRealignmentIndex] = null;
+					maxPreRealignmentIndex = last_joined;
 				}
-				else if(last_joined != maxIndex) thread[last_joined] = null;
+				if(last_joined != maxIndex && last_joined != maxPreRealignmentIndex) thread[last_joined] = null;
 			}catch(InterruptedException e){
 				OpalLogWriter.stdErrLogln("InterruptedException "+e.toString());
 				throw new GenericOpalException("InterruptedException "+e.toString());
 			}
 		}
 		
-		if(config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0) thread[maxIndex].printBest();
 		
+		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0)
+			if(!thread[maxIndex].printBest()) 
+				System.err.println("Print returned false");
+		if(advising_config.length>1 && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
+				if(!thread[maxPreRealignmentIndex].printBestPreRealignment()) 
+					System.err.println("Print returned false");
+				if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignment()) 
+					System.err.println("Print returned false");
+				if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignmentIncludePreRealignment()) 
+					System.err.println("Print returned false");
+		}
+		
+		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0 
+				&& thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0 
+				&& thread[maxPreRealignmentIndex].preRealignmentFacetScore < thread[maxIndex].facetScore){
+			if(!thread[maxIndex].printBestIncludePreRealignment()) 
+				System.err.println("Print returned false");
+		}else if(advising_config.length>1 && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
+			if(!thread[maxPreRealignmentIndex].printBestIncludePreRealignment()) 
+				System.err.println("Print returned false");
+		}
+		
+		
+		System.err.println("advising_config.length: " + advising_config.length + "\tmaxPreRealignmentIndex:" + maxPreRealignmentIndex + "\tthread[maxPreRealignmentIndex]:" + thread[maxPreRealignmentIndex]);
 		if (input.verbosity>0) {
 			Date now = new Date();
 			long diff = now.getTime() - start.getTime();

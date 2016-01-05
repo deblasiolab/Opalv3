@@ -12,7 +12,6 @@ import opal.align.Alignment;
 import opal.align.PairAligner;
 import opal.align.ProfileAligner;
 import opal.align.Aligner.AlignmentType;
-import opal.exceptions.GenericOpalException;
 
 public abstract class Tree {
 
@@ -84,7 +83,7 @@ public abstract class Tree {
 				int[][] tmp = new int[1][];
 				tmp[0] = alignments[0].seqs[i];
 				Alignment tmpAl;
-				tmpAl = Alignment.buildNewAlignment(Alignment.getDegappedCopy(tmp)[0], i, config);
+				tmpAl = Alignment.buildNewAlignment(Alignment.getDegappedCopy(tmp)[0], i, config, alignments[0].in);
 				node.setAlignment(tmpAl);
 			} else { 
 				node.setAlignment(alignments[i]);
@@ -119,7 +118,7 @@ public abstract class Tree {
 					tmp[1]= alignments[0].seqs[j];
 					int[] ids = {i,j};
 					Alignment tmpAl; 
-					tmpAl = Alignment.buildNewAlignment(tmp, ids, config);
+					tmpAl = Alignment.buildNewAlignment(tmp, ids, config, alignments[0].in);
 					d = ((NormCostDistance)dist).calcDistance( tmpAl);
 				}
 				int a = node_i.leafOrderFromInput.get(0);

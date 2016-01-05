@@ -225,8 +225,8 @@ public abstract class PairwiseAlignmentsContainer {
 		PairSuboptimalityMatrices[] matAB = pairSuboptMatrices.get(pair);
 		
 		if ( matAB == null){
-			Alignment A = Alignment.buildNewAlignment(origSeqs[a], a, config);
-			Alignment B = Alignment.buildNewAlignment(origSeqs[b], b, config);
+			//Alignment A = Alignment.buildNewAlignment(origSeqs[a], a, config);
+			//Alignment B = Alignment.buildNewAlignment(origSeqs[b], b, config);
 			
 			/*
 			 * 
@@ -310,8 +310,8 @@ public abstract class PairwiseAlignmentsContainer {
 		
 		PairSuboptimalityMatrices[] matAC = pairSuboptMatrices.get(pair);
 		if ( matAC == null){
-			Alignment A = Alignment.buildNewAlignment(origSeqs[a], a, config);
-			Alignment C = Alignment.buildNewAlignment(origSeqs[c], c, config);
+			//Alignment A = Alignment.buildNewAlignment(origSeqs[a], a, config);
+			//Alignment C = Alignment.buildNewAlignment(origSeqs[c], c, config);
 			/*
 			 * not sure whats happeneing here
 			
@@ -328,8 +328,8 @@ public abstract class PairwiseAlignmentsContainer {
 		pair = SequenceIdPair.makeString(b,c);
 		PairSuboptimalityMatrices matBC[] = pairSuboptMatrices.get(pair);
 		if ( matBC == null){
-			Alignment B = Alignment.buildNewAlignment(origSeqs[b], b, config);
-			Alignment C = Alignment.buildNewAlignment(origSeqs[c], c, config);
+			//Alignment B = Alignment.buildNewAlignment(origSeqs[b], b, config);
+			//Alignment C = Alignment.buildNewAlignment(origSeqs[c], c, config);
 			
 			/*
 			 * Again this

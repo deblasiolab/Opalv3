@@ -47,12 +47,12 @@ public class PairAligner extends Aligner {
 		V[0][0] = H[0][0] = D[0][0] = 0; 
 		long bigNumber = Long.MAX_VALUE/2; // half, to ensure no overflow from the next row/column 
 		for (int j=1; j<=N; j++) {
-			H[0][j] = H[0][j-1] + config.lambdaTerm + (j==1?config.gammaTerm:0);
+			H[0][j] = H[0][j-1] + config.leftLambdaTerm() + (j==1?config.leftGammaTerm():0);
 			D[0][j] = V[0][j] = bigNumber; //H[0][j] + gamma;
 		//	LogWriter.stdOutLogln("V[0][" + j + "] = " + V[0][j] + ";  H[0][" + j + "] = " + H[0][j] + ";  D[0][" + j + "] = " + D[0][j]);
 		}
 		for (int i=1; i<=M; i++) {
-			V[i][0] = V[i-1][0] + config.lambdaTerm + (i==1?config.gammaTerm:0);
+			V[i][0] = V[i-1][0] + config.leftLambdaTerm() + (i==1?config.leftGammaTerm():0);
 			D[i][0] = H[i][0] = bigNumber;//= V[i][0] + gamma ;
 		//	LogWriter.stdOutLogln("V[" + i + "][0] = " + V[i][0] + ";  H[" + i + "][0] = " + H[i][0] + ";  D[" + i + "][0] = " + D[i][0]);
 		}
@@ -65,8 +65,8 @@ public class PairAligner extends Aligner {
 		for (int i=1; i<=M; i++){
 			for (int j=1; j<=N; j++){
 					if (i==M || j==N) {
-						gamma_tmp = config.gammaTerm;
-						lambda_tmp = config.lambdaTerm;
+						gamma_tmp = config.rightGammaTerm();
+						lambda_tmp = config.rightLambdaTerm();
 					} else {
 						gamma_tmp = config.gamma;
 						lambda_tmp = config.lambda;						
@@ -75,8 +75,8 @@ public class PairAligner extends Aligner {
 					long structGamma_tmpA=0;
 					long structGamma_tmpB=0;
 					if (config.useStructure) {
-						structGamma_tmpA = Math.round(getStructGapOpenModiferPair(A.seqIds[0], i-1, config));
-						structGamma_tmpB = Math.round(getStructGapOpenModiferPair(B.seqIds[0], j-1, config));
+						structGamma_tmpA = Math.round(getStructGapOpenModiferPair(A.seqIds[0], i-1, config, A.in));
+						structGamma_tmpB = Math.round(getStructGapOpenModiferPair(B.seqIds[0], j-1, config, B.in));
 					}
 
 					
@@ -104,9 +104,9 @@ public class PairAligner extends Aligner {
 				D[i][j] += config.cost.costs[A.seqs[0][i-1]][B.seqs[0][j-1]];
 
 				if (config.useStructure) {
-					D[i][j] += Math.round(getStructSubModifierPair(A.seqIds[0], B.seqIds[0], i-1, j-1, config));
-					V[i][j] += Math.round(getStructGapExtModiferPair(A.seqIds[0], i-1, config));
-					H[i][j] += Math.round(getStructGapExtModiferPair(B.seqIds[0], j-1, config));
+					D[i][j] += Math.round(getStructSubModifierPair(A.seqIds[0], B.seqIds[0], i-1, j-1, config, A.in));
+					V[i][j] += Math.round(getStructGapExtModiferPair(A.seqIds[0], i-1, config, A.in));
+					H[i][j] += Math.round(getStructGapExtModiferPair(B.seqIds[0], j-1, config, B.in));
 				}
 			}
 		}
@@ -133,8 +133,8 @@ public class PairAligner extends Aligner {
 			
 			if (Direction.diag != dir) {
 				if (i==M || j==N) {
-					gamma_tmp = config.gammaTerm;
-					base = config.lambdaTerm;
+					gamma_tmp = config.rightGammaTerm();
+					base = config.rightLambdaTerm();
 				} else {
 					gamma_tmp = config.gamma;
 					base = config.lambda;						
@@ -144,13 +144,13 @@ public class PairAligner extends Aligner {
 			long structGamma_tmpA=0;
 			long structGamma_tmpB=0;
 			if (config.useStructure) {
-				structGamma_tmpA = Math.round(getStructGapOpenModiferPair(A.seqIds[0], i-1, config));
-				structGamma_tmpB = Math.round(getStructGapOpenModiferPair(B.seqIds[0], j-1, config));
+				structGamma_tmpA = Math.round(getStructGapOpenModiferPair(A.seqIds[0], i-1, config, A.in));
+				structGamma_tmpB = Math.round(getStructGapOpenModiferPair(B.seqIds[0], j-1, config, B.in));
 			}
 
 			
 			if (Direction.horiz == dir){
-				if (config.useStructure) base += Math.round(getStructGapExtModiferPair(B.seqIds[0], j-1, config));								
+				if (config.useStructure) base += Math.round(getStructGapExtModiferPair(B.seqIds[0], j-1, config, A.in));								
 				if ( cost == H[i][j-1] + base )				
 					nextdir = Direction.horiz;
 				else if ( cost == V[i][j-1] + base + gamma_tmp + structGamma_tmpA)
@@ -163,7 +163,7 @@ public class PairAligner extends Aligner {
 				}
 				j--;
 			} else if (Direction.vert == dir) {
-				if (config.useStructure) base += Math.round(getStructGapExtModiferPair(A.seqIds[0], i-1, config));
+				if (config.useStructure) base += Math.round(getStructGapExtModiferPair(A.seqIds[0], i-1, config, A.in));
 				if ( cost == H[i-1][j] + base + gamma_tmp + structGamma_tmpB)
 					nextdir = Direction.horiz;
 				else if ( cost == V[i-1][j] + base )				
@@ -177,7 +177,7 @@ public class PairAligner extends Aligner {
 				i--;
 			} else if (Direction.diag == dir ) {
 				base = config.cost.costs[A.seqs[0][i-1]][B.seqs[0][j-1]];
-				if (config.useStructure) base += Math.round(getStructSubModifierPair(A.seqIds[0], B.seqIds[0], i-1, j-1, config));
+				if (config.useStructure) base += Math.round(getStructSubModifierPair(A.seqIds[0], B.seqIds[0], i-1, j-1, config, A.in));
 
 				if ( cost == H[i-1][j-1] + base )				
 					nextdir = Direction.horiz;
