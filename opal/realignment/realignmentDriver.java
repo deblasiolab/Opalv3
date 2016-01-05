@@ -97,30 +97,49 @@ public class realignmentDriver {
 		float originalScore = evaluateWindow(startIndex, endIndex);
 		
 		
-		char[][] originalWindowSequences = new char[sequence.length][endIndex-startIndex+1];
+		char[][] originalWindowSequences = new char[sequence.length][endIndex-startIndex+1];		
+		int[] numberOfNonGaps = new int[sequence.length];
+		int numberOfNonBlankSequences = 0;
+		
 		String[] names = new String[sequence.length];
 		for(int i=0; i<sequence.length; i++){
-			int numberOfNonGaps = 0;
 			names[i] = Integer.toString(i);
 			for(int j=startIndex; j<=endIndex; j++){
-				if(sequence[i][j] != '-') numberOfNonGaps++;
-				windowSequences[i][j-startIndex] = sequence[i][j];
+				if(sequence[i][j] != '-') numberOfNonGaps[i]++;
+				originalWindowSequences[i][j-startIndex] = Character.toUpperCase(sequence[i][j]);;
 			}
-			windowStructure[i] = new float[numberOfNonGaps][3];
-			int k=0;
-			for(int j=startIndex; j<=endIndex; j++){
-				if(sequence[i][j] != '-'){
-					windowStructure[i][k][0] = structure_prob[i][j][0];
-					windowStructure[i][k][1] = structure_prob[i][j][1];
-					windowStructure[i][k][2] = structure_prob[i][j][2];
-					k++;
+			if(numberOfNonGaps[i] > 0) numberOfNonBlankSequences++;
+		}
+		
+		char[][] windowSequences = new char[numberOfNonBlankSequences][];
+		float[][][] windowStructure = new float[numberOfNonBlankSequences][][];
+		
+		int putInIndex = 0;
+		for(int i=0; i<sequence.length; i++){
+			int location = 0;
+			if(numberOfNonGaps[i] > 0){
+				windowSequences[putInIndex] = new char[numberOfNonGaps[i]];
+				for(int j=startIndex; j<=endIndex; j++){
+					if(sequence[i][j] != '-') windowSequences[putInIndex][location++] = Character.toUpperCase(sequence[i][j]);
 				}
+				windowStructure[putInIndex] = new float[numberOfNonGaps[i]][3];
+				int k=0;
+				for(int j=startIndex; j<=endIndex; j++){
+					if(sequence[i][j] != '-'){
+						windowStructure[putInIndex][k][0] = structure_prob[i][j][0];
+						windowStructure[putInIndex][k][1] = structure_prob[i][j][1];
+						windowStructure[putInIndex][k][2] = structure_prob[i][j][2];
+						k++;
+					}
+				}
+				putInIndex++;
 			}
 		}
 		
 		Inputs in = new Inputs();
 		char[][] bestSubAlignment = null;
-		float bestScore = -1;
+		float bestScore = originalScore;
+		String bestConfig = "";
 		
 		for(int i=0; numberOfNonBlankSequences > 1 && i<configList.length; i++){
 			
@@ -162,6 +181,12 @@ public class realignmentDriver {
 				bestConfig = "used " + configList[i].toString() + " (" + numberOfNonBlankSequences + " of " + sequence.length + " sequences)";
 			}
 		}
+		if(bestSubAlignment == null){
+			bestSubAlignment = originalWindowSequences;
+			bestConfig = "kept the same";
+		}
+		if(numberOfNonBlankSequences <= 1) bestConfig = "didn't try";
+		globalConfiguration.realignmentLog += "Realigned window [" + startIndex + "," + endIndex + "] " + bestConfig + "\n";
 		
 		return bestSubAlignment;
 	}
@@ -352,10 +377,12 @@ public class realignmentDriver {
 		int lastInAlignmentAlready = -1;
 		for(int i=0;i<sequence[0].length;i++){
 			if(!includeInRealignment[i]){
-				char[][] realignedRegion = realignWindow(lastInAlignmentAlready+1, i-1);
-				for(int j=0; j<sequence.length; j++){
-					for(int k=0; k<realignedRegion[j].length;k++)
-					newAlignment[j] += realignedRegion[j][k];
+				if(lastInAlignmentAlready+1 < i){
+					char[][] realignedRegion = realignWindow(lastInAlignmentAlready+1, i-1);
+					for(int j=0; j<sequence.length; j++){
+						for(int k=0; k<realignedRegion[j].length;k++)
+						newAlignment[j] += realignedRegion[j][k];
+					}
 				}
 				
 				for(int j=0; j<sequence.length; j++){
