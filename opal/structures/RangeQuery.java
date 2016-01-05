@@ -1,6 +1,5 @@
 package opal.structures;
 
-import com.traviswheeler.libs.LogWriter;
 import opal.exceptions.GenericOpalException;
 
 public class RangeQuery {

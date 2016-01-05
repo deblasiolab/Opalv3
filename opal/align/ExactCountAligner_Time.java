@@ -3,10 +3,13 @@ package opal.align;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
+
 import opal.align.shapes.*;
 import opal.exceptions.GenericOpalException;
+
 import com.traviswheeler.libs.LogWriter;
-import opal.IO.SequenceConverter;
+
+import opal.IO.Configuration;
 
 
 public class ExactCountAligner_Time extends ExactCountAligner {
@@ -59,12 +62,12 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 		int[][] revA = config.sc.buildReverseAlignment(A.seqs);
 		int[][] revB = config.sc.buildReverseAlignment(B.seqs);
 		
-		Alignment alA = Alignment.buildNewAlignment(revA, A.seqIds, true, config);
-		Alignment alB = Alignment.buildNewAlignment(revB, B.seqIds, true, config);
+		Alignment alA = Alignment.buildNewAlignment(revA, A.seqIds, true, config, A.in);
+		Alignment alB = Alignment.buildNewAlignment(revB, B.seqIds, true, config, B.in);
 		
 		
 		ProfileAligner al = new ProfileAligner( alA, alB);
-		al.config = config;
+		al.config = new Configuration(config);
 		al.setPessimistic(false);
 		al.align();
 		
@@ -74,23 +77,63 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 
 		
 		int[][] alignedSeqs = null;
-		if (config.useStructure) { // structure is stored in forward orientation. This is easiest way to get correct score calculated
-			alignedSeqs = config.sc.buildReverseAlignment(al.getAlignment().seqs);
+		if (al.config.useStructure) { // structure is stored in forward orientation. This is easiest way to get correct score calculated
+			alignedSeqs = al.config.sc.buildReverseAlignment(al.getAlignment().seqs);
 		} else {
 			alignedSeqs = al.getAlignment().seqs;
 		}
 				
-		costUpperBound = Aligner.calcCost(alignedSeqs,A.K,B.K,idsAB, config);
-
+		costUpperBound = Aligner.calcCost(alignedSeqs,A.K,B.K,idsAB, al.config, A.in);
+		
+		if(al.config.useLeftTerminal != al.config.useRightTerminal){
+			float costUpperBoundsArray[] = new float[3];
+			for(int terminal_index=0;terminal_index<3;terminal_index++){
+				ProfileAligner al_temp = new ProfileAligner( alA, alB);
+				al_temp.config = new Configuration(config);
+				
+				if(terminal_index == 0){
+					al_temp.config.useLeftTerminal = al_temp.config.useRightTerminal = false;
+				}
+				if(terminal_index == 2){
+					al_temp.config.useLeftTerminal = al_temp.config.useRightTerminal = true;
+				}
+				
+				al_temp.setPessimistic(false);
+				al_temp.align();
+				
+				int[] idsAB_temp = new int[A.seqIds.length + B.seqIds.length];
+				System.arraycopy(A.seqIds, 0, idsAB_temp, 0, A.seqIds.length);
+				System.arraycopy(B.seqIds, 0, idsAB_temp, A.seqIds.length, B.seqIds.length);
+	
+				
+				int[][] alignedSeqs_temp = null;
+				if (al_temp.config.useStructure) { // structure is stored in forward orientation. This is easiest way to get correct score calculated
+					alignedSeqs_temp = al_temp.config.sc.buildReverseAlignment(al_temp.getAlignment().seqs);
+				} else {
+					alignedSeqs_temp = al_temp.getAlignment().seqs;
+				}
+						
+				costUpperBoundsArray[terminal_index] = Aligner.calcCost(alignedSeqs_temp,A.K,B.K,idsAB_temp, al_temp.config, A.in);
+				
+			}
+			System.err.print("");
+		}
+		
+		//TODO !!! Needed to not over prune when doing computation
+		//costUpperBound *= 2;
+		long alValue = al.getEstimatedCost();
+		
 		if (costUpperBound < al.getEstimatedCost()) {
 			LogWriter.stdErrLogln("Surprise: actual cost of alignment is better than optimistic estimate");
 			throw new GenericOpalException("Surprise: actual cost of alignment is better than optimistic estimate");
 		}
 		
+
+		
 		if (A.seqs.length * B.seqs.length > Aligner.linearCutoff)
-			shapeTester = new ShapeTesterLinear (costUpperBound, al.getD(), al.getH(), al.getV(), config);
+			shapeTester = new ShapeTesterLinear (costUpperBound, al.getD(), al.getH(), al.getV(), al.config);
 		else
-			shapeTester = new ShapeTesterQuadratic (costUpperBound, al.getD(), al.getH(), al.getV(), config);
+			shapeTester = new ShapeTesterQuadratic (costUpperBound, al.getD(), al.getH(), al.getV(), al.config);
 		
 
 		// let the GC clean these up
@@ -103,8 +146,8 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 		al.setPessimistic(true);
 		al.align();
 		
-		long pessimisticUpperBound = Aligner.calcCost(al.getAlignment().seqs,A.K,B.K, idsAB, config);
-
+		long pessimisticUpperBound = Aligner.calcCost(al.getAlignment().seqs,A.K,B.K, idsAB, al.config, A.in);
+		long alValuePess = al.getEstimatedCost();
 		if (pessimisticUpperBound > al.getEstimatedCost()) {
 			LogWriter.stdErrLogln("Surprise: actual cost of alignment is worse than pessimistic estimate");
 			throw new GenericOpalException("Surprise: actual cost of alignment is worse than pessimistic estimate");

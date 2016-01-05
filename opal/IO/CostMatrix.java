@@ -1,13 +1,11 @@
 package opal.IO;
 
-import opal.align.Aligner;
 import opal.align.StructureAlignment.ParamModel;
 import opal.exceptions.GenericOpalException;
 
 import com.traviswheeler.libs.LogWriter;
 
 import java.util.*;
-import java.lang.StringBuffer;
 import java.io.File;
 import java.io.FileNotFoundException;
 

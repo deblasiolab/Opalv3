@@ -24,9 +24,10 @@ public class Support {
 			}
 		}
 		//System.err.println(rtn + "/" + ct);
+		if(ct == 0) return 0;
 		return rtn/ct;
 	}
-	 
+	
 	private static float[] scoreTriple(FacetAlignment a, int i, int j, int k, int column){
 		if(a.sequence[i].charAt(column) == '-' || a.sequence[j].charAt(column) == '-' || a.sequence[k].charAt(column) == '-') return null;
 		float sum_i = a.structure_prob[i][column][0] + a.structure_prob[i][column][1] + a.structure_prob[i][column][2];

@@ -6,7 +6,6 @@ import opal.IO.SequenceConverter;
 import opal.align.Aligner;
 import opal.align.Alignment;
 import opal.exceptions.GenericOpalException;
-import opal.IO.Configuration;
 
 public class NormCostDistance extends Distance {
 	
@@ -26,7 +25,7 @@ public class NormCostDistance extends Distance {
 				LogWriter.stdErrLogln("Internal error. Calculating normcost distance on an invalid number of sequences");
 				throw new GenericOpalException("Internal error. Calculating normcost distance on an invalid number of sequences");
 			}	
-			totalCost = Aligner.calcCost(A.seqs, A.seqIds, aligner.config);
+			totalCost = Aligner.calcCost(A.seqs, A.seqIds, aligner.config, A.in);
 			int cnt = 0;
 			for (int i=0; i<A.M; i++){
 				if (A.seqs[0][i] != SequenceConverter.GAP_VAL) cnt++; 

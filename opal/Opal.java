@@ -27,7 +27,7 @@ class runAlignment extends Thread{
 	AlignmentMaker am;
 	int[][] alignmentInstance;
 	double facetScore =-1;
-	Configuration[] realignmentConfigList = null;
+	Configuration[] configList = null;
 	
 	
 	
@@ -35,9 +35,9 @@ class runAlignment extends Thread{
 		conf = c;
 		in = i;
 	}
-	runAlignment(Configuration c, Inputs i, Configuration[] rcList){
+	runAlignment(Configuration c, Inputs i, Configuration[] cList){
 		this(c,i);
-		realignmentConfigList = rcList;
+		configList = cList;
 	}
 	
 	public void run(){
@@ -105,16 +105,7 @@ class runAlignment extends Thread{
 				alignmentInstance = am.buildAlignment();
 				if(in.structFileA != null){
 					fa = new FacetAlignment(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure);
-					
-					if(in.preRealignmentOutputFile != null){
-						String fname = in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
-						if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-						if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
-						am.printOutput(alignmentInstance, fname);
-						
-					}
-					
-					realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure, realignmentConfigList, conf, Facet.defaultValue(fa));
+					realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(alignmentInstance),StructureFileReader.structure, configList, conf, Facet.defaultValue(fa));
 					realigner.simpleRealignment(5);
 					alignmentInstance = realigner.newAlignment();
 				}
@@ -207,10 +198,9 @@ public class Opal {
  
 		
 
-		Configuration[] advising_config = argHandler.getAdvisingConfigs();
-		Configuration[] realignment_config = argHandler.getRealignmentConfigs();
+		Configuration[] config = argHandler.getConfigs();
 		Inputs input = argHandler.getInputs();
-		runAlignment[] thread = new runAlignment[advising_config.length];
+		runAlignment[] thread = new runAlignment[config.length];
 		
 		int last_joined = -1;
 		int max_threads = Runtime.getRuntime().availableProcessors();
@@ -220,8 +210,8 @@ public class Opal {
 		}
 		
 		int maxIndex = 0;
-		for(int i=0;i<advising_config.length;i++){
-			thread[i] = new runAlignment(advising_config[i],input, realignment_config);
+		for(int i=0;i<config.length;i++){
+			thread[i] = new runAlignment(config[i],input, config);
 			//thread[i] = new printLine(config[i],i);
 			thread[i].start();
 			if(i-last_joined>=max_threads){
@@ -241,7 +231,7 @@ public class Opal {
 			}
 		}
 		
-		for(last_joined++;last_joined<advising_config.length;last_joined++){
+		for(last_joined++;last_joined<config.length;last_joined++){
 			try{
 				thread[last_joined].join();
 				thread[last_joined].print();
@@ -256,7 +246,7 @@ public class Opal {
 			}
 		}
 		
-		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0) thread[maxIndex].printBest();
+		if(config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0) thread[maxIndex].printBest();
 		
 		if (input.verbosity>0) {
 			Date now = new Date();

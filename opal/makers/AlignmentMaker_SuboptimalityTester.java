@@ -3,10 +3,7 @@ package opal.makers;
 import opal.IO.AlignmentWriter;
 import opal.IO.ClustalWriter;
 import opal.IO.FastaWriter;
-import opal.IO.OpalLogWriter;
-
 import com.traviswheeler.libs.LogWriter;
-import opal.IO.SequenceConverter;
 import opal.IO.SequenceFileReader;
 import opal.IO.AlignmentWriter.OutputType;
 import opal.align.Aligner;
@@ -61,11 +58,11 @@ public class AlignmentMaker_SuboptimalityTester extends AlignmentMaker {
 		PairSuboptimalityMatrices cont;
 		
 		for (int i=0; i<K-1; i++ ) {
-			alA = Alignment.buildNewAlignment(seqs[i], i, conf);
+			alA = Alignment.buildNewAlignment(seqs[i], i, conf, in);
 			charsA[0] = chars[i];
 			namesA[0] = names[i];
 			for (int j=i+1; j<K; j++){
-				alB = Alignment.buildNewAlignment(seqs[j], j, conf);
+				alB = Alignment.buildNewAlignment(seqs[j], j, conf, in);
 				charsB[0] = chars[j];
 				namesB[0] = names[j];
 
@@ -93,7 +90,7 @@ public class AlignmentMaker_SuboptimalityTester extends AlignmentMaker {
 		return null;
 	}
 
-	public boolean printOutput(int[][] input, String fname){
+	public boolean printOutput(int[][] input, String fname, boolean printRealignmentLines){
 		return true;
 	}
 	

@@ -1,10 +1,9 @@
 package opal.align;
 
-import opal.IO.OpalLogWriter;
+import opal.IO.Inputs;
 import opal.IO.SequenceConverter;
 import opal.IO.StructureFileReader;
 import opal.IO.Configuration;
-import opal.exceptions.GenericOpalException;
 
 public class StructureAlignment extends Alignment {
 
@@ -28,29 +27,29 @@ public class StructureAlignment extends Alignment {
 	public float[] gapOpenSums_00; // sum of the gap-open values for the most recent column (<j) with a char, with form f00[j]
 
 	
-	public StructureAlignment(int[] A, int id, Configuration c ) {
-		this(A, id, c, 0);
+	public StructureAlignment(int[] A, int id, Configuration c, Inputs ipt ) {
+		this(A, id, c, ipt, 0);
 	}
 
-	public StructureAlignment(int[][] A, int[] ids, boolean isReverse, Configuration c) {
-		this(A, ids, isReverse, c, 0);
+	public StructureAlignment(int[][] A, int[] ids, boolean isReverse, Configuration c, Inputs ipt) {
+		this(A, ids, isReverse, c, ipt, 0);
 	}
 
-	public StructureAlignment(int[][] A, int[] ids, Configuration c) {
-		this(A, ids, c, 0);
+	public StructureAlignment(int[][] A, int[] ids, Configuration c, Inputs ipt) {
+		this(A, ids, c, ipt, 0);
 	}
 
 	
-	public StructureAlignment(int[] A, int id, Configuration c, int startIndex ) {
-		super(A, id, c, startIndex);
+	public StructureAlignment(int[] A, int id, Configuration c, Inputs ipt, int startIndex ) {
+		super(A, id, c, ipt, startIndex);
 	}
 
-	public StructureAlignment(int[][] A, int[] ids, boolean isReverse, Configuration c, int startIndex) {
-		super(A, ids, isReverse, c, startIndex);
+	public StructureAlignment(int[][] A, int[] ids, boolean isReverse, Configuration c, Inputs ipt, int startIndex) {
+		super(A, ids, isReverse, c, ipt, startIndex);
 	}
 
-	public StructureAlignment(int[][] A, int[] ids, Configuration c, int startIndex) {
-		super(A, ids, c, startIndex);
+	public StructureAlignment(int[][] A, int[] ids, Configuration c, Inputs ipt, int startIndex) {
+		super(A, ids, c, ipt, startIndex);
 	}
 
 
@@ -84,7 +83,7 @@ public class StructureAlignment extends Alignment {
 			loopProbSums[m+1] = 0;
 
 			for (int k=0; k<K; k++) {
-				int seqLen = StructureFileReader.helices[seqIds[k]].length ;
+				int seqLen = in.structure.helices[seqIds[k]].length ;
 				
 				if (seqs[k][m] == SequenceConverter.GAP_VAL) {
 					if (ms[k]==0 /*external gap*/ || ms[k] == seqLen) {
@@ -106,20 +105,20 @@ public class StructureAlignment extends Alignment {
 
 					int struct_x = x;
 					if (isReverse) {
-						struct_x = StructureFileReader.helices[seqIds[k]].length - x - 1;
+						struct_x = in.structure.helices[seqIds[k]].length - x - 1;
 					}
 
-					helixProbSums[m+1] += StructureFileReader.helices[seqIds[k]][struct_x];
-					sheetProbSums[m+1] += StructureFileReader.sheets[seqIds[k]][struct_x];
-					loopProbSums[m+1] += StructureFileReader.loops[seqIds[k]][struct_x];							
+					helixProbSums[m+1] += in.structure.helices[seqIds[k]][struct_x];
+					sheetProbSums[m+1] += in.structure.sheets[seqIds[k]][struct_x];
+					loopProbSums[m+1] += in.structure.loops[seqIds[k]][struct_x];							
 					
-					gapExtSums[m+1] += conf.gapExtMods[conf.getStructureLevelFromProbability(StructureFileReader.structureLevels[seqIds[k]][struct_x])];
+					gapExtSums[m+1] += conf.gapExtMods[conf.getStructureLevelFromProbability(in.structure.structureLevels[seqIds[k]][struct_x])];
 			
 					if (x < seqLen-1) { // at least one more character follows, so opening a gap after this won't give a terminal gap
 						if (isReverse) {
 							struct_x--;
 						}
-						prevOpenLvl[k] = conf.getStructureLevelFromProbability(StructureFileReader.structureNeighborLevels[seqIds[k]][struct_x]);
+						prevOpenLvl[k] = conf.getStructureLevelFromProbability(in.structure.structureNeighborLevels[seqIds[k]][struct_x]);
 						gapOpenSums_1[m+1] += conf.gapOpenMods[prevOpenLvl[k]];
 						if ( seqs[k][m+1] == SequenceConverter.GAP_VAL) 
 							gapOpenSums_10[m+2] += conf.gapOpenMods[prevOpenLvl[k]];
@@ -136,48 +135,48 @@ public class StructureAlignment extends Alignment {
 		if (type == ParamModel.G1) {
 			conf.gapLevelCnt = 1;
 			conf.gamma = 62;
-			conf.gammaTerm = 27;
+			conf.setGammaTerm(27);
 			int[] open = {0};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 37;
-			conf.lambdaTerm = 34;
+			conf.setLambdaTerm(34);
 			int[] ext = {0};
 			conf.gapExtMods = ext;
 			
 		} else if (type == ParamModel.G4) {
 			conf.gapLevelCnt = 4;
 			conf.gamma = 51;
-			conf.gammaTerm = 23;
+			conf.setGammaTerm(23);
 			int[] open = {0, 9, 32, 32};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 36;
-			conf.lambdaTerm = 36;
+			conf.setLambdaTerm(36);
 			int[] ext = {0, 2, 4, 4};
 			conf.gapExtMods = ext;
 			
 		} else if (type == ParamModel.G6) {
 			conf.gapLevelCnt = 6;
 			conf.gamma = 45;
-			conf.gammaTerm = 11;
+			conf.setGammaTerm(11);
 			int[] open = {0, 6, 19, 30, 49, 49};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 36;
-			conf.lambdaTerm = 35;
+			conf.setLambdaTerm(35);
 			int[] ext = {0, 1, 2, 2, 2, 2 };
 			conf.gapExtMods = ext;	
 
 		} else if (type == ParamModel.G8) {
 			conf.gapLevelCnt = 8;
 			conf.gamma = 47;
-			conf.gammaTerm = 19;
+			conf.setGammaTerm(19);
 			int[] open = {0, 0, 12, 19, 33, 36, 57, 57};
 			conf.gapOpenMods = open;
 			
 			conf.lambda = 38;
-			conf.lambdaTerm = 37;
+			conf.setLambdaTerm(37);
 			int[] ext = {0, 0, 1, 1, 1, 2, 4, 4};
 			conf.gapExtMods = ext;		
 		}

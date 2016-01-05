@@ -6,6 +6,3 @@
 .classpath
 
 *.class
-
-realignment_simple*
-realignment_removeBlankLines*
