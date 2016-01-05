@@ -92,9 +92,9 @@ public class ProfileAligner extends Aligner {
 		}
 	}
 	
-	Direction H_dir[][];
-	Direction V_dir[][];
-	Direction D_dir[][];	
+	//Direction H_dir[][];
+	//Direction V_dir[][];
+	//Direction D_dir[][];	
 	
 	protected void initialize () {
 		// +1 to shift over the characters to a 1-based counting method
@@ -102,9 +102,9 @@ public class ProfileAligner extends Aligner {
 		V = new long[M+1][N+1];
 		D = new long[M+1][N+1];		
 		
-		 H_dir = new Direction[M+1][N+1];
-		 V_dir = new Direction[M+1][N+1];
-		 D_dir = new Direction[M+1][N+1];	
+		 //H_dir = new Direction[M+1][N+1];
+		 //V_dir = new Direction[M+1][N+1];
+		 //D_dir = new Direction[M+1][N+1];	
 	}		
 
 	public void cleanup () {
@@ -188,7 +188,7 @@ public class ProfileAligner extends Aligner {
 						z += getStructGapOpenModifer((StructureAlignment)A, (StructureAlignment)B, i, j, Direction.horiz, Direction.diag, isPessimistic); 
 					}
 					H[i][j] = x<y ? x<z?x:z  :  y<z?y:z  ;
-					H_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
+					//H_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
 
 					x = H[i-1][j] + config.gamma*( (L * A.f1[i])-(begGapOpenCount_V+endGapOpenCount_Vh_pess) ) 
 							+ config.leftGammaTerm()*(begGapOpenCount_V)
@@ -205,7 +205,7 @@ public class ProfileAligner extends Aligner {
 						z += getStructGapOpenModifer((StructureAlignment)A, (StructureAlignment)B, i, j, Direction.vert, Direction.diag, isPessimistic); 
 					}					
 					V[i][j] = x<y ? x<z?x:z  :  y<z?y:z  ;
-					V_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
+					//V_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
 
 					x = H[i-1][j-1] + config.gamma*( (A.f1[i]*B.f0[j] + A.f0[i]*B.f01[j])-(begGapOpenCount_D+endGapOpenCount_Dh_pess)) 
 							+ config.leftGammaTerm()*(begGapOpenCount_D)
@@ -222,7 +222,7 @@ public class ProfileAligner extends Aligner {
 						z += getStructGapOpenModifer((StructureAlignment)A, (StructureAlignment)B, i, j, Direction.diag, Direction.diag, isPessimistic); 
 					}
 					D[i][j] = x<y ? x<z?x:z  :  y<z?y:z  ;
-					D_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
+					//D_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
 					
 					
 				} else {
@@ -251,7 +251,7 @@ public class ProfileAligner extends Aligner {
 						z += getStructGapOpenModifer((StructureAlignment)A, (StructureAlignment)B, i, j, Direction.horiz, Direction.diag, isPessimistic); 
 					}
 					H[i][j] = x<y ? x<z?x:z  :  y<z?y:z  ;
-					H_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
+					//H_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
 					
 					x = H[i-1][j] + config.gamma * (fA1fB1 - (begGapOpenCount_V+endGapOpenCount_V_opt)) 
 							+ config.leftGammaTerm()*(begGapOpenCount_V)
@@ -266,7 +266,7 @@ public class ProfileAligner extends Aligner {
 						z += getStructGapOpenModifer((StructureAlignment)A, (StructureAlignment)B, i, j, Direction.vert, Direction.diag, isPessimistic); 
 					}					
 					V[i][j] = x<y ? x<z?x:z  :  y<z?y:z  ;
-					V_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
+					//V_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
 
 					int vTermGapOpens_notFirstCol = A.firstLetterCount[i]*(B.gapsBeforeFirst[j]-B.f10[j]);
 					int hTermGapOpens_notFirstCol = B.firstLetterCount[j]*(A.gapsBeforeFirst[i]-A.f10[i]);
@@ -286,7 +286,7 @@ public class ProfileAligner extends Aligner {
 						z += getStructGapOpenModifer((StructureAlignment)A, (StructureAlignment)B, i, j, Direction.diag, Direction.diag, isPessimistic); 
 					}			
 					D[i][j] = x<y ? x<z?x:z  :  y<z?y:z  ;
-					D_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
+					//D_dir[i][j] = x<y ? x<z?Direction.horiz:Direction.diag  :  y<z?Direction.vert:Direction.diag  ;
 
 				
 				}
@@ -324,7 +324,7 @@ public class ProfileAligner extends Aligner {
 		//for (int i=1; i<=M; i++){
 		//	for (int j=1; j<=N; j++){				
 				
-				long HIJ;
+				/*long HIJ;
 				long VIJ;
 				long DIJ;
 				Direction H_dirIJ;
@@ -517,7 +517,7 @@ public class ProfileAligner extends Aligner {
 //			    LogWriter.stdOutLogln("[" + i + "," + j + "]: H = " + H[i][j] + " , V = " + V[i][j] + " , D = " + D[i][j]);
 				if(VIJ != V[i][j] || HIJ != H[i][j] || DIJ != D[i][j]){
 					System.err.println("Conflict");
-				}
+				}*/
 			}
 		}
 		
@@ -593,8 +593,8 @@ public class ProfileAligner extends Aligner {
 					if (testing) LogWriter.stdOutLogln("dh(" + i + "," + j+ "): " + (cost));
 				} else {
 					if (testing) LogWriter.stdErrLogln("no cost source found in dir == Direction.horiz [" + i + "/"+ M + "," + j +"/" + N +"]");
-					nextdir = V_dir[i][j];
-					//return false;					
+					//nextdir = V_dir[i][j];
+					return false;					
 				}
 				j--;
 			} else if (Direction.vert == dir) {
@@ -649,8 +649,8 @@ public class ProfileAligner extends Aligner {
 					if (testing) LogWriter.stdOutLogln("dv(" + i + "," + j+ "): " + (cost));
 			 	} else {
 			 		LogWriter.stdErrLogln("no cost source found in dir == Direction.vert [" + i + "/"+ M + "," + j +"/" + N +"]");
-			 		nextdir = V_dir[i][j];
-					//return false;					
+			 		//nextdir = V_dir[i][j];
+					return false;					
 				}
 				i--;
 			} else if (Direction.diag == dir ) {
@@ -732,8 +732,8 @@ public class ProfileAligner extends Aligner {
 					if (testing) LogWriter.stdOutLogln("dd(" + i + "," + j+ "): " + (cost));
 				} else {
 					LogWriter.stdErrLogln("no cost source found in dir == Direction.diag [" + i + "/"+ M + "," + j +"/" + N +"]");
-					nextdir = D_dir[i][j];
-					//return false;					
+					//nextdir = D_dir[i][j];
+					return false;					
 					
 				}
 				i--;
