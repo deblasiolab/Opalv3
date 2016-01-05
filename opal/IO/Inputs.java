@@ -24,14 +24,13 @@ public class Inputs {
 	public String configOutputFile;
 	public String bestOutputFile;
 	public String bestOutputFileIncludePreRealignment;
-	public String featureOutputFile;
-	public String preRealignmentOutputFile;
+	public String featureOutputFile;	public String preRealignmentOutputFile;
 	public String bestPreRealignmentOutputFile;
 	public String bestPreRealignmentsRealignmentOutputFile;
 	public String bestPreRealignmentsRealignmentOutputFileIncludePreRealignment;
 	
 	public StructureFileReader structure;
-	
+    
 	public Inputs() {
 		// TODO Auto-generated constructor stub
 	}

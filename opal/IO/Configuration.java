@@ -38,7 +38,7 @@ public class Configuration {
 	public int gapLevelCnt = 1;
  	public int[] gapOpenMods;
 	public int[] gapExtMods;
-	
+    
 	public enum THRESHOLD_TYPE{
 		VALUE, AVERAGE_WINDOW, WHOLE_ALIGNMENT,
 		TWO_VALUE, TWO_AVERAGE, TWO_WHOLE,

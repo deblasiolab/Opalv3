@@ -25,14 +25,13 @@ class runAlignment extends Thread{
 	Configuration[] realignmentConfigList = null;
 	
 	
-	
 	runAlignment(Configuration c, Inputs i){
 		conf = c;
 		in = new Inputs(i);
 	}
-	runAlignment(Configuration c, Inputs i, Configuration[] rcList){
+	runAlignment(Configuration c, Inputs i, Configuration[] cList){
 		this(c,i);
-		realignmentConfigList = rcList;
+		configList = cList;
 	}
 	
 	public void run(){
@@ -273,10 +272,9 @@ public class Opal {
  
 		
 
-		Configuration[] advising_config = argHandler.getAdvisingConfigs();
-		Configuration[] realignment_config = argHandler.getRealignmentConfigs();
+		Configuration[] config = argHandler.getConfigs();
 		Inputs input = argHandler.getInputs();
-		runAlignment[] thread = new runAlignment[advising_config.length];
+		runAlignment[] thread = new runAlignment[config.length];
 		
 		int last_joined = -1;
 		int max_threads = Runtime.getRuntime().availableProcessors();
@@ -286,7 +284,7 @@ public class Opal {
 		}
 		
 		int maxIndex = 0;
-		int maxPreRealignmentIndex = 0;
+        int maxPreRealignmentIndex = 0;
 		for(int i=0;i<advising_config.length;i++){
 			thread[i] = new runAlignment(advising_config[i],input, realignment_config);
 			//thread[i] = new printLine(config[i],i);
@@ -313,7 +311,7 @@ public class Opal {
 			}
 		}
 		
-		for(last_joined++;last_joined<advising_config.length;last_joined++){
+		for(last_joined++;last_joined<config.length;last_joined++){
 			try{
 				thread[last_joined].join();
 				thread[last_joined].print();
