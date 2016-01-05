@@ -5,6 +5,8 @@ import java.util.Arrays;
 import facet.Facet;
 import facet.FacetAlignment;
 import opal.IO.Configuration;
+import opal.IO.TCS;
+import opal.makers.AlignmentMaker;
 import opal.makers.AlignmentMaker_SingleSequences;
 import opal.IO.Inputs;
 
@@ -14,6 +16,7 @@ public class realignmentDriver {
 	Configuration[] configList;
 	Configuration globalConfiguration;
 	float wholeAlignmentScore;
+	AlignmentMaker globalAligmentMaker;
 	
 	int[][] alignmentInstance;
 	
@@ -37,11 +40,12 @@ public class realignmentDriver {
 		return (float)Math.sqrt((squareSum) / (numbers.length - 1));
 	}
 	
-	public realignmentDriver(char[][] se, float[][][] sp, Configuration[] cList, Configuration gConfig, float score) {
+	public realignmentDriver(char[][] se, float[][][] sp, Configuration[] cList, Configuration gConfig, float score, AlignmentMaker gAM) {
 		sequence = se.clone();
 		structure_prob = new float[se.length][se[0].length][3];
 		wholeAlignmentScore = score;
 		globalConfiguration = gConfig;
+		globalAligmentMaker = gAM;
 		
 		for(int i=0;i<se.length;i++){
                 int k=0;
@@ -88,6 +92,8 @@ public class realignmentDriver {
 			}
 		}
 		float value = Facet.defaultValue(new FacetAlignment(windowSequences, windowStructure), globalConfiguration.useLegacyFacetFunction);
+		if(globalConfiguration.useTCSforRealignment)
+			value = (float)TCS.TCSValue(globalConfiguration.sc.convertSeqsToInts(windowSequences), globalAligmentMaker, globalConfiguration);
 		return (Float.isNaN(value))?0:value;
 	}
 
@@ -154,13 +160,15 @@ public class realignmentDriver {
 			//configList[i].setGammaTerm(configList[i].gamma);
 			//configList[i].setLambdaTerm(configList[i].lambda);
 			
-			System.err.println("Window: [" + startIndex + "," + endIndex + "] " + configList[i].useLeftTerminal + " " + configList[i].useRightTerminal);
+			//System.err.println("Window: [" + startIndex + "," + endIndex + "] " + configList[i].useLeftTerminal + " " + configList[i].useRightTerminal);
 			
 			AlignmentMaker_SingleSequences am = new AlignmentMaker_SingleSequences();
 			am.initialize(configList[i].sc.convertSeqsToInts(windowSequences), names, configList[i], in);
 			int[][] subAlignmentInstance = am.buildAlignment();
 			//am.printOutput(subAlignmentInstance, null);
 			float score = Facet.defaultValue(new FacetAlignment(configList[i].sc.convertIntsToSeqs(subAlignmentInstance),windowStructure), globalConfiguration.useLegacyFacetFunction);
+			if(globalConfiguration.useTCSforRealignment)
+				score = (float)TCS.TCSValue(subAlignmentInstance, globalAligmentMaker, globalConfiguration);
 			
 			//globalConfiguration.realignmentLog += "Best Score:" + bestScore + "\tcurrent score:" + score + "\n";
 			if(score>bestScore){

@@ -71,6 +71,11 @@ public class ArgumentHandler {
 	float temp_realign_minimum_value = -1;
 	float temp_realignmentWindowWeightDecay = -1;
 	
+	public String temp_temporaryFileDirectory = null;
+	public String temp_tcoffeeDirectory = null;
+	public boolean temp_useTCSforRealignment = false;
+	public boolean temp_useTCSforAdvising = false;
+	
 	
 	public ArgumentHandler (String argString) {
 		this(argString.split("\\s"));
@@ -84,7 +89,7 @@ public class ArgumentHandler {
 		}
 		*/
 		
-		LongOpt[] longopts = new LongOpt[97];
+		LongOpt[] longopts = new LongOpt[100];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -203,7 +208,12 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("realignmentNeverTerminals", LongOpt.NO_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentPositionalTerminals", LongOpt.NO_ARGUMENT, null, 'k');
 
-		Getopt g = new Getopt("opal", argv, "k:a:b:c:d:e:f:g:hi:j:l:m:n:o:pqr:s:t:uw:y:z:1", longopts);		
+
+		longopts[longopts_index++] = new LongOpt("useTCS", LongOpt.REQUIRED_ARGUMENT, null, 'v');
+		longopts[longopts_index++] = new LongOpt("TcoffeePath", LongOpt.REQUIRED_ARGUMENT, null, 'v');
+		longopts[longopts_index++] = new LongOpt("TCSTempFilePath", LongOpt.REQUIRED_ARGUMENT, null, 'v');
+		
+		Getopt g = new Getopt("opal", argv, "k:a:b:c:d:e:f:g:hi:j:l:m:n:o:pqr:s:t:uv:w:y:z:1", longopts);		
 		 
 		String optName;
 		while ((c = g.getopt()) != -1) {
@@ -597,10 +607,6 @@ public class ArgumentHandler {
             		break; 
             		
             	case 'k':	
-            		
-            		
-            		
-            		
             		if (g.getLongind() == -1)  optName = "";	
             		else  optName = longopts[g.getLongind()].getName(); 
             		// --realignmentMinimumSizeTypeValue --realignmentMinimumSizeValue 10 --realignmentWindowSizeValue 3 --realignmentThresholdTypeAverage --realignmentThresholdValue 0.5
@@ -632,7 +638,30 @@ public class ArgumentHandler {
             		
             		
             		break; 
-        		
+            	case 'v':	
+
+            		if (g.getLongind() == -1)  optName = "";	
+            		else  optName = longopts[g.getLongind()].getName(); 
+            		
+            		//longopts[longopts_index++] = new LongOpt("useTCS", LongOpt.REQUIRED_ARGUMENT, null, 'v');
+            		//longopts[longopts_index++] = new LongOpt("TcoffeePath", LongOpt.REQUIRED_ARGUMENT, null, 'v');
+            		//longopts[longopts_index++] = new LongOpt("TCSTempFilePath", LongOpt.REQUIRED_ARGUMENT, null, 'v');
+            		if (optName.equals("useTCS")) {
+		            	if ( arg.toString().toLowerCase().startsWith("both")){
+		            		temp_useTCSforRealignment = true;
+		            		temp_useTCSforAdvising = true;
+		            	}
+		            	else if ( arg.toString().toLowerCase().startsWith("realignment"))
+		            		temp_useTCSforRealignment = true;
+		            	else if ( arg.toString().toLowerCase().startsWith("advisisng"))
+		            		temp_useTCSforAdvising = true;
+		            }else if (optName.equals("TcoffeePath")) {
+		            	temp_tcoffeeDirectory = arg.toString();
+		            }else if (optName.equals("TCSTempFilePath")) {
+		            	temp_temporaryFileDirectory = arg.toString();
+		            }
+            		
+            		break;
             	case 'j':
             		if (g.getLongind() == -1)  optName = "";	
             		else  optName = longopts[g.getLongind()].getName(); 
@@ -800,6 +829,10 @@ public class ArgumentHandler {
 				if(temp_realignmentWindowWeightDecay != -1) advising_configs[i].realignmentWindowWeightDecay = temp_realignmentWindowWeightDecay;
 				advising_configs[i].useLegacyFacetFunction = useLegacyFacetFunction;
 				advising_configs[i].doReverse = doReverse;
+				advising_configs[i].useTCSforAdvising = temp_useTCSforAdvising;
+				advising_configs[i].useTCSforRealignment = temp_useTCSforRealignment;
+				if(temp_tcoffeeDirectory != null) advising_configs[i].tcoffeeDirectory = temp_tcoffeeDirectory;
+				if(temp_temporaryFileDirectory != null) advising_configs[i].temporaryFileDirectory = temp_temporaryFileDirectory;
 			}
 			if(repeat_config==1){
 				return advising_configs;
@@ -830,6 +863,10 @@ public class ArgumentHandler {
 			if(temp_realignmentWindowWeightDecay != -1) advising_configs[j].realignmentWindowWeightDecay = temp_realignmentWindowWeightDecay;
 			advising_configs[j].useLegacyFacetFunction = useLegacyFacetFunction;
 			advising_configs[j].doReverse = doReverse;
+			advising_configs[j].useTCSforAdvising = temp_useTCSforAdvising;
+			advising_configs[j].useTCSforRealignment = temp_useTCSforRealignment;
+			if(temp_tcoffeeDirectory != null) advising_configs[j].tcoffeeDirectory = temp_tcoffeeDirectory;
+			if(temp_temporaryFileDirectory != null) advising_configs[j].temporaryFileDirectory = temp_temporaryFileDirectory;
 
 			if(repeat_config>1){
 				advising_configs[j].repetition = j+1;

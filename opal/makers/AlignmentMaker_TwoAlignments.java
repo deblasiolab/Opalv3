@@ -43,8 +43,7 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 	char [][] charsA;
 	char [][] charsB;
 	Configuration conf;
-	Inputs in;
-
+	
 	public char[][] result;
 	
 	/* Align two alignments */

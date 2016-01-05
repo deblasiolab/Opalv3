@@ -69,6 +69,11 @@ public class Configuration {
 	public String realignmentLog = "";
 	
 	public boolean useLegacyFacetFunction = true;
+	
+	public String temporaryFileDirectory = "";
+	public String tcoffeeDirectory = "/Users/deblasio/tcoffee/Version_9.02.r1228/bin/";
+	public boolean useTCSforRealignment = false;
+	public boolean useTCSforAdvising = false;
 
 	public String toString(){
 		

@@ -1,6 +1,7 @@
 package opal;
 
 import java.util.Date;
+
 import opal.IO.Configuration;
 import opal.IO.OpalLogWriter;
 
@@ -97,6 +98,8 @@ class runAlignment extends Thread{
 				//Thread.setDefaultUncaughtExceptionHandler(sh);  // this should be available for all calls ... but this is the one I use a lot, so it's all I've implemented it for
 
 				alignmentInstance = am.buildAlignment();
+				
+				
 				if(in.structFileA != null){
 					
 					if(realignmentConfigList != null){
@@ -109,7 +112,9 @@ class runAlignment extends Thread{
 								new FacetAlignment(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure),
 								conf.useLegacyFacetFunction
 						);
-						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure, newRealignmentConfigList, conf, (float) preRealignmentFacetScore);
+						if(conf.useTCSforAdvising)
+							preRealignmentFacetScore = TCS.TCSValue(preRealignmentAlignmentInstance, am, conf);
+						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure, newRealignmentConfigList, conf, (float) preRealignmentFacetScore, am);
 						if(conf.realignment_window_type == Configuration.WINDOW_SIZE.VALUE) realigner.simpleRealignment((int)conf.realignment_window_value);
 						alignmentInstance = realigner.newAlignment();
 						newRealignmentConfigList = null;
@@ -127,6 +132,8 @@ class runAlignment extends Thread{
 					Facet.outputDefaultFeatures(fname, fa);
 				}
 				facetScore = Facet.defaultValue(fa,conf.useLegacyFacetFunction);
+				if(conf.useTCSforAdvising)
+					facetScore = TCS.TCSValue(alignmentInstance, am, conf);
 			}
 			//in.structFileA = "";
 			//System.err.println("File: " + in.structFileA);
@@ -330,6 +337,7 @@ public class Opal {
 				throw new GenericOpalException("InterruptedException "+e.toString());
 			}
 		}
+		
 		
 		
 		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0)

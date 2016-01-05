@@ -17,6 +17,8 @@ public abstract class AlignmentMaker {
 	public static boolean showCost = false;
 	public static boolean initAlignmentProvided = false;
 	
+	public Inputs in;
+	
 /*	public AlignmentMaker (int outputWidth) {
 		this.outputWidth = outputWidth;
 	}

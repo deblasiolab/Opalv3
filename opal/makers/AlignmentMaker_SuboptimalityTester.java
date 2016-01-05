@@ -23,7 +23,6 @@ public class AlignmentMaker_SuboptimalityTester extends AlignmentMaker {
 	int K;
 	String file;
 	Configuration conf;
-	Inputs in;
 
 	public AlignmentMaker_SuboptimalityTester() {
 		super();

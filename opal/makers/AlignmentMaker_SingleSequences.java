@@ -34,7 +34,6 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 
 	Aligner al = null;
 	
-	int verbosity;
 	String costName;
 	public String file;
 	boolean toUpper;
@@ -49,7 +48,6 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	public boolean alignmentComplete = false;
 	
 	private Configuration conf;
-	private Inputs in;
 	
 	public AlignmentMaker_SingleSequences( ) {
 		super();
@@ -98,7 +96,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			out.print(sb);
 			out.close();
 
-			if (verbosity>1) LogWriter.stdErrLogln("output tree file = " + treeOutFile);
+			if (in.verbosity>1) LogWriter.stdErrLogln("output tree file = " + treeOutFile);
 		}
 
 	}	
@@ -106,7 +104,6 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	/* Align a set of sequences*/
 	final public int[][] buildAlignment () { 
 
-		this.verbosity = in.verbosity;
 		this.costName = conf.cost.costName;
 		this.toUpper = in.toUpper;
 		
@@ -124,7 +121,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			for (int i=0; i<res.length; i++) ids[i] = i;
 			alignments[0] = Alignment.buildNewAlignment(res, ids, conf, in);
 
-			if (verbosity > 1) {
+			if (in.verbosity > 1) {
 				if (initAlignmentProvided) {
 					LogWriter.stdErrLog("\nRead in input alignment. Treated as draft #" + (Tree.iterations-currIteration) + " of " + Tree.iterations + "  " );					
 				} else {
@@ -160,17 +157,17 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 				
 			int numSeqsForLog =  currIteration<Tree.iterations ? alignments[0].K : alignments.length;
 			
-			if (verbosity > 1) {
+			if (in.verbosity > 1) {
 				LogWriter.stdErrLogln("Calculating pairwise distances for " + numSeqsForLog + " sequences");
 			}
 			tree = getTree(alignments, currIteration);
 	
-			if (verbosity > 1)  {
+			if (in.verbosity > 1)  {
 				LogWriter.stdErrLogln("\nPairwise distances calculated.\n");
 				
 				LogWriter.stdErrLogln("Opal will now merge sequences into increasingly large alignments.");
 				LogWriter.stdErrLogln("A total of " + (numSeqsForLog-1) + " merges will be performed for the current iteration.");
-				if (verbosity == 2) 
+				if (in.verbosity == 2) 
 					LogWriter.stdErrLogln("After each merge, a dot will be printed:");
 				
 			}
@@ -199,7 +196,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			while (tree.mergesRemaining() > 0) {
 				latestNode = tree.mergeNext();
 				
-				if (verbosity == 2) {	
+				if (in.verbosity == 2) {	
 					LogWriter.stdErrLog(".");
 					if ( cnt%20 == 0) LogWriter.stdErrLogln("  " + cnt + " complete");
 					cnt++;
@@ -222,7 +219,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	*/		
 			}
 			
-			if (verbosity > 1)  
+			if (in.verbosity > 1)  
 				LogWriter.stdErrLogln("\n");
 
 			alignmentComplete = true;
@@ -255,20 +252,20 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			getPolishAligner();
 	
 			if (Polisher.polishMethod == Polisher.PolishType.exhaust_threecut) {
-				if (verbosity>1) LogWriter.stdErrLogln("First: exhaustive polishing phase");
-				polisher = new ExhaustiveTwoCutPolisher(latestNode, al, verbosity);
+				if (in.verbosity>1) LogWriter.stdErrLogln("First: exhaustive polishing phase");
+				polisher = new ExhaustiveTwoCutPolisher(latestNode, al, in.verbosity);
 				//polisher.polish(Polisher.polishIterations);
 				polisher.polish(polishIters);
-				if (verbosity>1) LogWriter.stdErrLogln("Next: three-cut polishing phase");
-				polisher = new RandomThreeCutPolisher(latestNode, al, verbosity);
+				if (in.verbosity>1) LogWriter.stdErrLogln("Next: three-cut polishing phase");
+				polisher = new RandomThreeCutPolisher(latestNode, al, in.verbosity);
 			} else if (Polisher.polishMethod == Polisher.PolishType.exhaust_twocut) 
-				polisher = new ExhaustiveTwoCutPolisher(latestNode, al, verbosity);
+				polisher = new ExhaustiveTwoCutPolisher(latestNode, al, in.verbosity);
 			else if (Polisher.polishMethod == Polisher.PolishType.random_tree_twocut) 
-				polisher = new RandomTreeTwoCutPolisher(latestNode, al, verbosity);
+				polisher = new RandomTreeTwoCutPolisher(latestNode, al, in.verbosity);
 			else if (Polisher.polishMethod == Polisher.PolishType.random_twocut) 
-				polisher = new RandomTreeTwoCutPolisher(latestNode, al, verbosity);
+				polisher = new RandomTreeTwoCutPolisher(latestNode, al, in.verbosity);
 			else // if (Polisher.polishMethod == Polisher.PolishType.random_threecut) 
-				polisher = new RandomThreeCutPolisher(latestNode, al, verbosity);
+				polisher = new RandomThreeCutPolisher(latestNode, al, in.verbosity);
 		
 //			polisher.polish(Polisher.polishIterations);
 			polisher.polish(polishIters);
@@ -334,17 +331,17 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 		}			
 		wr.write(outputWidth);
 			
-		if (verbosity>0) {
+		if (in.verbosity>0) {
 		
 			LogWriter.stdErrLogln("\n================================");
 			LogWriter.stdErrLogln("input file = " + file + " (" + K + " sequences)");
 		}
-		if (verbosity>-1) {
+		if (in.verbosity>-1) {
 			if (null != fname)
 				LogWriter.stdErrLogln("output file = " + fname);
 		}
 		
-		if (verbosity>0) {
+		if (in.verbosity>0) {
 			if (null != EnteredTree.treeFile  )
 				LogWriter.stdErrLogln("input tree file = " + EnteredTree.treeFile);
 	
@@ -375,7 +372,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	}
 	
 	protected void printParams (int length, Alignment example /* used in subclass*/) {
-		if (verbosity>0) {
+		if (in.verbosity>0) {
 			LogWriter.stdErrLogln("gamma is " + conf.gamma + " and lambda is " + conf.lambda);
 			if (conf.useLeftTerminal && conf.useRightTerminal)
 				LogWriter.stdErrLogln("gamma_term is " + conf.leftGammaTerm() + " and lambda_term is " + conf.leftLambdaTerm());
@@ -604,10 +601,10 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 		
 	protected Tree getTree (Alignment[] als, int currIteration) {
 		if (Tree.treeType == Tree.TreeType.mst)
-			return new MST_Tree(als, al, dist, currIteration, verbosity, conf);
+			return new MST_Tree(als, al, dist, currIteration, in.verbosity, conf);
 		else if (Tree.treeType == Tree.TreeType.entered) {
 			EnteredTree.names = names;
-			return new EnteredTree(als, al, dist, currIteration, verbosity, conf);
+			return new EnteredTree(als, al, dist, currIteration, in.verbosity, conf);
 		} else {
 			LogWriter.stdErrLogln("unrecognized tree type");
 			throw new GenericOpalException("unrecognized tree type");

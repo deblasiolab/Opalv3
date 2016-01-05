@@ -29,7 +29,6 @@ public class AlignmentMaker_Converter extends AlignmentMaker {
 	int K;
 	String file;
 	Configuration conf;
-	Inputs in;
 			
 	public void initialize (String fileA, String structFileA, String fileB, String structFileB) { 
 		/* nothing */
