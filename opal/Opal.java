@@ -29,9 +29,9 @@ class runAlignment extends Thread{
 		conf = c;
 		in = new Inputs(i);
 	}
-	runAlignment(Configuration c, Inputs i, Configuration[] cList){
+	runAlignment(Configuration c, Inputs i, Configuration[] rcList){
 		this(c,i);
-		configList = cList;
+		realignmentConfigList = rcList;
 	}
 	
 	public void run(){
@@ -271,10 +271,10 @@ public class Opal {
 		Date start = new Date();
  
 		
-
-		Configuration[] config = argHandler.getConfigs();
+		Configuration[] advising_config = argHandler.getAdvisingConfigs();
+		Configuration[] realignment_config = argHandler.getRealignmentConfigs();
 		Inputs input = argHandler.getInputs();
-		runAlignment[] thread = new runAlignment[config.length];
+		runAlignment[] thread = new runAlignment[advising_config.length];
 		
 		int last_joined = -1;
 		int max_threads = Runtime.getRuntime().availableProcessors();
@@ -311,7 +311,7 @@ public class Opal {
 			}
 		}
 		
-		for(last_joined++;last_joined<config.length;last_joined++){
+		for(last_joined++;last_joined<advising_config.length;last_joined++){
 			try{
 				thread[last_joined].join();
 				thread[last_joined].print();
