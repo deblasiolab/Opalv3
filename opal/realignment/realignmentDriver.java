@@ -279,7 +279,7 @@ public class realignmentDriver {
 			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
 				float[] sort_scores = scores.clone();
 				Arrays.sort(sort_scores);
-				good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value)];
+				good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value) - 1];
 				bad_threshold = sort_scores[(int)(scores.length * globalConfiguration.realignment_threshold_value_lower)];
 			}
 			
