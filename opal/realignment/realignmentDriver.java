@@ -40,6 +40,16 @@ public class realignmentDriver {
 		return (float)Math.sqrt((squareSum) / (numbers.length - 1));
 	}
 	
+	private float sum(float[] nums){
+		float sum = 0;
+		 
+		for (int i = 0; i < nums.length; i++) {
+			sum += nums[i];
+		}
+	
+		return sum;
+	}
+	
 	public realignmentDriver(char[][] se, float[][][] sp, Configuration[] cList, Configuration gConfig, float score, AlignmentMaker gAM) {
 		sequence = se.clone();
 		structure_prob = new float[se.length][se[0].length][3];
@@ -256,33 +266,6 @@ public class realignmentDriver {
 				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD ||
 				globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
 			
-			float good_threshold = 0;
-			float bad_threshold = 0;
-			
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_AVERAGE){ 
-				good_threshold = (float)globalConfiguration.realignment_threshold_value * (scoreTotal/scores.length);
-				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * (scoreTotal/scores.length);
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_WHOLE) {
-				good_threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
-				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * wholeAlignmentScore;
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD) {
-				float standard_deviation = standardDeviation(scores);
-				good_threshold = (float)globalConfiguration.realignment_threshold_value * standard_deviation + (scoreTotal/scores.length);
-				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * standard_deviation + (scoreTotal/scores.length);
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_VALUE){
-				good_threshold = globalConfiguration.realignment_threshold_value;
-				bad_threshold = globalConfiguration.realignment_threshold_value_lower;
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
-				float[] sort_scores = scores.clone();
-				Arrays.sort(sort_scores);
-				good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value) - 1];
-				bad_threshold = sort_scores[(int)(scores.length * globalConfiguration.realignment_threshold_value_lower)];
-			}
-			
 			float window_column_value[] = new float[windowSize];
 			for(int j=0;j<=windowSize/2;j++){
 				window_column_value[j] = (float)Math.pow(globalConfiguration.realignmentWindowWeightDecay, (windowSize/2)-j);
@@ -305,6 +288,34 @@ public class realignmentDriver {
 				column_scores[i] /= column_totals[i];
 				//System.err.println("\t" + column_scores[i]);
 			}
+			
+			float good_threshold = 0;
+			float bad_threshold = 0;
+			
+			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_AVERAGE){ 
+				good_threshold = (float)globalConfiguration.realignment_threshold_value * (sum(column_scores)/column_scores.length);
+				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * (sum(column_scores)/column_scores.length);
+			}
+			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_WHOLE) {
+				good_threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
+				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * wholeAlignmentScore;
+			}
+			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD) {
+				float standard_deviation = standardDeviation(column_scores);
+				good_threshold = (float)globalConfiguration.realignment_threshold_value * standard_deviation + (sum(column_scores)/column_scores.length);
+				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * standard_deviation + (sum(column_scores)/column_scores.length);
+			}
+			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_VALUE){
+				good_threshold = globalConfiguration.realignment_threshold_value;
+				bad_threshold = globalConfiguration.realignment_threshold_value_lower;
+			}
+			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
+				float[] sort_scores = column_scores.clone();
+				Arrays.sort(sort_scores);
+				good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value) - 1];
+				bad_threshold = sort_scores[(int)(scores.length * globalConfiguration.realignment_threshold_value_lower) -1];
+			}
+			
 			
 			for(int i=0;i<sequence[0].length;i++){
 				if(column_scores[i] >= good_threshold){
