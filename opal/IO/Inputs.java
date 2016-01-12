@@ -24,7 +24,8 @@ public class Inputs {
 	public String configOutputFile;
 	public String bestOutputFile;
 	public String bestOutputFileIncludePreRealignment;
-	public String featureOutputFile;	public String preRealignmentOutputFile;
+	public String featureOutputFile;	
+	public String preRealignmentOutputFile;
 	public String bestPreRealignmentOutputFile;
 	public String bestPreRealignmentsRealignmentOutputFile;
 	public String bestPreRealignmentsRealignmentOutputFileIncludePreRealignment;
@@ -51,6 +52,9 @@ public class Inputs {
 		preRealignmentOutputFile = in.preRealignmentOutputFile;
 		bestPreRealignmentOutputFile = in.bestPreRealignmentOutputFile;
 		bestPreRealignmentsRealignmentOutputFile = in.bestPreRealignmentsRealignmentOutputFile;
+
+		bestOutputFileIncludePreRealignment = in.bestOutputFileIncludePreRealignment;
+		bestPreRealignmentsRealignmentOutputFileIncludePreRealignment = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment;
 		
 		structure = new StructureFileReader(in.structure);
 		
