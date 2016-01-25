@@ -17,6 +17,7 @@ public class realignmentDriver {
 	Configuration globalConfiguration;
 	float wholeAlignmentScore;
 	AlignmentMaker globalAligmentMaker;
+	float[][][] originalStrucutre;
 	
 	int[][] alignmentInstance;
 	boolean changed_one_regions;
@@ -51,29 +52,34 @@ public class realignmentDriver {
 		return sum;
 	}
 	
+	private void derive_structure_array_from_sequence(){
+		structure_prob = new float[sequence.length][sequence[0].length][3];
+		for(int i=0;i<sequence.length;i++){
+            int k=0;
+            for(int j=0;j<sequence[0].length;j++){
+                    if(sequence[i][j] == '-'){
+                            structure_prob[i][j][0]=-1;
+                            structure_prob[i][j][1]=-1;
+                            structure_prob[i][j][2]=-1;
+                    }
+                    else{
+                            structure_prob[i][j][0] = originalStrucutre[i][k][0];
+                            structure_prob[i][j][1] = originalStrucutre[i][k][1];
+                            structure_prob[i][j][2] = originalStrucutre[i][k][2];
+                            k++;
+                    }
+            }
+		}
+	}
+	
 	public realignmentDriver(char[][] se, float[][][] sp, Configuration[] cList, Configuration gConfig, float score, AlignmentMaker gAM) {
 		sequence = se.clone();
-		structure_prob = new float[se.length][se[0].length][3];
 		wholeAlignmentScore = score;
 		globalConfiguration = gConfig;
 		globalAligmentMaker = gAM;
+		originalStrucutre = sp;
 		
-		for(int i=0;i<se.length;i++){
-                int k=0;
-                for(int j=0;j<se[0].length;j++){
-                        if(sequence[i][j] == '-'){
-                                structure_prob[i][j][0]=-1;
-                                structure_prob[i][j][1]=-1;
-                                structure_prob[i][j][2]=-1;
-                        }
-                        else{
-                                structure_prob[i][j][0] = sp[i][k][0];
-                                structure_prob[i][j][1] = sp[i][k][1];
-                                structure_prob[i][j][2] = sp[i][k][2];
-                                k++;
-                        }
-                }
-        }
+		derive_structure_array_from_sequence();
 		
 		configList = cList.clone();
 		for(int i=0;i<configList.length;i++){
@@ -435,6 +441,7 @@ public class realignmentDriver {
 			newAlignmentChar[j] = newAlignment[j].toCharArray();
 		}
 		sequence = newAlignmentChar;
+		derive_structure_array_from_sequence();
 		alignmentInstance = globalConfiguration.sc.convertSeqsToInts(newAlignmentChar);
 		
 		if(changed_one_regions){
