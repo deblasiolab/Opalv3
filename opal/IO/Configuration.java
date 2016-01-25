@@ -48,7 +48,7 @@ public class Configuration {
 	public float realignment_threshold_value = 1;
 	public float realignment_threshold_value_lower = 1;
 	public float realignmentWindowWeightDecay = (float)0.5;
-	public int realignment_itterations = 20;
+	public int realignment_itterations = 1;
 	
 	public enum WINDOW_SIZE_MINIMUM{
 		VALUE, WINDOW_MULTIPLIER, NONE
@@ -69,7 +69,7 @@ public class Configuration {
 	
 	public String realignmentLog = "";
 	
-	public boolean useLegacyFacetFunction = true;
+	public boolean useLegacyFacetFunction = false;
 	
 	public String temporaryFileDirectory = "";
 	public String tcoffeeDirectory = "/Users/deblasio/tcoffee/Version_9.02.r1228/bin/";

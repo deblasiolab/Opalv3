@@ -179,7 +179,7 @@ public class realignmentDriver {
 			//am.printOutput(subAlignmentInstance, null);
 			float score = Facet.defaultValue(new FacetAlignment(configList[i].sc.convertIntsToSeqs(subAlignmentInstance),windowStructure), globalConfiguration.useLegacyFacetFunction);
 			if(globalConfiguration.useTCSforRealignment)
-				score = (float)TCS.TCSValue(subAlignmentInstance, globalAligmentMaker, globalConfiguration);
+				score = (float)TCS.TCSValue(subAlignmentInstance, am, globalConfiguration);
 			
 			//globalConfiguration.realignmentLog += "Best Score:" + bestScore + "\tcurrent score:" + score + "\n";
 			if(score>bestScore){

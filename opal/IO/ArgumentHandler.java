@@ -41,7 +41,7 @@ public class ArgumentHandler {
 	Configuration[] realignment_configs;
 	int repeat_config = 1;
 	int max_threads = -1;
-	boolean useLegacyFacetFunction = true;
+	boolean useLegacyFacetFunction = false;
 	boolean doReverse = false;
 	
 	public String configOutputFile = null;
