@@ -19,6 +19,7 @@ public class realignmentDriver {
 	AlignmentMaker globalAligmentMaker;
 	
 	int[][] alignmentInstance;
+	boolean changed_one_regions;
 	
 	public static float mean(float[] nums) {
 		float sum = 0;
@@ -197,6 +198,7 @@ public class realignmentDriver {
 					if(numberOfNonGaps[j] > 0) putInIndex++;
 				}
 				bestConfig = "used " + configList[i].toString() + " (" + numberOfNonBlankSequences + " of " + sequence.length + " sequences)";
+				changed_one_regions = true;
 			}
 		}
 		if(bestSubAlignment == null){
@@ -210,6 +212,11 @@ public class realignmentDriver {
 	}
 	
 	public void simpleRealignment(int windowSize){
+		simpleRealignment(windowSize, 0);
+	}
+	public void simpleRealignment(int windowSize, int itteration){
+		if(globalConfiguration.realignment_itterations <= itteration) return;
+		
 		float[] scores = new float[sequence[0].length-windowSize+1];
 		float scoreTotal = 0;
 		for(int i=0;i<=sequence[0].length-windowSize;i++){
@@ -391,6 +398,9 @@ public class realignmentDriver {
 		}
 		
 		
+
+		changed_one_regions = false;
+		globalConfiguration.realignmentLog += "Realignment Itteration " + itteration + " \n-------------------\n";
 		
 		// TODO realign using each configuration
 		int lastInAlignmentAlready = -1;
@@ -424,7 +434,12 @@ public class realignmentDriver {
 		for(int j=0; j<sequence.length; j++){
 			newAlignmentChar[j] = newAlignment[j].toCharArray();
 		}
+		sequence = newAlignmentChar;
 		alignmentInstance = globalConfiguration.sc.convertSeqsToInts(newAlignmentChar);
+		
+		if(changed_one_regions){
+			simpleRealignment(windowSize, itteration + 1);
+		}
 	}
 	
 	public int[][] newAlignment(){

@@ -48,6 +48,7 @@ public class Configuration {
 	public float realignment_threshold_value = 1;
 	public float realignment_threshold_value_lower = 1;
 	public float realignmentWindowWeightDecay = (float)0.5;
+	public int realignment_itterations = 20;
 	
 	public enum WINDOW_SIZE_MINIMUM{
 		VALUE, WINDOW_MULTIPLIER, NONE
@@ -124,7 +125,11 @@ public class Configuration {
 		realignment_use_terminals = c.realignment_use_terminals;
 		useLegacyFacetFunction = c.useLegacyFacetFunction;
 		doReverse = c.doReverse;
-	
+		realignment_itterations = c.realignment_itterations;
+		temporaryFileDirectory = c.temporaryFileDirectory;
+		tcoffeeDirectory = c.tcoffeeDirectory;
+		useTCSforRealignment = c.useTCSforRealignment;
+		useTCSforAdvising = c.useTCSforAdvising;
 	}
 	
 
