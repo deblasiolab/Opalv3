@@ -71,6 +71,7 @@ public class ArgumentHandler {
 	float temp_realign_minimum_value = -1;
 	float temp_realignmentWindowWeightDecay = -1;
 	int temp_realignment_ittertations = 1;
+	boolean temp_realignment_save_threshold = false;
 	
 	public String temp_temporaryFileDirectory = null;
 	public String temp_tcoffeeDirectory = null;
@@ -90,7 +91,7 @@ public class ArgumentHandler {
 		}
 		*/
 		
-		LongOpt[] longopts = new LongOpt[89];
+		LongOpt[] longopts = new LongOpt[90];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -191,6 +192,7 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("realignmentWindowWeightDecay", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdLowerValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentThresholdItterationMethod", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		//realignmentAlwaysTerminals
 		longopts[longopts_index++] = new LongOpt("realignmentTerminals", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentItterations", LongOpt.REQUIRED_ARGUMENT, null, 'k');
@@ -633,6 +635,11 @@ public class ArgumentHandler {
             		if (optName.equals("realignmentItterations")){
             			temp_realignment_ittertations = Integer.parseInt(arg.toString());
             		}
+            		//realignmentThresholdItterationMethod keepFirstItteration
+            		if (optName.equals("realignmentThresholdItterationMethod")){
+						if (arg.toString().equals("keepFirstItteration")){ temp_realignment_save_threshold = true; }
+						if (arg.toString().equals("newThresholdEachItteration")){ temp_realignment_save_threshold = false; }
+					}
             		
             		break; 
             	case 'v':	
@@ -831,6 +838,7 @@ public class ArgumentHandler {
 				advising_configs[i].realignment_itterations = temp_realignment_ittertations;
 				if(temp_tcoffeeDirectory != null) advising_configs[i].tcoffeeDirectory = temp_tcoffeeDirectory;
 				if(temp_temporaryFileDirectory != null) advising_configs[i].temporaryFileDirectory = temp_temporaryFileDirectory;
+				advising_configs[i].realignment_save_threshold = temp_realignment_save_threshold;
 			}
 			if(repeat_config==1){
 				return advising_configs;
@@ -866,7 +874,8 @@ public class ArgumentHandler {
 			advising_configs[j].realignment_itterations = temp_realignment_ittertations;
 			if(temp_tcoffeeDirectory != null) advising_configs[j].tcoffeeDirectory = temp_tcoffeeDirectory;
 			if(temp_temporaryFileDirectory != null) advising_configs[j].temporaryFileDirectory = temp_temporaryFileDirectory;
-
+			advising_configs[j].realignment_save_threshold = temp_realignment_save_threshold;
+			
 			if(repeat_config>1){
 				advising_configs[j].repetition = j+1;
 			}

@@ -67,6 +67,8 @@ public class Configuration {
 	}
 	public REALIGNMENT_TERMINALS realignment_use_terminals = REALIGNMENT_TERMINALS.NEVER;
 	
+	public boolean realignment_save_threshold = false;
+	
 	public String realignmentLog = "";
 	
 	public boolean useLegacyFacetFunction = false;
@@ -130,6 +132,7 @@ public class Configuration {
 		tcoffeeDirectory = c.tcoffeeDirectory;
 		useTCSforRealignment = c.useTCSforRealignment;
 		useTCSforAdvising = c.useTCSforAdvising;
+		realignment_save_threshold = c.realignment_save_threshold;
 	}
 	
 

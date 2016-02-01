@@ -19,6 +19,10 @@ public class realignmentDriver {
 	AlignmentMaker globalAligmentMaker;
 	float[][][] originalStrucutre;
 	
+	float fixed_good_threshold = -1;
+	float fixed_bad_threshold = -1;
+	float fixed_threshold = -1;
+	
 	int[][] alignmentInstance;
 	boolean changed_one_regions;
 	
@@ -244,14 +248,18 @@ public class realignmentDriver {
 			//(float)0.75 * wholeAlignmentScore;
 			
 			//threshold = (float)0.75 * (scoreTotal/scores.length);
-			
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.AVERAGE_WINDOW) 
-				threshold = (float)globalConfiguration.realignment_threshold_value * (scoreTotal/scores.length);
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.WHOLE_ALIGNMENT) 
-				threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.VALUE)
-				threshold = globalConfiguration.realignment_threshold_value;
-			
+			if(globalConfiguration.realignment_save_threshold && itteration>0){
+				threshold = fixed_threshold;
+			}else{
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.AVERAGE_WINDOW) 
+					threshold = (float)globalConfiguration.realignment_threshold_value * (scoreTotal/scores.length);
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.WHOLE_ALIGNMENT) 
+					threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.VALUE)
+					threshold = globalConfiguration.realignment_threshold_value;
+				
+				fixed_threshold = threshold;
+			}
 			System.err.println(scoreTotal + "/" + scores.length + " = " + (scoreTotal/scores.length) + "\t" + wholeAlignmentScore + "\t" 
 					+ globalConfiguration.realignment_threshold_type + "," + globalConfiguration.realignment_threshold_value + "(" + threshold + ")\t" 
 					+ globalConfiguration.realignment_window_type + "," + globalConfiguration.realignment_window_value + "\t" 
@@ -305,38 +313,49 @@ public class realignmentDriver {
 			float good_threshold = 0;
 			float bad_threshold = 0;
 			
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_AVERAGE){ 
-				good_threshold = (float)globalConfiguration.realignment_threshold_value * (sum(column_scores)/column_scores.length);
-				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * (sum(column_scores)/column_scores.length);
+			if(globalConfiguration.realignment_save_threshold && itteration>0){
+				good_threshold = fixed_good_threshold;
+				bad_threshold = fixed_bad_threshold;
+			}else{
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_AVERAGE){ 
+					good_threshold = (float)globalConfiguration.realignment_threshold_value * (sum(column_scores)/column_scores.length);
+					bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * (sum(column_scores)/column_scores.length);
+				}
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_WHOLE) {
+					good_threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
+					bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * wholeAlignmentScore;
+				}
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD) {
+					float standard_deviation = standardDeviation(column_scores);
+					good_threshold = (float)globalConfiguration.realignment_threshold_value * standard_deviation + (sum(column_scores)/column_scores.length);
+					bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * standard_deviation + (sum(column_scores)/column_scores.length);
+				}
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_VALUE){
+					good_threshold = globalConfiguration.realignment_threshold_value;
+					bad_threshold = globalConfiguration.realignment_threshold_value_lower;
+				}
+				if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
+					float[] sort_scores = column_scores.clone();
+					Arrays.sort(sort_scores);
+					good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value) - 1];
+					bad_threshold = sort_scores[(int)(scores.length * globalConfiguration.realignment_threshold_value_lower) -1];
+				}
+				
+				fixed_good_threshold = good_threshold;
+				fixed_bad_threshold = bad_threshold;
 			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_WHOLE) {
-				good_threshold = (float)globalConfiguration.realignment_threshold_value * wholeAlignmentScore;
-				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * wholeAlignmentScore;
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_SD) {
-				float standard_deviation = standardDeviation(column_scores);
-				good_threshold = (float)globalConfiguration.realignment_threshold_value * standard_deviation + (sum(column_scores)/column_scores.length);
-				bad_threshold = (float)globalConfiguration.realignment_threshold_value_lower * standard_deviation + (sum(column_scores)/column_scores.length);
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_VALUE){
-				good_threshold = globalConfiguration.realignment_threshold_value;
-				bad_threshold = globalConfiguration.realignment_threshold_value_lower;
-			}
-			if(globalConfiguration.realignment_threshold_type == Configuration.THRESHOLD_TYPE.TWO_PERCENTAGE){
-				float[] sort_scores = column_scores.clone();
-				Arrays.sort(sort_scores);
-				good_threshold = sort_scores[scores.length - (int)(scores.length * globalConfiguration.realignment_threshold_value) - 1];
-				bad_threshold = sort_scores[(int)(scores.length * globalConfiguration.realignment_threshold_value_lower) -1];
-			}
-			
+			int ct_good = 0;
+			int ct_bad = 0;
 			
 			for(int i=0;i<sequence[0].length;i++){
 				if(column_scores[i] >= good_threshold){
 					includeInRealignment[i] = false;
 					System.err.print("G");
+					ct_good++;
 				}
 				else if(column_scores[i] <= bad_threshold){
 					System.err.print("B");
+					ct_bad++;
 					includeInRealignment[i] = true;
 					for(int j=i-1;j>=0 && column_scores[j] < good_threshold;j--){
 						includeInRealignment[j] = true;
@@ -348,12 +367,18 @@ public class realignmentDriver {
 					System.err.print("-");
 				}
 			}
+
+			System.err.println();
+			System.err.println("good: " + ct_good + "\tbad: " + ct_bad + "\ttotal: " + sequence[0].length + "\tgood_threshold: " + good_threshold + "\tbad_threshold: " + bad_threshold);
 		}
-		System.err.println();
+		//System.err.println();
+		int ct_save = 0;
 		for(int i=0;i<sequence[0].length;i++){
 			System.err.print(includeInRealignment[i]?"X":" ");
+			ct_save += (includeInRealignment[i]?0:1);
 		}
 		System.err.println();
+		System.err.println("saved: " + ct_save + "\trealigned: " + (sequence[0].length - ct_save) + "\ttotal: " + sequence[0].length);
 		
 		int[] blockStart = new int[sequence[0].length];
 		int blockAssignI = 1;
