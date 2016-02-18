@@ -120,7 +120,7 @@ class runAlignment extends Thread{
 							int window_size = (int)(conf.realignment_window_value * (float)preRealignmentAlignmentInstance[0].length);
 							if(window_size>conf.maximum_realignment_window_value) window_size = (int)conf.maximum_realignment_window_value;
 							if(window_size<conf.minimum_realignment_window_value) window_size = (int)conf.minimum_realignment_window_value;
-							realigner.simpleRealignment((int)conf.realignment_window_value);
+							realigner.simpleRealignment(window_size);
 						}
 						alignmentInstance = realigner.newAlignment();
 						newRealignmentConfigList = null;
