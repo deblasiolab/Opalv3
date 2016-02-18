@@ -616,8 +616,8 @@ public class ArgumentHandler {
 						if (arg.toString().equals("percentage")){ temp_window_type = Configuration.WINDOW_SIZE.PERCENTAGE; }
 					}
 					if (optName.equals("realignmentWindowSizeValue")){ temp_realign_window_size = Float.parseFloat(arg.toString()); }
-					if (optName.equals("realignmentWindowSizeMaximumValue")){ temp_maximum_realign_window_size = Float.parseFloat(arg.toString()); }
-					if (optName.equals("realignmentWindowSizeMinimumValue")){ temp_minimum_realign_window_size = Float.parseFloat(arg.toString()); }
+					if (optName.equals("realignmentMaximumWindowSizeValue")){ temp_maximum_realign_window_size = Float.parseFloat(arg.toString()); }
+					if (optName.equals("realignmentMinimumWindowSizeValue")){ temp_minimum_realign_window_size = Float.parseFloat(arg.toString()); }
 					
 					if (optName.equals("realignmentThresholdType")){
 						if (arg.toString().equals("value")){ temp_threshold_type = Configuration.THRESHOLD_TYPE.VALUE; }
