@@ -68,6 +68,8 @@ public class ArgumentHandler {
 	float temp_realign_threshold = -1;
 	float temp_realign_threshold_lower = (float)-10000.0;
 	float temp_realign_window_size = -1;
+	float temp_maximum_realign_window_size = -1;
+	float temp_minimum_realign_window_size = -1;
 	float temp_realign_minimum_value = -1;
 	float temp_realignmentWindowWeightDecay = -1;
 	int temp_realignment_ittertations = 1;
@@ -91,7 +93,7 @@ public class ArgumentHandler {
 		}
 		*/
 		
-		LongOpt[] longopts = new LongOpt[90];
+		LongOpt[] longopts = new LongOpt[92];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -188,6 +190,8 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("realignmentMinimumSizeValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentWindowSizeType", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentWindowSizeValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentMinimumWindowSizeValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("realignmentMaximumWindowSizeValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdType", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentWindowWeightDecay", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdValue", LongOpt.REQUIRED_ARGUMENT, null, 'k');
@@ -609,8 +613,11 @@ public class ArgumentHandler {
 					
 					if (optName.equals("realignmentWindowSizeType")){ 
 						if (arg.toString().equals("value")){ temp_window_type = Configuration.WINDOW_SIZE.VALUE; }
+						if (arg.toString().equals("percentage")){ temp_window_type = Configuration.WINDOW_SIZE.PERCENTAGE; }
 					}
 					if (optName.equals("realignmentWindowSizeValue")){ temp_realign_window_size = Float.parseFloat(arg.toString()); }
+					if (optName.equals("realignmentWindowSizeMaximumValue")){ temp_maximum_realign_window_size = Float.parseFloat(arg.toString()); }
+					if (optName.equals("realignmentWindowSizeMinimumValue")){ temp_minimum_realign_window_size = Float.parseFloat(arg.toString()); }
 					
 					if (optName.equals("realignmentThresholdType")){
 						if (arg.toString().equals("value")){ temp_threshold_type = Configuration.THRESHOLD_TYPE.VALUE; }
@@ -839,6 +846,8 @@ public class ArgumentHandler {
 				if(temp_tcoffeeDirectory != null) advising_configs[i].tcoffeeDirectory = temp_tcoffeeDirectory;
 				if(temp_temporaryFileDirectory != null) advising_configs[i].temporaryFileDirectory = temp_temporaryFileDirectory;
 				advising_configs[i].realignment_save_threshold = temp_realignment_save_threshold;
+				if(temp_maximum_realign_window_size != -1) advising_configs[i].maximum_realignment_window_value = temp_maximum_realign_window_size;
+				if(temp_minimum_realign_window_size != -1) advising_configs[i].minimum_realignment_window_value = temp_minimum_realign_window_size;
 			}
 			if(repeat_config==1){
 				return advising_configs;
@@ -875,6 +884,9 @@ public class ArgumentHandler {
 			if(temp_tcoffeeDirectory != null) advising_configs[j].tcoffeeDirectory = temp_tcoffeeDirectory;
 			if(temp_temporaryFileDirectory != null) advising_configs[j].temporaryFileDirectory = temp_temporaryFileDirectory;
 			advising_configs[j].realignment_save_threshold = temp_realignment_save_threshold;
+
+			if(temp_maximum_realign_window_size != -1) advising_configs[j].maximum_realignment_window_value = temp_maximum_realign_window_size;
+			if(temp_minimum_realign_window_size != -1) advising_configs[j].minimum_realignment_window_value = temp_minimum_realign_window_size;
 			
 			if(repeat_config>1){
 				advising_configs[j].repetition = j+1;

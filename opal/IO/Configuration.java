@@ -57,10 +57,13 @@ public class Configuration {
 	public float realignment_minimum_window_value = 2;
 	
 	public enum WINDOW_SIZE{
-		VALUE
+		VALUE, PERCENTAGE
 	}
 	public WINDOW_SIZE realignment_window_type = WINDOW_SIZE.VALUE;
 	public float realignment_window_value = 5;
+
+	public float maximum_realignment_window_value = 30;
+	public float minimum_realignment_window_value = 5;
 	
 	public enum REALIGNMENT_TERMINALS{
 		ALWAYS, NEVER, POSITIONAL
@@ -133,6 +136,9 @@ public class Configuration {
 		useTCSforRealignment = c.useTCSforRealignment;
 		useTCSforAdvising = c.useTCSforAdvising;
 		realignment_save_threshold = c.realignment_save_threshold;
+		minimum_realignment_window_value = c.minimum_realignment_window_value;
+		maximum_realignment_window_value = c.maximum_realignment_window_value;
+		
 	}
 	
 

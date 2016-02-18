@@ -55,6 +55,16 @@ public class Facet {
 		total +=  0.20416796078871755 * PercentIdentity.sequence(a, c10);
 		total +=  0.039875954173829012 * PercentIdentity.structure(a, c10) ;
 		total +=  0.23897573022221946 * Support.probability(a, c10);
+		/*
+		//-X  -0.44608190755533228  -C 0.77204231305791482 -8 0.015453277124287387 -3 0.16646708727763862 -7 0.018111444101661926 -5 0.2564808268357297 -D 0.49458991523843843
+		total = (float)-0.44608190755533228;
+		total += 0.77204231305791482 * Blockiness.evaluate(a, c6);
+		total += 0.015453277124287387 * CoreColumn.consensus(a, c20);
+		total += 0.16646708727763862 * GapDensity.open(a, c6);
+		total += 0.018111444101661926 * Consistancy.gap(a, c20);
+		total += 0.2564808268357297 * PercentIdentity.structure(a, c10);
+		total += 0.49458991523843843 * Support.probability(a, c10);
+		*/
 		return (float) total;
 	}
 	
@@ -92,6 +102,8 @@ public class Facet {
 			writer.println(CoreColumn.percentage(c10) + "\t" + CoreColumn.percentage(a, c10));
 			writer.println(CoreColumn.consensus(c20) + "\t" + CoreColumn.consensus(a, c20));
 			writer.println(InformationContent.evaluate(c20) + "\t" + InformationContent.evaluate(a, c20));
+			writer.println(Consistancy.gap(c20) + "\t" + Consistancy.gap(a, c20));
+			writer.println(Consistancy.sequence(c20) + "\t" + Consistancy.sequence(a, c20));
 			
 			if(a.type == FacetAlignment.AlignmentType.Protein){
 				writer.println(GapCoil.percentage(c6) + "\t" + GapCoil.percentage(a, c6));

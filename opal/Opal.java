@@ -116,6 +116,12 @@ class runAlignment extends Thread{
 							preRealignmentFacetScore = TCS.TCSValue(preRealignmentAlignmentInstance, am, conf);
 						realignmentDriver realigner = new realignmentDriver(conf.sc.convertIntsToSeqs(preRealignmentAlignmentInstance),in.structure.structure, newRealignmentConfigList, conf, (float) preRealignmentFacetScore, am);
 						if(conf.realignment_window_type == Configuration.WINDOW_SIZE.VALUE) realigner.simpleRealignment((int)conf.realignment_window_value);
+						else if(conf.realignment_window_type == Configuration.WINDOW_SIZE.PERCENTAGE){
+							int window_size = (int)(conf.realignment_window_value * (float)preRealignmentAlignmentInstance[0].length);
+							if(window_size>conf.maximum_realignment_window_value) window_size = (int)conf.maximum_realignment_window_value;
+							if(window_size<conf.minimum_realignment_window_value) window_size = (int)conf.minimum_realignment_window_value;
+							realigner.simpleRealignment((int)conf.realignment_window_value);
+						}
 						alignmentInstance = realigner.newAlignment();
 						newRealignmentConfigList = null;
 						
