@@ -148,7 +148,11 @@ public class realignmentDriver {
 				originalWindowSequences[i][j-startIndex] = Character.toUpperCase(sequence[i][j]);;
 			}
 			if(numberOfNonGaps[i] > 0) numberOfNonBlankSequences++;
-			realignmentIndexes += "("+stringStartChar+","+stringEndChar+");";
+			if(stringStartChar<stringEndChar){
+				realignmentIndexes += "("+stringStartChar+","+(stringEndChar-1)+");";
+			}else{
+				realignmentIndexes += "(--,--);";
+			}
 		}
 		
 		char[][] windowSequences = new char[numberOfNonBlankSequences][];
