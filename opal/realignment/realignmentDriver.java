@@ -127,19 +127,33 @@ public class realignmentDriver {
 		char[][] originalWindowSequences = new char[sequence.length][endIndex-startIndex+1];		
 		int[] numberOfNonGaps = new int[sequence.length];
 		int numberOfNonBlankSequences = 0;
+		String realignmentIndexes = "";
 		
 		String[] names = new String[sequence.length];
 		for(int i=0; i<sequence.length; i++){
 			names[i] = Integer.toString(i);
+			int stringStartChar = 0;
+			int stringEndChar = 0;
+			for(int j=0; j<startIndex; j++){
+				if(sequence[i][j] != '-'){
+					stringStartChar++;
+					stringEndChar++;
+				}
+			}
 			for(int j=startIndex; j<=endIndex; j++){
-				if(sequence[i][j] != '-') numberOfNonGaps[i]++;
+				if(sequence[i][j] != '-'){
+					numberOfNonGaps[i]++;
+					stringEndChar++;
+				}
 				originalWindowSequences[i][j-startIndex] = Character.toUpperCase(sequence[i][j]);;
 			}
 			if(numberOfNonGaps[i] > 0) numberOfNonBlankSequences++;
+			realignmentIndexes += "("+stringStartChar+","+stringEndChar+");";
 		}
 		
 		char[][] windowSequences = new char[numberOfNonBlankSequences][];
 		float[][][] windowStructure = new float[numberOfNonBlankSequences][][];
+		
 		
 		int putInIndex = 0;
 		for(int i=0; i<sequence.length; i++){
@@ -216,7 +230,8 @@ public class realignmentDriver {
 			bestConfig = "kept the same";
 		}
 		if(numberOfNonBlankSequences <= 1) bestConfig = "didn't try";
-		globalConfiguration.realignmentLog += "Realigned window [" + startIndex + "," + endIndex + "] " + bestConfig + "\n";
+		globalConfiguration.realignmentLog += "Realigned window [" + startIndex + "," + endIndex + "] " + bestConfig + "\n"+realignmentIndexes+"\n";
+		
 		
 		return bestSubAlignment;
 	}
