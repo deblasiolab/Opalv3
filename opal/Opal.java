@@ -155,9 +155,9 @@ class runAlignment extends Thread{
 	}
 	
 	public boolean print(){
-		if(facetScore==-1){
-			am = null;
-		}
+		//if(facetScore==-1){
+		//	am = null;
+		//}
 		if (in.verbosity>0 && facetScore>-1) {
 			System.err.printf("\nfacet score: %.6f",facetScore);
 		}
@@ -174,7 +174,7 @@ class runAlignment extends Thread{
 	}
 	
 	public boolean printBest(){
-		if (in.verbosity>-1) {
+		if (facetScore != -1 && in.verbosity>-1) {
 			System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
 		}
 
@@ -306,8 +306,8 @@ public class Opal {
 				last_joined++;
 				try{
 					thread[last_joined].join();
-					thread[last_joined].print();
-					if(realignment_config != null) thread[last_joined].printPreRealignment(); 
+					if(input.configOutputFile != null) thread[last_joined].print();
+					if(input.configOutputFile != null && realignment_config != null) thread[last_joined].printPreRealignment(); 
 					if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
 						if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 						maxIndex = last_joined;
@@ -327,8 +327,8 @@ public class Opal {
 		for(last_joined++;last_joined<advising_config.length;last_joined++){
 			try{
 				thread[last_joined].join();
-				thread[last_joined].print();
-				if(realignment_config != null) thread[last_joined].printPreRealignment(); 
+				if(input.configOutputFile != null) thread[last_joined].print();
+				if(input.configOutputFile != null && realignment_config != null) thread[last_joined].printPreRealignment(); 
 				if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
 					if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 					maxIndex = last_joined;
@@ -346,30 +346,34 @@ public class Opal {
 		
 		
 		
-		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0)
-			if(!thread[maxIndex].printBest()) 
-				System.err.println("Print returned false");
-		if(advising_config.length>1 && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
-				if(!thread[maxPreRealignmentIndex].printBestPreRealignment()) 
-					System.err.println("Print returned false");
-				if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignment()) 
-					System.err.println("Print returned false");
-				if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignmentIncludePreRealignment()) 
-					System.err.println("Print returned false");
+		//if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0)
+		if(!thread[maxIndex].printBest()) 
+			System.err.println("Print returned false");
+		
+		if(advising_config.length>1 && realignment_config != null  && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
+				if(input.bestPreRealignmentOutputFile != null) 
+					if(!thread[maxPreRealignmentIndex].printBestPreRealignment()) 
+						System.err.println("Print returned false");
+				if(input.bestPreRealignmentsRealignmentOutputFile != null)
+					if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignment()) 
+						System.err.println("Print returned false");
+				if(input.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment != null)
+					if(!thread[maxPreRealignmentIndex].printBestPreRealignmentsRealignmentIncludePreRealignment()) 
+						System.err.println("Print returned false");
 		}
 		
-		if(advising_config.length>1 && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0 
+		if(advising_config.length>1 && realignment_config != null  && thread[maxIndex]!=null && thread[maxIndex].facetScore>=0 
 				&& thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0 
 				&& thread[maxPreRealignmentIndex].preRealignmentFacetScore < thread[maxIndex].facetScore){
-			if(!thread[maxIndex].printBestIncludePreRealignment()) 
-				System.err.println("Print returned false");
+			if(input.bestOutputFileIncludePreRealignment != null)
+				if(!thread[maxIndex].printBestIncludePreRealignment()) 
+					System.err.println("Print returned false");
 		}else if(advising_config.length>1 && thread[maxPreRealignmentIndex]!=null && thread[maxPreRealignmentIndex].facetScore>=0){
-			if(!thread[maxPreRealignmentIndex].printBestIncludePreRealignment()) 
-				System.err.println("Print returned false");
+			if(input.bestOutputFileIncludePreRealignment != null)
+				if(!thread[maxPreRealignmentIndex].printBestIncludePreRealignment()) 
+					System.err.println("Print returned false");
 		}
 		
-		
-		System.err.println("advising_config.length: " + advising_config.length + "\tmaxPreRealignmentIndex:" + maxPreRealignmentIndex + "\tthread[maxPreRealignmentIndex]:" + thread[maxPreRealignmentIndex]);
 		if (input.verbosity>0) {
 			Date now = new Date();
 			long diff = now.getTime() - start.getTime();

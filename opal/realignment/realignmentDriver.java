@@ -26,6 +26,7 @@ public class realignmentDriver {
 	int[][] alignmentInstance;
 	boolean changed_one_regions;
 	
+	boolean verbose = false;
 	public static float mean(float[] nums) {
 		float sum = 0;
 		 
@@ -234,7 +235,8 @@ public class realignmentDriver {
 			bestConfig = "kept the same";
 		}
 		if(numberOfNonBlankSequences <= 1) bestConfig = "didn't try";
-		globalConfiguration.realignmentLog += "Realigned window [" + startIndex + "," + endIndex + "] " + bestConfig + "\n"+realignmentIndexes+"\n";
+		globalConfiguration.realignmentLog += "\tRealigned window [" + startIndex + "," + endIndex + "] " + bestConfig + "\n";
+		if(verbose) globalConfiguration.realignmentLog += "\t\t" + realignmentIndexes+"\n";
 		
 		
 		return bestSubAlignment;
@@ -279,7 +281,7 @@ public class realignmentDriver {
 				
 				fixed_threshold = threshold;
 			}
-			System.err.println(scoreTotal + "/" + scores.length + " = " + (scoreTotal/scores.length) + "\t" + wholeAlignmentScore + "\t" 
+			if(verbose) System.err.println(scoreTotal + "/" + scores.length + " = " + (scoreTotal/scores.length) + "\t" + wholeAlignmentScore + "\t" 
 					+ globalConfiguration.realignment_threshold_type + "," + globalConfiguration.realignment_threshold_value + "(" + threshold + ")\t" 
 					+ globalConfiguration.realignment_window_type + "," + globalConfiguration.realignment_window_value + "\t" 
 					+ globalConfiguration.realignment_minimum_type + "," + globalConfiguration.realignment_minimum_window_value
@@ -369,11 +371,11 @@ public class realignmentDriver {
 			for(int i=0;i<sequence[0].length;i++){
 				if(column_scores[i] >= good_threshold){
 					includeInRealignment[i] = false;
-					System.err.print("G");
+					if(verbose) System.err.print("G");
 					ct_good++;
 				}
 				else if(column_scores[i] <= bad_threshold){
-					System.err.print("B");
+					if(verbose) System.err.print("B");
 					ct_bad++;
 					includeInRealignment[i] = true;
 					for(int j=i-1;j>=0 && column_scores[j] < good_threshold;j--){
@@ -383,21 +385,21 @@ public class realignmentDriver {
 						includeInRealignment[j] = true;
 					}
 				}else{
-					System.err.print("-");
+					if(verbose) System.err.print("-");
 				}
 			}
 
-			System.err.println();
-			System.err.println("good: " + ct_good + "\tbad: " + ct_bad + "\ttotal: " + sequence[0].length + "\tgood_threshold: " + good_threshold + "\tbad_threshold: " + bad_threshold);
+			if(verbose) System.err.println();
+			if(verbose) System.err.println("good: " + ct_good + "\tbad: " + ct_bad + "\ttotal: " + sequence[0].length + "\tgood_threshold: " + good_threshold + "\tbad_threshold: " + bad_threshold);
 		}
 		//System.err.println();
 		int ct_save = 0;
 		for(int i=0;i<sequence[0].length;i++){
-			System.err.print(includeInRealignment[i]?"X":" ");
+			if(verbose) System.err.print(includeInRealignment[i]?"X":" ");
 			ct_save += (includeInRealignment[i]?0:1);
 		}
-		System.err.println();
-		System.err.println("saved: " + ct_save + "\trealigned: " + (sequence[0].length - ct_save) + "\ttotal: " + sequence[0].length);
+		if(verbose) System.err.println();
+		if(verbose) System.err.println("saved: " + ct_save + "\trealigned: " + (sequence[0].length - ct_save) + "\ttotal: " + sequence[0].length);
 		
 		int[] blockStart = new int[sequence[0].length];
 		int blockAssignI = 1;
@@ -450,7 +452,7 @@ public class realignmentDriver {
 		
 
 		changed_one_regions = false;
-		globalConfiguration.realignmentLog += "Realignment Itteration " + itteration + " \n-------------------\n";
+		globalConfiguration.realignmentLog += "Realignment Itteration " + itteration + "\n";
 		
 		// TODO realign using each configuration
 		int lastInAlignmentAlready = -1;

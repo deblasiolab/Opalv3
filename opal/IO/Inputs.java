@@ -56,7 +56,7 @@ public class Inputs {
 		bestOutputFileIncludePreRealignment = in.bestOutputFileIncludePreRealignment;
 		bestPreRealignmentsRealignmentOutputFileIncludePreRealignment = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment;
 		
-		structure = new StructureFileReader(in.structure);
+		if(in.structure != null) structure = new StructureFileReader(in.structure);
 		
 	}
 

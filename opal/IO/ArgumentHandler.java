@@ -72,13 +72,16 @@ public class ArgumentHandler {
 	float temp_minimum_realign_window_size = -1;
 	float temp_realign_minimum_value = -1;
 	float temp_realignmentWindowWeightDecay = -1;
-	int temp_realignment_ittertations = 1;
+	int temp_realignment_ittertations = -1;
 	boolean temp_realignment_save_threshold = false;
 	
 	public String temp_temporaryFileDirectory = null;
 	public String temp_tcoffeeDirectory = null;
 	public boolean temp_useTCSforRealignment = false;
 	public boolean temp_useTCSforAdvising = false;
+
+	public boolean temp_useLeftTerminal = true;
+	public boolean temp_useRightTerminal = true;
 	
 	
 	public ArgumentHandler (String argString) {
@@ -93,7 +96,7 @@ public class ArgumentHandler {
 		}
 		*/
 		
-		LongOpt[] longopts = new LongOpt[92];
+		LongOpt[] longopts = new LongOpt[93];
 		int longopts_index=0;
 		longopts[longopts_index++] = new LongOpt("help", LongOpt.NO_ARGUMENT, null, 'h');
 		longopts[longopts_index++] = new LongOpt("usage", LongOpt.NO_ARGUMENT, null, 'u');
@@ -199,6 +202,7 @@ public class ArgumentHandler {
 		longopts[longopts_index++] = new LongOpt("realignmentThresholdItterationMethod", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		//realignmentAlwaysTerminals
 		longopts[longopts_index++] = new LongOpt("realignmentTerminals", LongOpt.REQUIRED_ARGUMENT, null, 'k');
+		longopts[longopts_index++] = new LongOpt("terminals", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 		longopts[longopts_index++] = new LongOpt("realignmentItterations", LongOpt.REQUIRED_ARGUMENT, null, 'k');
 
 
@@ -355,7 +359,7 @@ public class ArgumentHandler {
             		}  else if (optName.equals("out_prerealignment_best_realignment_include_pre")) {
             			bestPreRealignmentsRealignmentOutputFileIncludePreRealignment = arg.toString();
         			} else if (optName.equals("out")) {
-            			if(configOutputFile == null) configOutputFile = arg.toString();
+            			//if(configOutputFile == null) configOutputFile = arg.toString();
             			if(bestOutputFile == null) bestOutputFile = arg.toString();
 		            	/*try {
 		            		AlignmentMaker.setOutputName(arg.toString());
@@ -647,7 +651,12 @@ public class ArgumentHandler {
 						if (arg.toString().equals("keepFirstItteration")){ temp_realignment_save_threshold = true; }
 						if (arg.toString().equals("newThresholdEachItteration")){ temp_realignment_save_threshold = false; }
 					}
-            		
+            		if (optName.equals("terminals")){
+						if (arg.toString().equals("all")){ temp_useLeftTerminal = true; temp_useRightTerminal = true; }
+						if (arg.toString().equals("noLeft") || arg.toString().equals("Right")){ temp_useLeftTerminal = false; temp_useRightTerminal = true; }
+						if (arg.toString().equals("noRight") || arg.toString().equals("Left")){ temp_useLeftTerminal = true; temp_useRightTerminal = false; }
+						if (arg.toString().equals("none") || arg.toString().equals("noTerm")){ temp_useLeftTerminal = false; temp_useRightTerminal = false; }
+					}
             		break; 
             	case 'v':	
 
@@ -842,12 +851,14 @@ public class ArgumentHandler {
 				advising_configs[i].doReverse = doReverse;
 				advising_configs[i].useTCSforAdvising = temp_useTCSforAdvising;
 				advising_configs[i].useTCSforRealignment = temp_useTCSforRealignment;
-				advising_configs[i].realignment_itterations = temp_realignment_ittertations;
+				if(temp_realignment_ittertations != -1) advising_configs[i].realignment_itterations = temp_realignment_ittertations;
 				if(temp_tcoffeeDirectory != null) advising_configs[i].tcoffeeDirectory = temp_tcoffeeDirectory;
 				if(temp_temporaryFileDirectory != null) advising_configs[i].temporaryFileDirectory = temp_temporaryFileDirectory;
 				advising_configs[i].realignment_save_threshold = temp_realignment_save_threshold;
 				if(temp_maximum_realign_window_size != -1) advising_configs[i].maximum_realignment_window_value = temp_maximum_realign_window_size;
 				if(temp_minimum_realign_window_size != -1) advising_configs[i].minimum_realignment_window_value = temp_minimum_realign_window_size;
+				advising_configs[i].useLeftTerminal = temp_useLeftTerminal;
+				advising_configs[i].useRightTerminal = temp_useRightTerminal;
 			}
 			if(repeat_config==1){
 				return advising_configs;
@@ -880,10 +891,12 @@ public class ArgumentHandler {
 			advising_configs[j].doReverse = doReverse;
 			advising_configs[j].useTCSforAdvising = temp_useTCSforAdvising;
 			advising_configs[j].useTCSforRealignment = temp_useTCSforRealignment;
-			advising_configs[j].realignment_itterations = temp_realignment_ittertations;
+			if(temp_realignment_ittertations != -1) advising_configs[j].realignment_itterations = temp_realignment_ittertations;
 			if(temp_tcoffeeDirectory != null) advising_configs[j].tcoffeeDirectory = temp_tcoffeeDirectory;
 			if(temp_temporaryFileDirectory != null) advising_configs[j].temporaryFileDirectory = temp_temporaryFileDirectory;
 			advising_configs[j].realignment_save_threshold = temp_realignment_save_threshold;
+			advising_configs[j].useLeftTerminal = temp_useLeftTerminal;
+			advising_configs[j].useRightTerminal = temp_useRightTerminal;
 
 			if(temp_maximum_realign_window_size != -1) advising_configs[j].maximum_realignment_window_value = temp_maximum_realign_window_size;
 			if(temp_minimum_realign_window_size != -1) advising_configs[j].minimum_realignment_window_value = temp_minimum_realign_window_size;

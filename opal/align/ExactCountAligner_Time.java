@@ -84,7 +84,7 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 		}
 				
 		costUpperBound = Aligner.calcCost(alignedSeqs,A.K,B.K,idsAB, al.config, A.in);
-		
+		/*
 		if(al.config.useLeftTerminal != al.config.useRightTerminal){
 			float costUpperBoundsArray[] = new float[3];
 			for(int terminal_index=0;terminal_index<3;terminal_index++){
@@ -117,10 +117,10 @@ public class ExactCountAligner_Time extends ExactCountAligner {
 				
 			}
 			System.err.print("");
-		}
+		}*/
 		
 		//TODO !!! Needed to not over prune when doing computation
-		//costUpperBound *= 2;
+		costUpperBound *= 2;
 		long alValue = al.getEstimatedCost();
 		
 		if (costUpperBound < al.getEstimatedCost()) {

@@ -35,6 +35,7 @@ abstract public class ShapeTester {
 	}
 	
 	public boolean boundPrune (Shape s) {
+		
 		/* see calcGapBounds for def of Hgap, Vgap, and Dgap */
 		
 		long[] H_V_D = new long[3]; 

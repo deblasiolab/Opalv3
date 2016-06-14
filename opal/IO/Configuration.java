@@ -44,31 +44,31 @@ public class Configuration {
 		TWO_VALUE, TWO_AVERAGE, TWO_WHOLE,
 		TWO_SD, TWO_PERCENTAGE
 	}
-	public THRESHOLD_TYPE realignment_threshold_type = THRESHOLD_TYPE.WHOLE_ALIGNMENT;
-	public float realignment_threshold_value = 1;
-	public float realignment_threshold_value_lower = 1;
-	public float realignmentWindowWeightDecay = (float)0.5;
-	public int realignment_itterations = 1;
+	public THRESHOLD_TYPE realignment_threshold_type = THRESHOLD_TYPE.TWO_PERCENTAGE;
+	public float realignment_threshold_value = (float)0.5;
+	public float realignment_threshold_value_lower = (float)0.1;
+	public float realignmentWindowWeightDecay = (float)0.9;
+	public int realignment_itterations = 5;
 	
 	public enum WINDOW_SIZE_MINIMUM{
 		VALUE, WINDOW_MULTIPLIER, NONE
 	}
-	public WINDOW_SIZE_MINIMUM realignment_minimum_type = WINDOW_SIZE_MINIMUM.WINDOW_MULTIPLIER;
+	public WINDOW_SIZE_MINIMUM realignment_minimum_type = WINDOW_SIZE_MINIMUM.NONE;
 	public float realignment_minimum_window_value = 2;
 	
 	public enum WINDOW_SIZE{
 		VALUE, PERCENTAGE
 	}
-	public WINDOW_SIZE realignment_window_type = WINDOW_SIZE.VALUE;
-	public float realignment_window_value = 5;
+	public WINDOW_SIZE realignment_window_type = WINDOW_SIZE.PERCENTAGE;
+	public float realignment_window_value = (float)0.3;
 
 	public float maximum_realignment_window_value = 30;
-	public float minimum_realignment_window_value = 5;
+	public float minimum_realignment_window_value = 10;
 	
 	public enum REALIGNMENT_TERMINALS{
 		ALWAYS, NEVER, POSITIONAL
 	}
-	public REALIGNMENT_TERMINALS realignment_use_terminals = REALIGNMENT_TERMINALS.NEVER;
+	public REALIGNMENT_TERMINALS realignment_use_terminals = REALIGNMENT_TERMINALS.POSITIONAL;
 	
 	public boolean realignment_save_threshold = false;
 	
@@ -138,6 +138,8 @@ public class Configuration {
 		realignment_save_threshold = c.realignment_save_threshold;
 		minimum_realignment_window_value = c.minimum_realignment_window_value;
 		maximum_realignment_window_value = c.maximum_realignment_window_value;
+		useLeftTerminal = c.useLeftTerminal;
+		useRightTerminal = c.useRightTerminal;
 		
 	}
 	

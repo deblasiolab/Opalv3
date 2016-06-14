@@ -16,8 +16,8 @@ use File::Temp qw/ tempfile tempdir /; # for mafft polishing routine
 # The next line may be edit
 #=======================================================
 
-#my $psipred_dir ; # if empty, use $PATH
-my $psipred_dir = "/Volumes/Portable_2TB/ParamAdvising/psipred35" ; 
+my $psipred_dir ; # if empty, use $PATH
+#my $psipred_dir = "/Volumes/Portable_2TB/ParamAdvising/psipred35" ; 
 
 #=======================================================
 # You shouldn't need to edit the script below this point
