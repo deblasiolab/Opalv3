@@ -129,54 +129,107 @@ public class StructureAlignment extends Alignment {
 	}
 
 
+  public static int getDefaultGamma(ParamModel type) {
+    if (type == ParamModel.G1) {
+      return 62;
+    } else if (type == ParamModel.G4) {
+      return 51;
+    } else if (type == ParamModel.G6) {
+      return 45;
+    } else if (type == ParamModel.G8) {
+      return 47;
+    }
+    return -1;
+  }
+  
+  public static int getDefaultGammaTerm(ParamModel type) {
+    if (type == ParamModel.G1) {
+      return 27;
+    } else if (type == ParamModel.G4) {
+      return 23;
+    } else if (type == ParamModel.G6) {
+      return 11;
+    } else if (type == ParamModel.G8) {
+      return 19;
+    }
+    return -1;
+  }
+  
+  public static int getDefaultLambda(ParamModel type) {
+    if (type == ParamModel.G1) {
+      return 37;
+    } else if (type == ParamModel.G4) {
+      return 36;
+    } else if (type == ParamModel.G6) {
+      return 36;
+    } else if (type == ParamModel.G8) {
+      return 38;
+    }
+    return -1;
+  }
+  
+  public static int getDefaultLambdaTerm(ParamModel type) {
+    if (type == ParamModel.G1) {
+      return 34;
+    } else if (type == ParamModel.G4) {
+      return 36;
+    } else if (type == ParamModel.G6) {
+      return 35;
+    } else if (type == ParamModel.G8) {
+      return 37;
+    }
+    return -1;
+  }
+	
+	
 	public static void setParams (ParamModel type, Configuration conf) {
 		conf.modelType = type;
 		
 		if (type == ParamModel.G1) {
 			conf.gapLevelCnt = 1;
-			conf.gamma = 62;
-			conf.setGammaTerm(27);
+			//conf.gamma = 62;
+			//conf.setGammaTerm(27);
 			int[] open = {0};
 			conf.gapOpenMods = open;
 			
-			conf.lambda = 37;
-			conf.setLambdaTerm(34);
+			//conf.lambda = 37;
+			//conf.setLambdaTerm(34);
 			int[] ext = {0};
 			conf.gapExtMods = ext;
 			
 		} else if (type == ParamModel.G4) {
 			conf.gapLevelCnt = 4;
-			conf.gamma = 51;
-			conf.setGammaTerm(23);
+			//conf.gamma = 51;
+			//conf.setGammaTerm(23);
 			int[] open = {0, 9, 32, 32};
 			conf.gapOpenMods = open;
 			
-			conf.lambda = 36;
-			conf.setLambdaTerm(36);
+			//conf.lambda = 36;
+			//conf.setLambdaTerm(36);
 			int[] ext = {0, 2, 4, 4};
 			conf.gapExtMods = ext;
 			
 		} else if (type == ParamModel.G6) {
 			conf.gapLevelCnt = 6;
-			conf.gamma = 45;
-			conf.setGammaTerm(11);
+			//conf.gamma = 45;
+			//conf.setGammaTerm(11);
 			int[] open = {0, 6, 19, 30, 49, 49};
 			conf.gapOpenMods = open;
 			
-			conf.lambda = 36;
-			conf.setLambdaTerm(35);
+			//conf.lambda = 36;
+			//conf.setLambdaTerm(35);
 			int[] ext = {0, 1, 2, 2, 2, 2 };
 			conf.gapExtMods = ext;	
 
 		} else if (type == ParamModel.G8) {
 			conf.gapLevelCnt = 8;
-			conf.gamma = 47;
-			conf.setGammaTerm(19);
+			//conf.gamma = 47;
+			//conf.setGammaTerm(19);
 			int[] open = {0, 0, 12, 19, 33, 36, 57, 57};
 			conf.gapOpenMods = open;
 			
-			conf.lambda = 38;
-			conf.setLambdaTerm(37);
+			//conf.lambda = 38;
+			//conf.setLambdaTerm(37);
 			int[] ext = {0, 0, 1, 1, 1, 2, 4, 4};
 			conf.gapExtMods = ext;		
 		}

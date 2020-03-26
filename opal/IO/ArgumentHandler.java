@@ -476,14 +476,16 @@ public class ArgumentHandler {
 		            		advising_configs[0] = new Configuration();
 		            	}
 		            	if (!advising_configs[0].useStructure) // if model hasn't already been set
-		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,advising_configs[0]);*/
-		            	if (structmodel == null) // if model hasn't already been set
+		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,advising_configs[0]);
+		            		
+                  advising_configs[0].useStructure = true;
+                  */
+		            	
+		              if (structmodel == null) // if model hasn't already been set
 		            		structmodel = StructureAlignment.ParamModel.G8;
 		            	
 
 	            		Aligner.linearCutoff = Integer.MAX_VALUE;
-		            	
-	            		advising_configs[0].useStructure = true;
 		            	if (optName.equals("structure_file")) {
 		            		if(structFileA!=null){
 			            		LogWriter.stdErrLogln("Only 'facet_structure' or 'structure_file' can be specified. Alignment structure is used for Facet.");
@@ -879,9 +881,25 @@ public class ArgumentHandler {
 			}
 		}
 		
+		// advising configs is null, so use the input information
 		advising_configs = new Configuration[repeat_config];
 		for(int j=0;j<repeat_config;j++){
+		  
+		  if(structmodel != null) {
+		    System.out.println("Structure Model Not Null");
+        if(gamma == -1) gamma = StructureAlignment.getDefaultGamma(structmodel);
+        if(gammaTerm == -1) gammaTerm = StructureAlignment.getDefaultGammaTerm(structmodel);
+        if(lambda == -1) lambda = StructureAlignment.getDefaultLambda(structmodel);
+        if(lambdaTerm == -1) lambdaTerm = StructureAlignment.getDefaultLambdaTerm(structmodel);
+		  }else {
+
+        System.out.println("Structure Model IS Null");
+		  }
 			advising_configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
+			if(structmodel != null) {
+			  advising_configs[j].useStructure = true;
+			  StructureAlignment.setParams(structmodel, advising_configs[j]);
+			}
 			
 			if(temp_threshold_type != null) advising_configs[j].realignment_threshold_type = temp_threshold_type;
 			if(temp_realign_threshold != -1) advising_configs[j].realignment_threshold_value = temp_realign_threshold;
