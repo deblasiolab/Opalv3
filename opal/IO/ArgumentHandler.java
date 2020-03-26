@@ -37,6 +37,7 @@ public class ArgumentHandler {
 	int lambda = -1;
 	int gammaTerm = -1;
 	int lambdaTerm = -1;
+	StructureAlignment.ParamModel structmodel = null;
 	Configuration[] advising_configs;
 	Configuration[] realignment_configs;
 	int repeat_config = 1;
@@ -470,12 +471,15 @@ public class ArgumentHandler {
 		            	}
 		            } else if (optName.startsWith("structure_file")) {
 		            	
-		            	if(advising_configs == null){
+		            	/*if(advising_configs == null){
 		            		advising_configs = new Configuration[1];
 		            		advising_configs[0] = new Configuration();
 		            	}
 		            	if (!advising_configs[0].useStructure) // if model hasn't already been set
-		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,advising_configs[0]);
+		            		StructureAlignment.setParams(StructureAlignment.ParamModel.G8,advising_configs[0]);*/
+		            	if (structmodel == null) // if model hasn't already been set
+		            		structmodel = StructureAlignment.ParamModel.G8;
+		            	
 
 	            		Aligner.linearCutoff = Integer.MAX_VALUE;
 		            	
@@ -491,17 +495,18 @@ public class ArgumentHandler {
 			            	structFileB = arg.toString();
 		            	}
 		            } else if (optName.equals("structure_model")) {
-		            	if(advising_configs == null){
+		            	/*if(advising_configs == null){
 		            		advising_configs = new Configuration[1];
 		            		advising_configs[0] = new Configuration();
 		            	}
 		            	
-		            	advising_configs[0].useStructure = true;
+		            	advising_configs[0].useStructure = true;*/
 		            	String s = arg.toString();
 		            	boolean isSet = false;
 		            	for (StructureAlignment.ParamModel type : StructureAlignment.ParamModel.values()) {
 		            		if (s.equalsIgnoreCase(type.toString())) {
-		            			StructureAlignment.setParams(type, advising_configs[0]);
+		            			structmodel = type;
+		            			//StructureAlignment.setParams(type, advising_configs[0]);
 		            			isSet = true;
 		            			break;
 		            		}
