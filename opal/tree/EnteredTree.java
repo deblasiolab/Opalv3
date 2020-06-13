@@ -138,7 +138,7 @@ public class EnteredTree extends Tree {
 			if (name.equals(names[i])) {
 				found = true;
 				node.leafOrderFromInput = new ArrayList<Integer>(1);
-				node.leafOrderFromInput.add(new Integer(i));
+				node.leafOrderFromInput.add(Integer.valueOf(i));
 				if ( AlignmentMaker.initAlignmentProvided) {
 					node.setAlignment(null);
 				} else {

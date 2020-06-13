@@ -19,7 +19,7 @@ public abstract class TreeNode {
 	private int nextLeafID = 0;
 	
 	public TreeNode(int rootsCount, int i) {
-		leafOrderFromInput.add(new Integer(i));
+		leafOrderFromInput.add(Integer.valueOf(i));
 	}
 	
 	public TreeNode(int rootsCount) {

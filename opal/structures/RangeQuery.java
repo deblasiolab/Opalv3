@@ -26,8 +26,8 @@ public class RangeQuery {
 		int leafCount = values.length;
 		int nodeCount = 2*values.length -1;
 
-		int fullDepth = (new Double (Math.log(nodeCount)/Math.log(2))).intValue()-1;
-		int fullDepthNodes = (new Double(Math.pow((double)2,(double)fullDepth))).intValue(); // how many leaves there would be in a full binary tree of this depth
+		int fullDepth = (Double.valueOf(Math.log(nodeCount)/Math.log(2))).intValue()-1;
+		int fullDepthNodes = (Double.valueOf(Math.pow((double)2,(double)fullDepth))).intValue(); // how many leaves there would be in a full binary tree of this depth
 		int fullDepthInternalNodes = leafCount - fullDepthNodes ; // if this != 0, then this many sequences will have leaves on the next (unfull) level
 		int nextLevelLeaves = 2 * fullDepthInternalNodes; 
 

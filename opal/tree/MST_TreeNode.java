@@ -25,13 +25,13 @@ public class MST_TreeNode extends TreeNode {
 		// so do it manually. 
 		x -= distances.size();
 		for (int j=0; j<x; j++) {
-			distances.add(new Float(0));
+			distances.add(Float.valueOf(0));
 		}
 	}
 	
 
 	final public void setDistance (int i, float d) {
-		distances.set(i, new Float(d));
+		distances.set(i, Float.valueOf(d));
 	}
 
 	final public float getDistance (int i) {
@@ -43,7 +43,7 @@ public class MST_TreeNode extends TreeNode {
 	final public void removeDistances (int i, int j) {
 		distances.remove(i);
 		distances.remove(j);		
-		distances.add(new Float(0));
+		distances.add(Float.valueOf(0));
 	}	
 	
 	final public void clearDistances () {

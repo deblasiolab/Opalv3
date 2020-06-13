@@ -18,8 +18,8 @@ public class SequenceIdPair {
 		int[] ret = new int[2];
 		
 		
-		ret[0] =  new Integer(nums[0]).intValue();
-		ret[1] =  new Integer(nums[1]).intValue();
+		ret[0] =  Integer.valueOf(nums[0]).intValue();
+		ret[1] =  Integer.valueOf(nums[1]).intValue();
 		return ret;
 	}
 	

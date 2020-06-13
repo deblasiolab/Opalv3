@@ -461,11 +461,11 @@ public class ArgumentHandler {
             		else  optName = longopts[g.getLongind()].getName(); 
             		
 		            if (optName.equals("seed")) {
-	            		Polisher.setRandomSeed( (new Long(arg.toString())).longValue());
+	            		Polisher.setRandomSeed( Long.parseLong(arg.toString()));
 		            } else if (optName.equals("show_cost")) {
 	            		AlignmentMaker.showCost = true;
 		            } else if (optName.endsWith("subopt")) {
-		            	PairSuboptimalityMatrices.setDelta( (new Integer(arg.toString())).intValue());
+		            	PairSuboptimalityMatrices.setDelta( (Integer.valueOf(arg.toString())).intValue());
 		            	if (optName.equals("just_subopt")) {
 		            		justDoSubOpt = true;
 		            	}
@@ -559,23 +559,23 @@ public class ArgumentHandler {
             		else  optName = longopts[g.getLongind()].getName(); 
             		
 		            if (optName.equals("consistency_weight")) {
-		            	PairwiseAlignmentsContainer.consistency_weight = (new Float(arg.toString())).floatValue();
+		            	PairwiseAlignmentsContainer.consistency_weight = Float.parseFloat(arg.toString());
 		            } else if (optName.equals("consistency_other_seqs_weight")) {
-			            PairwiseAlignmentsContainer.consistency_other_seqs_weight = (new Float(arg.toString())).floatValue();
+			            PairwiseAlignmentsContainer.consistency_other_seqs_weight = Float.parseFloat(arg.toString());
 		            } else if (optName.equals("consistency_neighbors")) {
-		            	PairwiseAlignmentsContainer.neighborCount = (new Integer(arg.toString())).intValue();
+		            	PairwiseAlignmentsContainer.neighborCount = Integer.parseInt(arg.toString());
 		            } else if (optName.equals("consistency_maxsubtree")) {
-		            	PairwiseAlignmentsContainer.maxSubtreeSize = (new Integer(arg.toString())).intValue();
+		            	PairwiseAlignmentsContainer.maxSubtreeSize = Integer.parseInt(arg.toString());
 		            } else if (optName.equals("consistency_badscore_mult")) {
-		            	PairwiseAlignmentsContainer.badScoreMult = (new Double(arg.toString())).doubleValue();
+		            	PairwiseAlignmentsContainer.badScoreMult = Double.parseDouble(arg.toString());
 		            } else if (optName.equals("consistency_use_neighbor_weights")) {
 		            	PairwiseAlignmentsContainer.useWeights = true;
 		            } else if (optName.equals("consistency_use_avg")) {
 		            	PairwiseAlignmentsContainer.useMax = false;
 		            } else if (optName.equals("consistency_flatten_abc_subopt")) {
-		            	PairwiseAlignmentsContainer.flattenABC = (new Float(arg.toString())).floatValue();
+		            	PairwiseAlignmentsContainer.flattenABC = Float.parseFloat(arg.toString());
 		            } else if (optName.equals("consistency_neighbor_dist_thresh")) {
-		            	PairwiseAlignmentsContainer.neighborDistThreshold = (new Float(arg.toString())).floatValue();            
+		            	PairwiseAlignmentsContainer.neighborDistThreshold = Float.parseFloat(arg.toString());
 		            } else if (optName.equals("consistency_blend_type")) {
 		            	if (arg.toString().equals("simple")) {
 		            		PairwiseAlignmentsContainer.blendMethod = PairwiseAlignmentsContainer.BlendType.simple; 
@@ -603,11 +603,11 @@ public class ArgumentHandler {
             		else  optName = longopts[g.getLongind()].getName(); 
             		
 		            if (optName.equals("output_width")) {
-		            	AlignmentMaker.outputWidth = (new Integer(arg.toString())).intValue();
+		            	AlignmentMaker.outputWidth = Integer.parseInt(arg.toString());
 		            }
 		            break;            
             	case 'z' :
-            		Aligner.linearCutoff = (new Integer(arg.toString())).intValue();
+            		Aligner.linearCutoff = Integer.parseInt(arg.toString());
             		break; 
             		
             	case 'k':	
