@@ -336,7 +336,7 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 			LogWriter.stdErrLogln("\n================================");
 			LogWriter.stdErrLogln("input file = " + file + " (" + K + " sequences)");
 		}
-		if (in.verbosity>-1) {
+		if (in.verbosity>0) {
 			if (null != fname)
 				LogWriter.stdErrLogln("output file = " + fname);
 		}
