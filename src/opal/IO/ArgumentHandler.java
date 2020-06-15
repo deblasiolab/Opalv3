@@ -886,14 +886,14 @@ public class ArgumentHandler {
 		for(int j=0;j<repeat_config;j++){
 		  
 		  if(structmodel != null) {
-		    System.out.println("Structure Model Not Null");
+		    //System.out.println("Structure Model Not Null");
         if(gamma == -1) gamma = StructureAlignment.getDefaultGamma(structmodel);
         if(gammaTerm == -1) gammaTerm = StructureAlignment.getDefaultGammaTerm(structmodel);
         if(lambda == -1) lambda = StructureAlignment.getDefaultLambda(structmodel);
         if(lambdaTerm == -1) lambdaTerm = StructureAlignment.getDefaultLambdaTerm(structmodel);
 		  }else {
 
-        System.out.println("Structure Model IS Null");
+        //System.out.println("Structure Model IS Null");
 		  }
 			advising_configs[j] = new Configuration(costName, gamma, gammaTerm, lambda, lambdaTerm, fileA);
 			if(structmodel != null) {
