@@ -12,7 +12,7 @@ OUT_DIR := bin
 # sources
 ##
 SRCS := $(wildcard $(SRC_DIR)/facet/*.java $(SRC_DIR)/opal/*.java $(SRC_DIR)/opal/*/*.java $(SRC_DIR)/opal/*/*/*.java $(SRC_DIR)/com/traviswheeler/libs/*java $(SRC_DIR)/com/bluemarsh/graphmaker/core/util/*java $(SRC_DIR)/gnu/getopt/*java)
-MBS := $(wildcard $(SRC_DIR)/gnu/getopt/MessagesBundle*)
+MBS := $(wildcard $(SRC_DIR)/gnu/getopt/MessagesBundle* $(SRC_DIR)/opal/IO/usage.txt)
 
 ##
 # classes
