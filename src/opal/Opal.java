@@ -178,9 +178,12 @@ class runAlignment extends Thread{
 			System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
 		}
 
-		String fname = in.bestOutputFile.replace("__CONFIG__", conf.toString());
-		if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-		if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
+		String fname = null; 
+    if(in.bestOutputFile != null){
+      fname = in.bestOutputFile.replace("__CONFIG__", conf.toString());
+		  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+		  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
+    }
 
 		return am.printOutput(alignmentInstance, fname);
 	}
@@ -190,17 +193,23 @@ class runAlignment extends Thread{
 			if (in.verbosity>-1) {
 				System.err.printf("\nbest facet value --  %.6f (%s)",facetScore, conf );
 			}
-			String fname = in.bestOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
-			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
-			return am.printOutput(alignmentInstance, fname);
+			String fname = null;
+      if(in.bestOutputFileIncludePreRealignment != null){
+        fname = in.bestOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
+      }
+      return am.printOutput(alignmentInstance, fname);
 		}else{
 			if (in.verbosity>0 && facetScore>-1) {
 				System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
 			}
-			String fname = in.bestOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
-			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
+			String fname = null;
+      if(in.bestOutputFileIncludePreRealignment != null){
+        fname = in.bestOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
+      }
 			return am.printOutput(preRealignmentAlignmentInstance, fname, false);
 			
 		}
@@ -211,9 +220,12 @@ class runAlignment extends Thread{
 			System.err.printf("\npre-realignment facet score: %.6f",preRealignmentFacetScore);
 		}
 		if(in.preRealignmentOutputFile != null){
-			String fname = in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
-			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
+			String fname = null; 
+      if(in.preRealignmentOutputFile != null){
+        in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
+      }
 			return am.printOutput(preRealignmentAlignmentInstance, fname, false);
 		}else{
 			return am.printOutput(preRealignmentAlignmentInstance, null, false);
@@ -225,20 +237,26 @@ class runAlignment extends Thread{
 		if (in.verbosity>-1) {
 			System.err.printf("\nbest pre-realignment facet value --  %.6f (%s)",preRealignmentFacetScore, conf );
 		}
-		String fname = in.bestPreRealignmentOutputFile.replace("__CONFIG__", conf.toString());
-		if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-		if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
-		return am.printOutput(preRealignmentAlignmentInstance, fname, false);
+		String fname = null;
+    if(in.bestPreRealignmentOutputFile != null){
+      in.bestPreRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+		  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+		  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
+    }
+    return am.printOutput(preRealignmentAlignmentInstance, fname, false);
 	}	
 	
 	public boolean printBestPreRealignmentsRealignment(){
 		if (in.verbosity>-1) {
 			System.err.printf("\nbest pre-realignments realignment facet value --  %.6f (%s)",facetScore, conf );
 		}
-		String fname = in.bestPreRealignmentsRealignmentOutputFile.replace("__CONFIG__", conf.toString());
-		if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-		if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));	
-		return am.printOutput(alignmentInstance, fname);
+		String fname = null;
+    if(in.bestPreRealignmentsRealignmentOutputFile != null){
+      in.bestPreRealignmentsRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+		  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+		  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));	
+    }
+    return am.printOutput(alignmentInstance, fname);
 	}	
 	
 	public boolean printBestPreRealignmentsRealignmentIncludePreRealignment(){
@@ -246,17 +264,23 @@ class runAlignment extends Thread{
 			if (in.verbosity>-1) {
 				System.err.printf("\nbest pre-realignments realignment facet value --  %.6f (%s)",facetScore, conf );
 			}
-			String fname = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
-			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));	
+			String fname = null;
+      if(in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment != null){
+        fname = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));	
+      }
 			return am.printOutput(alignmentInstance, fname);
 		}else{
 			if (in.verbosity>-1) {
 				System.err.printf("\nbest pre-realignment facet value --  %.6f (%s)",preRealignmentFacetScore, conf );
 			}
-			String fname = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
-			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
-			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));		
+			String fname = null;
+      if(in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment != null){
+        in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
+			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));		
+      }
 			return am.printOutput(preRealignmentAlignmentInstance, fname, false);
 		}
 	}
