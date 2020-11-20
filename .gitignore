@@ -13,3 +13,4 @@ temp*
 /bin/
 *.DS_Store
 ._*
+*.swp
