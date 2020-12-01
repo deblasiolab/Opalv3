@@ -15,6 +15,9 @@ import facet.FacetAlignment;
 import facet.Facet;
 import opal.realignment.realignmentDriver;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 class runAlignment extends Thread{
 	Configuration conf;
 	Inputs in;
@@ -335,14 +338,23 @@ public class Opal {
 		if(input.verbosity>0){
 			OpalLogWriter.stdErrLogln("The number of available threads is " + Runtime.getRuntime().availableProcessors() + ", Opal will use " + max_threads);
 		}
-		
+    ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(max_threads);
+		//ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newWorkStealingPool(max_threads);
 		int maxIndex = 0;
-        int maxPreRealignmentIndex = 0;
+    int maxPreRealignmentIndex = 0;
 		for(int i=0;i<advising_config.length;i++){
 			thread[i] = new runAlignment(advising_config[i],input, realignment_config);
 			//thread[i] = new printLine(config[i],i);
-			thread[i].start();
-			if(i-last_joined>=max_threads){
+			//thread[i].start();
+      executor.execute(thread[i]);
+    }
+    executor.shutdown();
+    try{
+      executor.awaitTermination(10,TimeUnit.HOURS);
+    }catch(InterruptedException e){
+      System.out.println("Command interupted: " + e);
+    }
+		/*  	if(i-last_joined>=max_threads){
 				last_joined++;
 				try{
 					thread[last_joined].join();
@@ -361,8 +373,8 @@ public class Opal {
 					OpalLogWriter.stdErrLogln("InterruptedException "+e.toString());
 					throw new GenericOpalException("InterruptedException "+e.toString());
 				}
-			}
-		}
+			//}
+		}*/
 		
 		for(last_joined++;last_joined<advising_config.length;last_joined++){
 			try{
