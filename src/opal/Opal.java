@@ -160,7 +160,11 @@ class runAlignment extends Thread{
 			System.err.println("File Error:" + e.toString());
 			System.exit(15);
 		}*/
-	}
+    
+		/* Moved here to allow for print as you go on long runs */
+		if(in.configOutputFile != null) print();
+    if(in.configOutputFile != null && realignmentConfigList != null) printPreRealignment();
+	}// end run
 	
 	public boolean print(){
 		//if(facetScore==-1){
@@ -429,8 +433,6 @@ public class Opal {
 		for(last_joined++;last_joined<advising_config.length;last_joined++){
 			try{
 				thread[last_joined].join();
-				if(input.configOutputFile != null) thread[last_joined].print();
-				if(input.configOutputFile != null && realignment_config != null) thread[last_joined].printPreRealignment(); 
 				if(thread[last_joined].facetScore > thread[maxIndex].facetScore){
 					if(maxPreRealignmentIndex != maxIndex) thread[maxIndex] = null;
 					maxIndex = last_joined;
