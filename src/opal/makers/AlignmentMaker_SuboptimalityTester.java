@@ -72,9 +72,9 @@ public class AlignmentMaker_SuboptimalityTester extends AlignmentMaker {
 					char[][] result = conf.sc.convertPathToCharAlignment (cont.getAlignment().getPath(), charsA, charsB);
 					AlignmentWriter wr;
 					if ( AlignmentWriter.outFormat == OutputType.fasta)
-						wr = new FastaWriter(namesA, namesB, result, 1, 1, in.toUpper);
+						wr = new FastaWriter(namesA, namesB, result, 1, 1, in.toUpper, System.out);
 					else {//CLUSTAL 
-						wr = new ClustalWriter(namesA, namesB, result, 1, 1, in.toUpper);
+						wr = new ClustalWriter(namesA, namesB, result, 1, 1, in.toUpper, System.out);
 						wr.setPath(cont.getAlignment().getPath());
 					}
 					wr.write(outputWidth);

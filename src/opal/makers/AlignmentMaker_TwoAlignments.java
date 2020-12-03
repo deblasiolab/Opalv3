@@ -66,10 +66,11 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 	
 	public boolean printOutput(int[][] result_i, String fname, boolean printRealignmentLines){
 		PrintStream stdout = System.out;
+		PrintStream out = System.out;
 		if(fname!=null){
 			try{
-				PrintStream out = new PrintStream(new FileOutputStream(fname));
-				System.setOut(out);
+				out = new PrintStream(new FileOutputStream(fname));
+				//System.setOut(out);
 			}catch(FileNotFoundException e){
 				throw new GenericOpalException(e.toString());
 			}
@@ -77,9 +78,9 @@ public class AlignmentMaker_TwoAlignments extends AlignmentMaker {
 		
 		AlignmentWriter wr;
 		if ( AlignmentWriter.outFormat == OutputType.fasta)
-			wr = new FastaWriter(namesA, namesB, result, K, L, in.toUpper);
+			wr = new FastaWriter(namesA, namesB, result, K, L, in.toUpper, out);
 		else {//clustal
-			wr = new ClustalWriter(namesA, namesB, result, K, L, in.toUpper);
+			wr = new ClustalWriter(namesA, namesB, result, K, L, in.toUpper, out);
 			wr.setPath(al.getPath());
 		}
 		wr.write(outputWidth);

@@ -1,15 +1,18 @@
 package opal.IO;
 
+
+import java.io.PrintStream;
+
 import com.traviswheeler.libs.LogWriter;
 
 public class FastaWriter extends AlignmentWriter {
 
-	public FastaWriter(String[] namesA, String[] namesB, char[][] alignment, int K, int L, boolean toUpper) {
-		super(namesA, namesB, alignment, K, L, toUpper);
+	public FastaWriter(String[] namesA, String[] namesB, char[][] alignment, int K, int L, boolean toUpper, PrintStream outStream) {
+		super(namesA, namesB, alignment, K, L, toUpper, outStream);
 	}
 
-	public FastaWriter(String[] names, char[][] alignment, int K, boolean toUpper) {
-		super(names, alignment, K, toUpper);
+	public FastaWriter(String[] names, char[][] alignment, int K, boolean toUpper, PrintStream outStream) {
+		super(names, alignment, K, toUpper, outStream);
 	}
 	
 	final protected void setDefaultOutputWidth() {
@@ -22,17 +25,21 @@ public class FastaWriter extends AlignmentWriter {
 			String seq = new String(alignment[x]);
 			if (toUpper)
 				seq = seq.toUpperCase();
-			LogWriter.stdOutLogln(">" + name);
+			//LogWriter.stdOutLogln(">" + name);
+			out.println(">" + name);
 			int start = 0;
 			int end = width;
 			while (end < seq.length()) {
-				LogWriter.stdOutLogln( seq.substring(start, end));
+				//LogWriter.stdOutLogln( seq.substring(start, end));
+				out.println(seq.substring(start, end));
 				start += width;
 				end += width;
 			}
-			LogWriter.stdOutLogln( seq.substring(start)+"\n");
+			//LogWriter.stdOutLogln( seq.substring(start)+"\n");
+			out.println(seq.substring(start)+"\n");
 		}
-		LogWriter.stdOutLogln("");		
+		//LogWriter.stdOutLogln("");
+		out.println("");		
 	}
 
 }

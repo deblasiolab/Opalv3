@@ -1,6 +1,8 @@
 package opal.IO;
 
 import opal.align.Aligner;
+
+import java.io.PrintStream;
 import com.traviswheeler.libs.LogWriter;
 
 public class ClustalWriter extends AlignmentWriter {
@@ -9,8 +11,8 @@ public class ClustalWriter extends AlignmentWriter {
 	
 
 	
-	public ClustalWriter(String[] namesA, String[] namesB, char[][] alignment, int K, int L, boolean toUpper) {
-		super(namesA, namesB, alignment, K, L, toUpper);
+	public ClustalWriter(String[] namesA, String[] namesB, char[][] alignment, int K, int L, boolean toUpper, PrintStream outStream) {
+		super(namesA, namesB, alignment, K, L, toUpper, outStream);
 		
 		int maxNameLen = 0;
 		for(int i=0; i<namesA.length; i++)
@@ -24,8 +26,8 @@ public class ClustalWriter extends AlignmentWriter {
 		}
 	}
 
-	public ClustalWriter(String[] names, char[][] alignment, int K, boolean toUpper) {
-		super(names, alignment, K, toUpper);
+	public ClustalWriter(String[] names, char[][] alignment, int K, boolean toUpper, PrintStream outStream) {
+		super(names, alignment, K, toUpper, outStream);
 	}	
 
 	final protected void setDefaultOutputWidth() {
@@ -67,7 +69,8 @@ public class ClustalWriter extends AlignmentWriter {
 				String seq = seqs[i].substring(start,end);
 				ends[i] = starts[i] + seq.replaceAll("-| ","").length()-1;
 			
-				LogWriter.stdOutLogln(nm + " " + pad(starts[i]+(start>last[i] ? 0 : 1),maxPosWidth, false) + 
+				//LogWriter.stdOutLogln
+				out.println(nm + " " + pad(starts[i]+(start>last[i] ? 0 : 1),maxPosWidth, false) + 
 						             " " + seq + " " + pad(ends[i]+1,maxPosWidth, false));
 				
 				starts[i] = ends[i] + 1;
@@ -76,12 +79,15 @@ public class ClustalWriter extends AlignmentWriter {
 			
 			if (null != path && L > 0) {
 				//print path line
-				LogWriter.stdOutLog( pad("",nameWidth+2+maxPosWidth, true));
+				//LogWriter.stdOutLogln
+				out.println( pad("",nameWidth+2+maxPosWidth, true));
 				for (int i=start; i<end; i++) {
 					Aligner.Direction direc = path.get(i);
-					LogWriter.stdOutLog(direc == Aligner.Direction.diag ? "|" : " ");
+					//LogWriter.stdOutLogln
+					out.println(direc == Aligner.Direction.diag ? "|" : " ");
 				}
-				LogWriter.stdOutLog("\n");
+				//LogWriter.stdOutLogln
+				out.println("\n");
 			}
 
 			for (int i=0; i<L; i++) {
@@ -89,15 +95,18 @@ public class ClustalWriter extends AlignmentWriter {
 				String seq = seqs[K+i].substring(start,end);			
 				ends[K+i] = starts[K+i] + seq.replaceAll("-| ","").length()-1;
 				
-				LogWriter.stdOutLogln(nm + " " + pad(starts[K+i]+(start>last[K+i] ? 0 : 1),maxPosWidth, false) + 
+				//LogWriter.stdOutLogln
+				out.println(nm + " " + pad(starts[K+i]+(start>last[K+i] ? 0 : 1),maxPosWidth, false) + 
 			             " " + seq + " " + pad(ends[K+i]+1,maxPosWidth, false));
 				starts[K+i] = ends[K+i] + 1;
 
 			}
 			
-			LogWriter.stdOutLogln("\n");
+			//LogWriter.stdOutLogln
+			out.println("\n");
 		}
-		LogWriter.stdOutLogln("");
+		//LogWriter.stdOutLogln
+		out.println("");
 		
 
 	}

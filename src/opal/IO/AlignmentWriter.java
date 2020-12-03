@@ -2,6 +2,7 @@ package opal.IO;
 
 import java.util.ArrayList;
 
+import java.io.PrintStream;
 
 import opal.align.Aligner;
 
@@ -17,10 +18,11 @@ public abstract class AlignmentWriter {
 	int K, L;
 	ArrayList<Aligner.Direction> path;
 	boolean toUpper;
+	PrintStream out;
 	
 	protected int width;
 	
-	public AlignmentWriter(String[] namesA, String[] namesB, char[][] alignment, int K, int L, boolean toUpper) {	
+	public AlignmentWriter(String[] namesA, String[] namesB, char[][] alignment, int K, int L, boolean toUpper, PrintStream outStream) {	
 		this.namesA = namesA;
 		this.namesB = namesB;
 		this.alignment = alignment;
@@ -28,10 +30,11 @@ public abstract class AlignmentWriter {
 		this.L = L;	
 		this.toUpper = toUpper;
 		setDefaultOutputWidth();
+		out = outStream; 
 	}
 
-	public AlignmentWriter(String[] names, char[][] alignment, int K, boolean toUpper) {	
-		this (names, null, alignment, K, 0, toUpper);
+	public AlignmentWriter(String[] names, char[][] alignment, int K, boolean toUpper, PrintStream outStream) {	
+		this (names, null, alignment, K, 0, toUpper, outStream);
 	}
 
 	public void setPath(ArrayList<Aligner.Direction> path) {

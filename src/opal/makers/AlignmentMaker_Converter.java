@@ -52,10 +52,11 @@ public class AlignmentMaker_Converter extends AlignmentMaker {
 
 	public boolean printOutput(int[][] num, String fname, boolean printRealignmentLines){
 		PrintStream stdout = System.out;
+		PrintStream out = System.out;
 		if(fname!=null){
 			try{
-				PrintStream out = new PrintStream(new FileOutputStream(fname));
-				System.setOut(out);
+				out = new PrintStream(new FileOutputStream(fname));
+				//System.setOut(out);
 			}catch(FileNotFoundException e){
 				throw new GenericOpalException(e.toString());
 			}
@@ -64,9 +65,9 @@ public class AlignmentMaker_Converter extends AlignmentMaker {
 		if (in.verbosity > 1) {
 			AlignmentWriter wr;
 			if ( AlignmentWriter.outFormat == OutputType.fasta)
-				wr = new FastaWriter(names, seqs, K, in.toUpper);
+				wr = new FastaWriter(names, seqs, K, in.toUpper, out);
 			else {//CLUSTAL 
-				wr = new ClustalWriter(names, seqs, K, in.toUpper);
+				wr = new ClustalWriter(names, seqs, K, in.toUpper, out);
 			}			
 			wr.write(outputWidth);			
 		}		

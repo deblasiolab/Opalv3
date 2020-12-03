@@ -304,13 +304,13 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 	public boolean printOutput (int[][] reorderedSeqs, String fname, boolean printRealignmentLines) {
 
 		PrintStream stdout = System.out;
-		PrintStream out = null;
+		PrintStream out = System.out;
 		if(fname!=null){
 			try{
 				java.io.File file = new java.io.File(fname);
 				if(file.getParentFile()!=null)file.getParentFile().mkdirs();
 				out = new PrintStream(new FileOutputStream(file));
-				System.setOut(out);
+				//System.setOut(out);
 			}catch(FileNotFoundException e){
 				throw new GenericOpalException(e.toString());
 			}
@@ -324,9 +324,9 @@ public class AlignmentMaker_SingleSequences extends AlignmentMaker {
 		 
 		AlignmentWriter wr;
 		if ( AlignmentWriter.outFormat == OutputType.fasta)
-			wr = new FastaWriter(names, result, K, toUpper);
+			wr = new FastaWriter(names, result, K, toUpper, out);
 		else {//CLUSTAL 
-			wr = new ClustalWriter(names, result, K, toUpper);
+			wr = new ClustalWriter(names, result, K, toUpper, out);
 			//wr.setPath(al.getPath());
 		}			
 		wr.write(outputWidth);
