@@ -137,6 +137,11 @@ class runAlignment extends Thread{
 			if(fa != null){
 				if(in.featureOutputFile!=null){
 					String fname = in.featureOutputFile.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 					if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 					Facet.outputDefaultFeatures(fname, fa);
 				}
@@ -167,6 +172,11 @@ class runAlignment extends Thread{
 		
 		if(in.configOutputFile != null){
 			String fname = in.configOutputFile.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 			if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 			if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
 			return am.printOutput(alignmentInstance, fname);
@@ -184,6 +194,11 @@ class runAlignment extends Thread{
 		String fname = null; 
     if(in.bestOutputFile != null){
       fname = in.bestOutputFile.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 		  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 		  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
     }
@@ -199,6 +214,11 @@ class runAlignment extends Thread{
 			String fname = null;
       if(in.bestOutputFileIncludePreRealignment != null){
         fname = in.bestOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
       }
@@ -210,6 +230,11 @@ class runAlignment extends Thread{
 			String fname = null;
       if(in.bestOutputFileIncludePreRealignment != null){
         fname = in.bestOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(facetScore));
       }
@@ -226,6 +251,11 @@ class runAlignment extends Thread{
 			String fname = null; 
       if(in.preRealignmentOutputFile != null){
         in.preRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
       }
@@ -243,6 +273,11 @@ class runAlignment extends Thread{
 		String fname = null;
     if(in.bestPreRealignmentOutputFile != null){
       in.bestPreRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 		  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 		  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));
     }
@@ -256,6 +291,11 @@ class runAlignment extends Thread{
 		String fname = null;
     if(in.bestPreRealignmentsRealignmentOutputFile != null){
       in.bestPreRealignmentsRealignmentOutputFile.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 		  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 		  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));	
     }
@@ -270,6 +310,11 @@ class runAlignment extends Thread{
 			String fname = null;
       if(in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment != null){
         fname = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+      fname = fname.replace("__MATRIX__",conf.cost.costName);
+      fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));	
       }
@@ -280,7 +325,12 @@ class runAlignment extends Thread{
 			}
 			String fname = null;
       if(in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment != null){
-        in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+        fname = in.bestPreRealignmentsRealignmentOutputFileIncludePreRealignment.replace("__CONFIG__", conf.toString());
+      	fname = fname.replace("__MATRIX__",conf.cost.costName);
+     	 	fname = fname.replace("__LAMBDA__",String.valueOf(conf.getLambda()));
+      	fname = fname.replace("__LAMBDATERM__",String.valueOf(conf.getLambdaTerm()));
+      	fname = fname.replace("__GAMMA__",String.valueOf(conf.getGamma()));
+      	fname = fname.replace("__GAMMATERM__",String.valueOf(conf.getGammaTerm()));
 			  if(conf.repetition>=0) fname = fname.replace("__ITTERATION__", Integer.toString(conf.repetition));
 			  if(facetScore>=0) fname = fname.replace("__FACETSCORE__", "facetScore" + Double.toString(preRealignmentFacetScore));		
       }

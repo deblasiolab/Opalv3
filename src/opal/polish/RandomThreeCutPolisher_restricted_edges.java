@@ -11,7 +11,7 @@ import opal.align.Aligner.AlignmentType;
 
 public class RandomThreeCutPolisher_restricted_edges extends TreePolisher {
 
-	Random randomGenerator;
+	private Random randomGenerator;
 	static long seed;
 	static boolean seedAssigned = false;
 	

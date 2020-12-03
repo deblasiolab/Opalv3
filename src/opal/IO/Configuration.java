@@ -312,4 +312,10 @@ public class Configuration {
 	}
 	public void setGammaTerm(int gT){ gammaTerm = gT; }
 	public void setLambdaTerm(int lT){ lambdaTerm = lT; }
+
+  public int getGamma(){ return gamma; }
+  public int getLambda(){ return lambda; }
+  public int getGammaTerm(){ return gammaTerm; }
+  public int getLambdaTerm(){ return lambdaTerm; }
+  
 }
