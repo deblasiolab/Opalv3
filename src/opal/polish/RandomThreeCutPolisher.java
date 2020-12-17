@@ -88,13 +88,14 @@ public class RandomThreeCutPolisher extends TreePolisher {
 				aligner = slowAligner;
 			
 			indexB = indexA = randomGenerator.nextInt( numNodes-1 ); // "-1" so I don't pick root
-
+      System.err.println("IndexA/IndexB: " + indexB);
 			while (indexB == indexA ||    
 					// can't cut the two edges under the root ... then there's no "group C"
 					(nodeList[indexA]==root.leftChild && nodeList[indexB]==root.rightChild) ||  
 					(nodeList[indexB]==root.leftChild && nodeList[indexA]==root.rightChild)
 					) {
 				indexB = randomGenerator.nextInt( numNodes-1 );
+        System.err.println("IndexB: " + indexB);
 			}
 			
 			nodeA = nodeList[indexA]; 

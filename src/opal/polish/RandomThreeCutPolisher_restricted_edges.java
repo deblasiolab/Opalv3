@@ -79,6 +79,8 @@ public class RandomThreeCutPolisher_restricted_edges extends TreePolisher {
 			while (true) { //keep going 'till I've got nodes that are part of separate subtrees, and not siblings
 				indexA = randomGenerator.nextInt( numNodes-1 ); // "-1" so I don't pick root
 				indexB = randomGenerator.nextInt( numNodes-1 ); // "-1" so I don't pick root
+        System.err.println("IndexA: " + indexA);
+        System.err.println("IndexB: " + indexB);
 				
 				nodeA = nodeList[indexA]; 
 				nodeB = nodeList[indexB]; 

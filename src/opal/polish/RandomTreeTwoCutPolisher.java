@@ -84,7 +84,7 @@ public class RandomTreeTwoCutPolisher extends TreePolisher {
 				aligner = slowAligner;
 			
 			int index = randomGenerator.nextInt( numNodes-1 );
-			
+		  System.err.println(aligner.config.toString() + "Random Index: " + index);	
 			node = nodeList[index]; 
 			 
 			int[][] A, B;

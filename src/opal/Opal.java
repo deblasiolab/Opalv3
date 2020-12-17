@@ -401,12 +401,14 @@ public class Opal {
 			//thread[i] = new printLine(config[i],i);
 			//thread[i].start();
       executor.execute(thread[i]);
+      System.err.println("Started thread " + i);
     }
     executor.shutdown();
     try{
-      executor.awaitTermination(10,TimeUnit.HOURS);
+      executor.awaitTermination(10 * thread.length,TimeUnit.HOURS);
     }catch(InterruptedException e){
-      System.out.println("Command interupted: " + e);
+      System.err.println("Command interupted: " + e);
+      System.exit(1);
     }
 		/*  	if(i-last_joined>=max_threads){
 				last_joined++;
