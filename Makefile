@@ -39,13 +39,18 @@ JCFLAGS := -d $(OUT_DIR)/ -cp $(SRC_DIR)/
 ##
 # default target(s)
 ##
-all: $(CLS) $(MBO)
+all: $(CLS) $(MBO) $(OUT_DIR)/Opal.jar
 
 $(CLS): $(OUT_DIR)/%.class: $(SRC_DIR)/%.java
 	$(JC) $(JCFLAGS) $<
 
 $(MBO): $(OUT_DIR)/%: $(SRC_DIR)/%
 	cp $< $@
+
+$(OUT_DIR)/Opal.jar: $(CLS)
+	mkdir -p $(OUT_DIR)/META-INF
+	./createManifest.pl $(OUT_DIR)
+	cd $(OUT_DIR) ; jar -c -f Opal.jar -m META-INF/MANIFEST.MF *
 
 ##
 # clean up any output files

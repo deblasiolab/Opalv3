@@ -199,8 +199,8 @@ fi
 #Run Opal.jar with appropriate arguments
 
 
-cmd="$java -server -Xmx$mem -jar $path_only/Opal.jar"
-cmd="$java -server -Xmx$mem -cp $path_only opal.Opal"
+cmd="$java -server -Xmx$mem -jar $path_only/bin/Opal.jar"
+cmd="$java -server -Xmx$mem -cp $path_only/bin opal.Opal"
 
 if [ ${structfile} ] 
 then
