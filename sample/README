@@ -1,0 +1,5 @@
+This example input and output was generated using the default parameters. To recreate it, assuming you have run the make file in the directory one level up you can run the following in this folder to recreate the result (this example code does not use the Jar but the compile source). 
+
+```
+java -cp ../bin/ opal.Opal twi_200.input.fasta > twi_200.output.fasta
+```
