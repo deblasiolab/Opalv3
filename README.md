@@ -1,6 +1,6 @@
 # Opalv3
 
-For previous commits see http://svn.dandeblasio.com/opal_facet
+**Pleaee note, this is the development version of this application. Any bug reports are very much appreciated.**
 
 Contents
 --------
@@ -41,14 +41,8 @@ after publication of that paper, through heuristic guide-tree construction
 Quick-start
 -----------
 
-(1) After downloading opal.tgz, unpack with the command
-  tar -xzf Opal.tgz
-This will create a folder opal_x.y.z, containing four files:
-  - 00README (this file)
-  - Opal.jar (the heart of Opal, a Java jar file)
-  - opal (a shell script that runs Opal.jar with appropriate Java flags)
-  - predict_structure.pl (a perl script that handles the job of calling
-    psipred, and collating the results into a format recognized by Opal.jar) 
+(1) After cloning this repository, simply run `make` from the command line, 
+        this will create a `bin` folder and a new `Opal.jar` file. 
 
 (2) To build a alignment, use one of the following commands:
 
