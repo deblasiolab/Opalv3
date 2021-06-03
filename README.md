@@ -180,19 +180,13 @@ Bypassing the shell script
 
 If you wish to bypass the shell script, you can run Opal.jar directly with
 a command like:
- java -server -Xmx1G -jar Opal.jar unaligned_seqs.fasta > alignment.fasta
+ java -server -Xmx1G -jar bin/Opal.jar unaligned_seqs.fasta > alignment.fasta
 
 If you are using structure predictions while calling Opal in this way, you 
 must provide a structure file of the sort produced by predict_structure.pl.
 Suppose such a file is named file.ss; then call Opal like:
 
- java -server -Xmx1G -jar Opal.jar --structure_file file.ss file.fasta > output
-
-If you take this approach because of some failing in the opal shell script, 
-please e-mail me so I can improve the shell script
-
-Source code is included in the jar. Extract the jar 
-('mv opal runopal; jar xf Opal.jar'), then enter the directory opal.
+ java -server -Xmx1G -jar bin/Opal.jar --structure_file file.ss file.fasta > output
 
 
 Default parameters
